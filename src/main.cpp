@@ -9,8 +9,6 @@
 
 
 int main(void){
-    std::cout<< "let's begin\n"<<std::endl;
-
     // Create a window instance
     Window window(800, 600, "OpenGL Window");
 
