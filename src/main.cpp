@@ -5,10 +5,16 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
 #include "window.hpp"
 #include "shader.hpp"
 #include "renderer2d.hpp"
 
+// Define quad data
+struct Quad {
+    glm::vec2 position;
+    glm::vec4 color;
+};
 
 int main(void){
     // Create a window instance
@@ -28,8 +34,6 @@ int main(void){
         return -1; // Exit if renderer initialization fails
     }
 
-    // Color: opaque blue
-    glm::vec4 color = glm::vec4(0.2f, 0.4f, 1.0f, 1.0f);
 
     while(!window.shouldClose()){
         // Poll for events
@@ -43,6 +47,12 @@ int main(void){
         float worldHeight = 5.0f;
         float worldWidth = worldHeight * aspect;
 
+        std::vector<Quad> quads = {
+            { {worldWidth * 0.3f, worldHeight * 0.5f}, {0.2f, 0.4f, 1.0f, 1.0f} }, // blue, left
+            { {worldWidth * 0.5f, worldHeight * 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} }, // green, center
+            { {worldWidth * 0.7f, worldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
+        };
+
         // Projection matrix (orthographic): dynamic, based on aspect
         glm::mat4 projection = glm::ortho(
             0.0f, worldWidth,
@@ -53,13 +63,12 @@ int main(void){
         // View matrix: identity for now (no camera)
         glm::mat4 view = glm::mat4(1.0f);
 
-        // Position quad at the center of the screen
-        glm::vec3 position(worldWidth / 2.0f, worldHeight / 2.0f, 0.0f);
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
-
         renderer.beginScene(shader, view, projection); // Begin the scene
         // Draw a quad at the center of the screen
-        renderer.drawQuad(shader, model, color); // Draw the quad with the specified model transform and color
+        for(const auto& quad : quads){
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(quad.position, 0.0f));
+            renderer.drawQuad(shader, model, quad.color);
+        }
 
         // Swap buffers
         window.swap();

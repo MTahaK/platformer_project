@@ -33,6 +33,8 @@ bool Window::createWindow(int width, int height, const std::string& title) {
 
     // Set OpenGL context to newly created (ie current) window
     glfwMakeContextCurrent(window_);
+    glfwSwapInterval(1); // Enables vsync (1 = on, 0 = off)
+
 
     // Load OpenGL function pointers using GLAD
     if(!gladLoadGL()) {
