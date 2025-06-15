@@ -1,130 +1,124 @@
 #include "renderer2d.hpp"
+#include "shader.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
-Shader::Shader(){
-    shaderID = 0;
+Renderer2D::~Renderer2D() {
+    shutdown();
 }
-Shader::~Shader() {
-    if (shaderID != 0) {
-        glDeleteProgram(shaderID);
+
+bool Renderer2D::init(Shader& shader){
+    // Shader object is passed in, use directly
+    if (!shader.getID()) {
+        std::cerr << "[Renderer2D] Shader program ID is 0, shader not loaded." << std::endl;
+        return false; // Shader not loaded
     }
-}
+    shaderLoaded_ = true;
+    shader_ = shader.getID();
 
-std::string Shader::loadShaderSource(const std::string& path) {
-    // Reads from shader file, creates buffer containing contents
-    // of shader file
-    std::ifstream file(path);
-    std::stringstream buf;
+    // Set up vertex array object (VAO), vertex buffer object (VBO), and element buffer object (EBO)
+    glGenVertexArrays(1, &vao_);
+    glBindVertexArray(vao_);
 
-    if(!file.is_open()){
-        std::cerr<< "[Shader] Failed to open shader file: " << path <<". Load aborting...\n";
-        return "";
-    }
+    glGenBuffers(1, &vbo_);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 
-    buf << file.rdbuf(); // Read the entire file into the buffer
-    file.close();
-    return buf.str();
-}
-
-GLuint compileShader(const std::string& source, GLenum type){
-
-    // Compile a shader from source code
-    GLuint shader = glCreateShader(type); // type is GL_VERTEX_SHADER or GL_FRAGMENT_SHADER
-
-    const char* src = source.c_str(); /// Needs to be a C-style string
-    glShaderSource(shader, 1, &src, nullptr);
-    glCompileShader(shader);
-
-    // Check for compilation errors
-    int pass;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &pass);
+    // Define the vertex data for a quad
+        float vertices[] = {
+        // x, y
+        -0.5f, -0.5f, // Bottom-left
+         0.5f, -0.5f, // Bottom-right
+         0.5f,  0.5f, // Top-right
+        -0.5f,  0.5f  // Top-left
+    };
     
-    if(pass == GL_FALSE){
-        int length;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-        std::string log(length, ' ');
-        glGetShaderInfoLog(shader, length, &length, &log[0]);
-        std::cerr << "[Shader] Compilation failed: " << log << std::endl;
-        glDeleteShader(shader);
-        return 0; // Return 0 on failure
-    }
-    return shader; // Return the shader ID on success
+    // Indices for the quad
+    unsigned int indices[] = {
+        0, 1, 2, // First triangle
+        2, 3, 0  // Second triangle
+    };
+
+    // Upload vertex data to the VBO, create EBO, bind, and upload index data
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &ebo_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // Set vertex attribute pointers
+        glVertexAttribPointer(
+        0,                  // attribute location (in vertex shader)
+        2,                  // number of components (x, y)
+        GL_FLOAT,           // data type
+        GL_FALSE,           // normalize?
+        2 * sizeof(float),  // stride (bytes between vertices)
+        (void*)0            // offset into data
+    );
+
+    glEnableVertexAttribArray(0); // Enable the vertex attribute at location 0
+
+    // Unbind VAO to avoid accidental modification
+    glBindVertexArray(0);
+
+    // Successful initialization
+    std::cout << "[Renderer2D] Renderer initialized successfully." << std::endl;
+    return true;
 }
 
-bool Shader::load(const std::string& vertexPath, const std::string& fragmentPath) {
-    
-    // Load vertex and fragment shaders from files, compile them, and link them into a shader program
-
-    // Before loading in, check if the shader has already been loaded
-    if(shaderID != 0){
-        std::cerr << "[Shader] Shader already loaded. Cannot load again." << std::endl;
-        return false;
+void Renderer2D::shutdown() {
+    // Clean up resources
+    if (vao_) {
+        glDeleteVertexArrays(1, &vao_);
+        vao_ = 0;
     }
-
-    vertexPath_ = vertexPath;
-    fragmentPath_ = fragmentPath;
-
-    std::string vertexSource = loadShaderSource(vertexPath_);
-    if(vertexSource.empty()){
-        std::cerr << "[Shader] Failed to load vertex shader source from: " << vertexPath_ << std::endl;
-        return false;
+    if (vbo_) {
+        glDeleteBuffers(1, &vbo_);
+        vbo_ = 0;
     }
-    std::string fragmentSource = loadShaderSource(fragmentPath_);
-    if(fragmentSource.empty()){
-        std::cerr << "[Shader] Failed to load fragment shader source from: " << fragmentPath_ << std::endl;
-        return false;
+    if (ebo_) {
+        glDeleteBuffers(1, &ebo_);
+        ebo_ = 0;
     }
+    shaderLoaded_ = false;
+    shader_ = 0;
 
-    // Shaders are loaded into memory buffers, now compile
-
-    GLuint vertexShader = compileShader(vertexSource, GL_VERTEX_SHADER);
-    if(vertexShader == 0){
-        std::cerr << "[Shader] Vertex shader compilation failed." << std::endl;
-        return false;
-    }
-    GLuint fragmentShader = compileShader(fragmentSource, GL_FRAGMENT_SHADER);
-    if(fragmentShader == 0){
-        std::cerr << "[Shader] Fragment shader compilation failed." << std::endl;
-        glDeleteShader(vertexShader); // Clean up vertex shader, since already compiled here
-        return false;
-    }
-
-    // Shaders compiled successfully, now link them into a shader program
-    shaderID = glCreateProgram();
-    glAttachShader(shaderID, vertexShader);
-    glAttachShader(shaderID, fragmentShader);
-
-    glLinkProgram(shaderID);
-    int pass;
-    // Check for linking errors
-    glGetProgramiv(shaderID, GL_LINK_STATUS, &pass);
-    if(pass == GL_FALSE){
-        int length;
-        glGetProgramiv(shaderID, GL_INFO_LOG_LENGTH, &length);
-        std::string log(length, ' ');
-        glGetProgramInfoLog(shaderID, length, &length, &log[0]);
-        std::cerr << "[Shader] Linking failed: " << log << std::endl;
-        glDeleteProgram(shaderID);
-        shaderID = 0; // Reset shaderID to indicate failure
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-        return false;
-    }
-
-    // Successfully linked, now delete the individual shaders
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return true; // Return true on success
+    std::cout << "[Renderer2D] Renderer shutdown successfully." << std::endl;
 }
 
-void Shader::use() const {
+void Renderer2D::beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj){
+    // Set up clear color
+    glClearColor(0, (float)(23/255), (float)(41/255), 1.0f); // Dark blue
+    glClear(GL_COLOR_BUFFER_BIT); // Clear color
+
     // Use the shader program
-    if(shaderID != 0){
-        glUseProgram(shaderID);
-    } else {
-        std::cerr << "[Shader] Cannot use shader, shaderID is 0." << std::endl;
-    }
+    shader.use();
+
+    // Set the view and projection matrices in the shader
+    // shader.setMat4("view", view);
+    // shader.setMat4("projection", proj);
+
+    // Save view and proj matrices
+    view_ = view;
+    proj_ = proj;
+    // Set the model matrix to identity for now
+    model_ = glm::mat4(1.0f);
+
+    // Reactivate the VAO for drawing
+    glBindVertexArray(vao_);
+}
+
+void Renderer2D::drawQuad(Shader& shader, const glm::mat4& transform, const glm::vec4& color) {
+    // Set the model matrix to the provided transform
+    model_ = transform;
+
+    // Compute MVP
+    glm::mat4 mvp = proj_ * view_ * model_;
+
+    // Set the MVP matrix in the shader
+    shader.setMat4("mvp", mvp);
+    shader.setVec4("color", color); // Set the color uniform
+
+    // Draw the quad using the EBO, VAO already bound in beginScene
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

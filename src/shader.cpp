@@ -7,8 +7,14 @@ Shader::Shader(){
     shaderID = 0;
 }
 Shader::~Shader() {
-    if (shaderID != 0) {
+    shutdown();
+}
+
+void Shader::shutdown() {
+    // Deletes the shader program if it exists
+    if(shaderID != 0){
         glDeleteProgram(shaderID);
+        shaderID = 0; // Reset to 0 after deletion
     }
 }
 
@@ -143,6 +149,9 @@ void Shader::setVec2(const std::string& name, const glm::vec2& value) const {
 }
 void Shader::setVec3(const std::string& name, const glm::vec3& value) const {
     glUniform3fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(value));
+}
+void Shader::setVec4(const std::string& name, const glm::vec4& value) const {
+    glUniform4fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(value));
 }
 void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
     glUniformMatrix4fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
