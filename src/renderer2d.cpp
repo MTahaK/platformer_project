@@ -88,7 +88,7 @@ void Renderer2D::shutdown() {
 
 void Renderer2D::beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj){
     // Set up clear color
-    glClearColor(0, (float)(23/255), (float)(41/255), 1.0f); // Dark blue
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark blue
     glClear(GL_COLOR_BUFFER_BIT); // Clear color
 
     // Use the shader program
@@ -116,7 +116,7 @@ void Renderer2D::drawQuad(Shader& shader, const glm::mat4& transform, const glm:
     glm::mat4 mvp = proj_ * view_ * model_;
 
     // Set the MVP matrix in the shader
-    shader.setMat4("mvp", mvp);
+    shader.setMat4("MVP", mvp);
     shader.setVec4("color", color); // Set the color uniform
 
     // Draw the quad using the EBO, VAO already bound in beginScene

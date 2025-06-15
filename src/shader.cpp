@@ -4,6 +4,7 @@
 #include <sstream>
 
 Shader::Shader(){
+    // Initialize shaderID to 0, indicating no shader program is loaded
     shaderID = 0;
 }
 Shader::~Shader() {
@@ -34,7 +35,7 @@ std::string Shader::loadShaderSource(const std::string& path) {
     return buf.str();
 }
 
-GLuint compileShader(const std::string& source, GLenum type){
+GLuint Shader::compileShader(const std::string& source, GLenum type){
 
     // Compile a shader from source code
     GLuint shader = glCreateShader(type); // type is GL_VERTEX_SHADER or GL_FRAGMENT_SHADER

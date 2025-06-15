@@ -76,6 +76,7 @@ bool Window::createWindow(int width, int height, const std::string& title) {
             //      0, 0 is the lower-left corner of the window, and new_w, new_h
             //      are the new width and height of the framebuffer.
             glViewport(0, 0, new_w, new_h);
+            // std::cout << "[Window] Framebuffer resized to " << new_w << "x" << new_h << "." << std::endl;
         }
     );
 

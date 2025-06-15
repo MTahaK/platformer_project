@@ -9,7 +9,7 @@
 class Shader{
 
     public:
-        Shader() = default;
+        Shader();
         ~Shader();
 
         // Load shaders, compile, and link into shader program
