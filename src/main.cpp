@@ -9,12 +9,7 @@
 #include "window.hpp"
 #include "shader.hpp"
 #include "renderer2d.hpp"
-
-// Define quad data
-struct Quad {
-    glm::vec2 position;
-    glm::vec4 color;
-};
+#include "gameobject.hpp"
 
 int main(void){
     // Create a window instance
@@ -47,7 +42,7 @@ int main(void){
         float worldHeight = 5.0f;
         float worldWidth = worldHeight * aspect;
 
-        std::vector<Quad> quads = {
+        std::vector<GameObject> objects = {
             { {worldWidth * 0.3f, worldHeight * 0.5f}, {0.2f, 0.4f, 1.0f, 1.0f} }, // blue, left
             { {worldWidth * 0.5f, worldHeight * 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} }, // green, center
             { {worldWidth * 0.7f, worldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
@@ -65,9 +60,9 @@ int main(void){
 
         renderer.beginScene(shader, view, projection); // Begin the scene
         // Draw a quad at the center of the screen
-        for(const auto& quad : quads){
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(quad.position, 0.0f));
-            renderer.drawQuad(shader, model, quad.color);
+        for(const auto& object : objects){
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(object.getPosition(), 0.0f));
+            renderer.drawQuad(shader, model, object.getColor());
         }
 
         // Swap buffers
