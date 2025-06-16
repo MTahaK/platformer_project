@@ -29,6 +29,18 @@ int main(void){
         return -1; // Exit if renderer initialization fails
     }
 
+    
+    // --- INITIAL WORLD DIMENSIONS (used only to set initial object positions) ---
+    float initialWorldHeight = 5.0f;
+    float initialAspectRatio = 1920.0f / 1080.0f;
+    float initialWorldWidth = initialWorldHeight * initialAspectRatio;
+
+    // --- Create game objects ONCE (they persist across frames) ---
+    std::vector<GameObject> objects = {
+        { {initialWorldWidth * 0.3f, initialWorldHeight * 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f} }, // blue, left
+        { {initialWorldWidth * 0.5f, initialWorldHeight * 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} }, // green, center
+        { {initialWorldWidth * 0.7f, initialWorldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
+    };
 
     while(!window.shouldClose()){
         // Poll for events
@@ -41,12 +53,6 @@ int main(void){
         // Define a fixed vertical size for the in-game "world"
         float worldHeight = 5.0f;
         float worldWidth = worldHeight * aspect;
-
-        std::vector<GameObject> objects = {
-            { {worldWidth * 0.3f, worldHeight * 0.5f}, {0.2f, 0.4f, 1.0f, 1.0f} }, // blue, left
-            { {worldWidth * 0.5f, worldHeight * 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} }, // green, center
-            { {worldWidth * 0.7f, worldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
-        };
 
         // Projection matrix (orthographic): dynamic, based on aspect
         glm::mat4 projection = glm::ortho(
@@ -67,6 +73,8 @@ int main(void){
 
         // Swap buffers
         window.swap();
+        objects[0].offsetPosition(glm::vec2(-0.001f, 0.0f)); 
+        objects[2].offsetPosition(glm::vec2(0.001f, 0.0f)); // Move left and right objects
     }
     // Cleanup and exit
     renderer.shutdown();

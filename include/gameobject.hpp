@@ -16,8 +16,17 @@ class GameObject {
 
         // Setters
         void setPosition(const glm::vec2& position) { position_ = position; }
+        void offsetPosition(const glm::vec2& offset) { position_ += offset; }
+        void multPosition(const glm::vec2& multiplier) { position_ *= multiplier; }
+
         void setScale(const glm::vec2& scale) { scale_ = scale; }
+        void offsetScale(const glm::vec2& offset) { scale_ += offset; }
+        void multScale(const glm::vec2& multiplier) { scale_ *= multiplier; }
+
         void setRotation(float rotation) { rotation_ = rotation; }
+        void offsetRotation(float offset) { rotation_ += offset; }
+        void multRotation(float multiplier) { rotation_ *= multiplier; }
+        
         void setColor(const glm::vec4& color) { color_ = color; }
         void setName(const std::string& name) { name_ = name; }
 
