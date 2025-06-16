@@ -18,7 +18,7 @@ struct Quad {
 
 int main(void){
     // Create a window instance
-    Window window(800, 600, "OpenGL Window");
+    Window window(1920, 1080, "OpenGL Window");
 
     // Create shader instance, load shaders, and check for success
     Shader shader;
