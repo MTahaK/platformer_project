@@ -1,5 +1,10 @@
 #include "input.hpp"
 
+// Define static members
+GLFWwindow* Input::s_window = nullptr;
+
+std::unordered_map<int, int> Input::s_curr;
+std::unordered_map<int, int> Input::s_prev;
 
 void Input::initialize(GLFWwindow* window){
     s_window = window;

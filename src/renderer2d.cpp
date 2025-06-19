@@ -61,6 +61,9 @@ bool Renderer2D::init(Shader& shader){
     // Unbind VAO to avoid accidental modification
     glBindVertexArray(0);
 
+    // Set up glClearColor
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark grey
+    
     // Successful initialization
     std::cout << "[Renderer2D] Renderer initialized successfully." << std::endl;
     return true;
@@ -87,8 +90,6 @@ void Renderer2D::shutdown() {
 }
 
 void Renderer2D::beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj){
-    // Set up clear color
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark blue
     glClear(GL_COLOR_BUFFER_BIT); // Clear color
 
     // Use the shader program
