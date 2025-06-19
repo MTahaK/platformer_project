@@ -1,5 +1,6 @@
 #pragma once
 #include <GLFW/glfw3.h>
+#include <vector>
 #include <unordered_map>
 
 // Input class handles polling-style keyboard and mouse input
@@ -19,9 +20,18 @@ public:
 
 
 private:
-    static GLFWwindow* s_Window;
+    static GLFWwindow* s_window;
 
-    static std::unordered_map<int, bool> s_CurrentKeys;
-    static std::unordered_map<int, bool> s_PreviousKeys;
+    static std::unordered_map<int, int> s_curr;
+    static std::unordered_map<int, int> s_prev;;
 
+};
+
+// Vector of keys that are tracked for input state
+std::vector<int> tracked_keys = {
+    GLFW_KEY_SPACE, GLFW_KEY_ENTER, GLFW_KEY_ESCAPE,
+    GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP, GLFW_KEY_DOWN,
+    GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_Q, GLFW_KEY_E,
+    GLFW_KEY_F, GLFW_KEY_G, GLFW_KEY_H, GLFW_KEY_J, GLFW_KEY_K, GLFW_KEY_L,
+    GLFW_KEY_Z, GLFW_KEY_X
 };
