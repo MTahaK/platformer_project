@@ -65,16 +65,19 @@ int main(void){
         glm::vec2 playerposoffset(0.0f, 0.0f); // Player position offset, used for movement 
 
         if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
-            playerposoffset.x -= 0.01f * deltaTime; // Move left
+            playerposoffset.x -= 1.0f * deltaTime; // Move left
         }
         if(Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)){
-            playerposoffset.x += 0.01f * deltaTime; // Move right
+            playerposoffset.x += 1.0f * deltaTime; // Move right
         }
         if(Input::isKeyPressed(GLFW_KEY_UP) || Input::isKeyPressed(GLFW_KEY_W)){
-            playerposoffset.y += 0.01f * deltaTime; // Move up
+            playerposoffset.y += 1.0f * deltaTime; // Move up
         }
         if(Input::isKeyPressed(GLFW_KEY_DOWN) || Input::isKeyPressed(GLFW_KEY_S)){
-            playerposoffset.y -= 0.01f * deltaTime; // Move down
+            playerposoffset.y -= 1.0f * deltaTime; // Move down
+        }
+        if(Input::isKeyJustPressed(GLFW_KEY_ESCAPE)){
+            break; // Exit the loop
         }
 
         // Get current framebuffer size

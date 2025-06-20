@@ -18,6 +18,7 @@ public:
     static bool isKeyJustPressed(int key);  // Transitioned from up to down this frame
     static bool isKeyJustReleased(int key); // Transitioned from down to up this frame
 
+    static std::vector<int> tracked_keys;
 
 private:
     static GLFWwindow* s_window;
@@ -25,13 +26,4 @@ private:
     static std::unordered_map<int, int> s_curr;
     static std::unordered_map<int, int> s_prev;;
 
-};
-
-// Vector of keys that are tracked for input state
-std::vector<int> tracked_keys = {
-    GLFW_KEY_SPACE, GLFW_KEY_ENTER, GLFW_KEY_ESCAPE,
-    GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP, GLFW_KEY_DOWN,
-    GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_Q, GLFW_KEY_E,
-    GLFW_KEY_F, GLFW_KEY_G, GLFW_KEY_H, GLFW_KEY_J, GLFW_KEY_K, GLFW_KEY_L,
-    GLFW_KEY_Z, GLFW_KEY_X
 };
