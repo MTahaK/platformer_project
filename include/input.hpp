@@ -18,11 +18,11 @@ public:
     static bool isKeyJustPressed(int key);  // Transitioned from up to down this frame
     static bool isKeyJustReleased(int key); // Transitioned from down to up this frame
 
-    static std::vector<int> tracked_keys;
-
 private:
     static GLFWwindow* s_window;
 
+    static std::vector<int> tracked_keys;
+    
     static std::unordered_map<int, int> s_curr;
     static std::unordered_map<int, int> s_prev;;
 
