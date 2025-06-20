@@ -5,11 +5,16 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <chrono>
 #include <vector>
 #include "window.hpp"
 #include "shader.hpp"
 #include "renderer2d.hpp"
 #include "gameobject.hpp"
+#include "input.hpp"
+
+constexpr double targetFPS = 120.0;
+constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 
 int main(void){
     // Create a window instance
@@ -42,9 +47,36 @@ int main(void){
         { {initialWorldWidth * 0.7f, initialWorldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
     };
 
+    // Initialize input system
+    Input::initialize(window.getWindow());
+
+    float lastFrameTime = glfwGetTime(); // seconds
     while(!window.shouldClose()){
+        float currentFrameTime = glfwGetTime();
+        auto frameStart = std::chrono::high_resolution_clock::now();
+        float deltaTime = currentFrameTime - lastFrameTime;
+        lastFrameTime = currentFrameTime;
         // Poll for events
         window.pollEvents();
+
+        // Key polling for basic movement
+        Input::update();
+
+        glm::vec2 playerposoffset(0.0f, 0.0f); // Player position offset, used for movement 
+
+        if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
+            playerposoffset.x -= 0.01f * deltaTime; // Move left
+        }
+        if(Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)){
+            playerposoffset.x += 0.01f * deltaTime; // Move right
+        }
+        if(Input::isKeyPressed(GLFW_KEY_UP) || Input::isKeyPressed(GLFW_KEY_W)){
+            playerposoffset.y += 0.01f * deltaTime; // Move up
+        }
+        if(Input::isKeyPressed(GLFW_KEY_DOWN) || Input::isKeyPressed(GLFW_KEY_S)){
+            playerposoffset.y -= 0.01f * deltaTime; // Move down
+        }
+
         // Get current framebuffer size
         int fbWidth, fbHeight;
         window.getFramebufferSize(fbWidth, fbHeight);
@@ -75,6 +107,11 @@ int main(void){
         window.swap();
         objects[0].offsetPosition(glm::vec2(-0.001f, 0.0f)); 
         objects[2].offsetPosition(glm::vec2(0.001f, 0.0f)); // Move left and right objects
+
+        // Update the player position based on input using offset
+        objects[1].offsetPosition(playerposoffset);
+        auto frameEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = frameEnd - frameStart;
     }
     // Cleanup and exit
     renderer.shutdown();
