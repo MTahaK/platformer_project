@@ -105,6 +105,18 @@ int main(void){
             break; // Exit the loop
         }
 
+        // Secondary object movement
+        actionSystem.addAction({
+            .offset = glm::vec2(-0.001f, 0.0f), // Move left
+            .actor = &objects[0], // The left object
+            .affectedObjects = {}
+        });
+        actionSystem.addAction({
+            .offset = glm::vec2(0.001f, 0.0f), // Move right
+            .actor = &objects[2], // The right object
+            .affectedObjects = {}
+        });
+        
         // Get current framebuffer size
         int fbWidth, fbHeight;
         window.getFramebufferSize(fbWidth, fbHeight);
@@ -133,9 +145,10 @@ int main(void){
 
         // Swap buffers
         window.swap();
-        objects[0].offsetPosition(glm::vec2(-0.001f, 0.0f)); 
-        objects[2].offsetPosition(glm::vec2(0.001f, 0.0f)); // Move left and right objects
+        // objects[0].offsetPosition(glm::vec2(-0.001f, 0.0f)); 
+        // objects[2].offsetPosition(glm::vec2(0.001f, 0.0f)); // Move left and right objects
 
+        
         // Update the player position based on input using offset
         // objects[1].offsetPosition(playerposoffset);
 

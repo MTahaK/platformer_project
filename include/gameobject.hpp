@@ -3,7 +3,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
 
-
+struct AABB{
+    float left, right, top, bottom;
+};
 class GameObject {
 
     public:
@@ -37,6 +39,10 @@ class GameObject {
         const glm::vec4& getColor() const { return color_; }
         const std::string& getName() const { return name_; }
 
+
+        const void computeAABB();
+        const AABB& getAABB() const { return aabb_; } // Returns the computed AABB
+        
         glm::mat4 getModelMatrix() const; // Computes and returns model matrix
 
     private:
@@ -44,5 +50,6 @@ class GameObject {
         glm::vec2 scale_;       // Scaling coefficient (in each direction)
         float rotation_;        // Angle in radians
         glm::vec4 color_;
-        std::string name_;       
+        std::string name_;
+        AABB aabb_; // Axis-aligned bounding box for collision detection
 };
