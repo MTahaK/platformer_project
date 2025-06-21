@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <glm/glm.hpp>
 #include "gameobject.hpp"
 
 struct QueuedAction {
@@ -14,7 +15,6 @@ struct QueuedAction {
 class Action{
 
     public:
-        void init();
         void addAction(const QueuedAction& action) {
             actions.push_back(action);
         }
@@ -27,4 +27,4 @@ class Action{
     private:
         std::vector<QueuedAction> actions; // Queue of actions to be processed
 
-}
+};

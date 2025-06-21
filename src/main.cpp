@@ -12,6 +12,7 @@
 #include "renderer2d.hpp"
 #include "gameobject.hpp"
 #include "input.hpp"
+#include "action.hpp"
 
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
@@ -19,7 +20,7 @@ constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 int main(void){
     // Create a window instance
     Window window(1920, 1080, "OpenGL Window");
-
+    
     // Create shader instance, load shaders, and check for success
     Shader shader;
     if(!shader.load("shaders/vertex.glsl", "shaders/fragment.glsl")){
@@ -50,6 +51,9 @@ int main(void){
     // Initialize input system
     Input::initialize(window.getWindow());
 
+    // Initialize action system
+    Action actionSystem;
+
     float lastFrameTime = glfwGetTime(); // seconds
     while(!window.shouldClose()){
         float currentFrameTime = glfwGetTime();
@@ -65,16 +69,37 @@ int main(void){
         glm::vec2 playerposoffset(0.0f, 0.0f); // Player position offset, used for movement 
 
         if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
-            playerposoffset.x -= 1.0f * deltaTime; // Move left
+            // playerposoffset.x -= 1.0f * deltaTime; // Move left
+            // Create QueuedAction for left movement and add to action system
+            actionSystem.addAction({
+                .offset = glm::vec2(-1.0f * deltaTime, 0.0f), // Small step left
+                .actor = &objects[1], // The player object
+                .affectedObjects = {}
+            });
         }
         if(Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)){
-            playerposoffset.x += 1.0f * deltaTime; // Move right
+            // playerposoffset.x += 1.0f * deltaTime; // Move right
+            actionSystem.addAction({
+                .offset = glm::vec2(1.0f * deltaTime, 0.0f), // Small step left
+                .actor = &objects[1], // The player object
+                .affectedObjects = {}
+            });
         }
         if(Input::isKeyPressed(GLFW_KEY_UP) || Input::isKeyPressed(GLFW_KEY_W)){
-            playerposoffset.y += 1.0f * deltaTime; // Move up
+            // playerposoffset.y += 1.0f * deltaTime; // Move up
+            actionSystem.addAction({
+                .offset = glm::vec2(0.0f, 1.0f * deltaTime), // Small step left
+                .actor = &objects[1], // The player object
+                .affectedObjects = {}
+            });
         }
         if(Input::isKeyPressed(GLFW_KEY_DOWN) || Input::isKeyPressed(GLFW_KEY_S)){
-            playerposoffset.y -= 1.0f * deltaTime; // Move down
+            // playerposoffset.y -= 1.0f * deltaTime; // Move down
+            actionSystem.addAction({
+                .offset = glm::vec2(0.0f, -1.0f * deltaTime), // Small step left
+                .actor = &objects[1], // The player object
+                .affectedObjects = {}
+            });
         }
         if(Input::isKeyJustPressed(GLFW_KEY_ESCAPE)){
             break; // Exit the loop
@@ -112,7 +137,12 @@ int main(void){
         objects[2].offsetPosition(glm::vec2(0.001f, 0.0f)); // Move left and right objects
 
         // Update the player position based on input using offset
-        objects[1].offsetPosition(playerposoffset);
+        // objects[1].offsetPosition(playerposoffset);
+
+        // Process actions in the action system
+        actionSystem.validateActions(); // Validate actions (e.g., check for collisions)
+        actionSystem.processActions(); // Apply the actions to the game objects
+        actionSystem.clearActions(); // Clear the action queue for next frame
         auto frameEnd = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = frameEnd - frameStart;
     }
