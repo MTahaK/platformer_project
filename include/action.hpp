@@ -10,6 +10,7 @@ struct QueuedAction {
     std::vector<GameObject*> affectedObjects; // Any objects potentially affected
     // enum class Type { Move, Attack, Push };  // For later
     // Type actionType;
+    bool valid = true; // Whether the action is valid after validation checks
 };
 
 class Action{

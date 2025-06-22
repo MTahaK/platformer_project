@@ -61,3 +61,17 @@ bool checkCollision(const AABB& a, const AABB& b) {
     }
     return (collision);
 }
+
+const AABB GameObject::computeOffsetAABB(const glm::vec2& offset) {
+    // Computes AABB based on next position after applying offset
+    AABB offsetAABB;
+    float halfWidth = scale_.x / 2.0f;
+    float halfHeight = scale_.y / 2.0f;
+
+    offsetAABB.left = (position_.x + offset.x) - halfWidth;
+    offsetAABB.right = (position_.x + offset.x) + halfWidth;
+    offsetAABB.top = (position_.y + offset.y) + halfHeight;
+    offsetAABB.bottom = (position_.y + offset.y) - halfHeight;
+
+    return offsetAABB;
+}

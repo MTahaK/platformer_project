@@ -45,7 +45,8 @@ class GameObject {
 
 
         const void computeAABB();
-        const void computeOffsetAABB(const glm::vec2& offset); // Computes AABB based on next position
+        const AABB computeOffsetAABB(const glm::vec2& offset); // Computes AABB based on next position
+        // NOTE: This EXPLICITLY DOES NOT UPDATE THE INTERNAL AABB.
         const AABB& getAABB() const { return aabb_; } // Returns the computed AABB
         
         glm::mat4 getModelMatrix() const; // Computes and returns model matrix
