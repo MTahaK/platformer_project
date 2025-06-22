@@ -27,7 +27,5 @@ void Action::processActions() {
     // For now, this will just apply the offsets to the actors.
     for (const auto& action : actions) {
         action.actor->offsetPosition(action.offset);
-        // Recompute AABB after moving
-        action.actor->computeAABB();
     }
 }

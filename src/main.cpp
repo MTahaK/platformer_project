@@ -169,7 +169,7 @@ int main(void){
         glm::mat4 view = glm::mat4(1.0f);
 
         renderer.beginScene(shader, view, projection); // Begin the scene
-        // Draw a quad at the center of the screen
+
         for(const auto& object : objects){
             glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(object.getPosition(), 0.0f));
             renderer.drawQuad(shader, model, object.getColor());
