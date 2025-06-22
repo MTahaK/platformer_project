@@ -113,6 +113,9 @@ int main(void){
         if(Input::isKeyJustPressed(GLFW_KEY_LEFT_SHIFT)){
             playerspeed = 2.0f;
         }
+        if(Input::isKeyJustReleased(GLFW_KEY_LEFT_SHIFT)){
+            playerspeed = 1.0f;
+        }
         if(Input::isKeyJustPressed(GLFW_KEY_ESCAPE)){
             break; // Exit the loop
         }
