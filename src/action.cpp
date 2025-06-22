@@ -1,10 +1,25 @@
 #include "action.hpp"
+#include <iostream>
 
 
-void Action::validateActions() {
-    // Placeholder for validation logic - primarily, checks for collisions
-    // or other game rules that might prevent an action from being valid.
-    // Since we have no collision logic yet, this is a no-op.
+void Action::validateActions(const std::vector<GameObject>& allObjects) {
+    // For now, check collisions between an actor and ALL objects
+    for(const auto& action : actions) {
+
+        // Check collision with all other objects
+        for (const auto& obj : allObjects) {
+
+            // Skip collision check with itself
+            if (action.actor == &obj) continue;
+
+            if (checkCollision(action.actor->getAABB(), obj.getAABB())) {
+                // Collision detected - handle it here
+                // Set colour to red for the actor
+                action.actor->setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red color
+                std::cout << "Collision detected between actor: " << action.actor->getName() << " and object: " << obj.getName() << std::endl;
+            }
+        }
+    }
 }
 
 void Action::processActions() {
@@ -12,6 +27,7 @@ void Action::processActions() {
     // For now, this will just apply the offsets to the actors.
     for (const auto& action : actions) {
         action.actor->offsetPosition(action.offset);
-        // Future: Apply effects to affectedObjects if needed
+        // Recompute AABB after moving
+        action.actor->computeAABB();
     }
 }

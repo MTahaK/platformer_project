@@ -17,6 +17,7 @@
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 
+
 int main(void){
     // Create a window instance
     Window window(1920, 1080, "OpenGL Window");
@@ -47,14 +48,22 @@ int main(void){
         { {initialWorldWidth * 0.5f, initialWorldHeight * 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} }, // green, center
         { {initialWorldWidth * 0.7f, initialWorldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
     };
-
+    
+    objects[0].setName("Left Object");
+    objects[1].setName("Player Object");
+    objects[2].setName("Right Object");
     // Initialize input system
     Input::initialize(window.getWindow());
 
     // Initialize action system
     Action actionSystem;
 
+    int leftdir = -1;
+    int rightdir = 1;
+    float playerspeed = 1.0f;
+        
     float lastFrameTime = glfwGetTime(); // seconds
+
     while(!window.shouldClose()){
         float currentFrameTime = glfwGetTime();
         auto frameStart = std::chrono::high_resolution_clock::now();
@@ -72,7 +81,7 @@ int main(void){
             // playerposoffset.x -= 1.0f * deltaTime; // Move left
             // Create QueuedAction for left movement and add to action system
             actionSystem.addAction({
-                .offset = glm::vec2(-1.0f * deltaTime, 0.0f), // Small step left
+                .offset = glm::vec2(-playerspeed * deltaTime, 0.0f), // Small step left
                 .actor = &objects[1], // The player object
                 .affectedObjects = {}
             });
@@ -80,7 +89,7 @@ int main(void){
         if(Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)){
             // playerposoffset.x += 1.0f * deltaTime; // Move right
             actionSystem.addAction({
-                .offset = glm::vec2(1.0f * deltaTime, 0.0f), // Small step left
+                .offset = glm::vec2(playerspeed * deltaTime, 0.0f), // Small step left
                 .actor = &objects[1], // The player object
                 .affectedObjects = {}
             });
@@ -88,7 +97,7 @@ int main(void){
         if(Input::isKeyPressed(GLFW_KEY_UP) || Input::isKeyPressed(GLFW_KEY_W)){
             // playerposoffset.y += 1.0f * deltaTime; // Move up
             actionSystem.addAction({
-                .offset = glm::vec2(0.0f, 1.0f * deltaTime), // Small step left
+                .offset = glm::vec2(0.0f, playerspeed * deltaTime), // Small step left
                 .actor = &objects[1], // The player object
                 .affectedObjects = {}
             });
@@ -96,27 +105,47 @@ int main(void){
         if(Input::isKeyPressed(GLFW_KEY_DOWN) || Input::isKeyPressed(GLFW_KEY_S)){
             // playerposoffset.y -= 1.0f * deltaTime; // Move down
             actionSystem.addAction({
-                .offset = glm::vec2(0.0f, -1.0f * deltaTime), // Small step left
+                .offset = glm::vec2(0.0f, -playerspeed * deltaTime), // Small step left
                 .actor = &objects[1], // The player object
                 .affectedObjects = {}
             });
+        }
+        if(Input::isKeyJustPressed(GLFW_KEY_LEFT_SHIFT)){
+            playerspeed = 2.0f;
         }
         if(Input::isKeyJustPressed(GLFW_KEY_ESCAPE)){
             break; // Exit the loop
         }
 
         // Secondary object movement
+        
+        // If the left object hits the left world boundary, reverse direction
+        if(objects[0].getPosition().x <= 0.0f){
+            leftdir = 1; // Reverse direction
+        }
+        // If it hits the right world boundary, reverse direction
+        if(objects[0].getPosition().x >= initialWorldWidth){
+            leftdir = -1; // Reverse direction
+        }
+        // If the right object hits the right world boundary, reverse direction
+        if(objects[2].getPosition().x >= initialWorldWidth){
+            rightdir = -1; // Reverse direction
+        }
+        // If it hits the left world boundary, reverse direction
+        if(objects[2].getPosition().x <= 0.0f){
+            rightdir = 1; // Reverse direction
+        }
         actionSystem.addAction({
-            .offset = glm::vec2(-0.001f, 0.0f), // Move left
+            .offset = glm::vec2(leftdir*0.001f, 0.0f), // Move left
             .actor = &objects[0], // The left object
             .affectedObjects = {}
         });
         actionSystem.addAction({
-            .offset = glm::vec2(0.001f, 0.0f), // Move right
+            .offset = glm::vec2(rightdir*0.001f, 0.0f), // Move right
             .actor = &objects[2], // The right object
             .affectedObjects = {}
         });
-        
+
         // Get current framebuffer size
         int fbWidth, fbHeight;
         window.getFramebufferSize(fbWidth, fbHeight);
@@ -145,17 +174,12 @@ int main(void){
 
         // Swap buffers
         window.swap();
-        // objects[0].offsetPosition(glm::vec2(-0.001f, 0.0f)); 
-        // objects[2].offsetPosition(glm::vec2(0.001f, 0.0f)); // Move left and right objects
-
-        
-        // Update the player position based on input using offset
-        // objects[1].offsetPosition(playerposoffset);
 
         // Process actions in the action system
-        actionSystem.validateActions(); // Validate actions (e.g., check for collisions)
+        actionSystem.validateActions(objects); // Validate actions (e.g., check for collisions)
         actionSystem.processActions(); // Apply the actions to the game objects
         actionSystem.clearActions(); // Clear the action queue for next frame
+        
         auto frameEnd = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = frameEnd - frameStart;
     }

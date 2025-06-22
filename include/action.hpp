@@ -18,7 +18,7 @@ class Action{
         void addAction(const QueuedAction& action) {
             actions.push_back(action);
         }
-        void validateActions(); // Process and validate actions in the queue
+        void validateActions(const std::vector<GameObject>& allObjects); // Process and validate actions in the queue
         void processActions(); // Execute the actions in the queue
         void clearActions() {
             actions.clear();

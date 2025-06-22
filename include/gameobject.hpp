@@ -2,10 +2,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
-
+#include <vector>
 struct AABB{
     float left, right, top, bottom;
 };
+
+bool checkCollision(const AABB& a, const AABB& b);
+
 class GameObject {
 
     public:
@@ -51,5 +54,5 @@ class GameObject {
         float rotation_;        // Angle in radians
         glm::vec4 color_;
         std::string name_;
-        AABB aabb_; // Axis-aligned bounding box for collision detection
+        AABB aabb_;             // Axis-aligned bounding box for collision detection
 };

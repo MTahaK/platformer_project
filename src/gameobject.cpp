@@ -1,4 +1,5 @@
 #include "gameobject.hpp"
+#include <iostream>
 
 GameObject::GameObject() {
     // Initialize with default values
@@ -7,6 +8,7 @@ GameObject::GameObject() {
     rotation_ = 0.0f;
     color_ = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); // Default white color
     name_ = "Unnamed";
+    computeAABB(); // Compute AABB based on default position and scale
 }
 
 GameObject::GameObject(const glm::vec2& position, const glm::vec4& color){
@@ -16,6 +18,8 @@ GameObject::GameObject(const glm::vec2& position, const glm::vec4& color){
     rotation_ = 0.0f; // Default rotation
     color_ = color;
     name_ = "Unnamed";
+    computeAABB(); // Compute AABB based on position and scale
+    // Note: AABB will be computed with default scale (1,1) and rotation
 }
 
 GameObject::GameObject(const glm::vec2& position, const glm::vec2& scale, float rotation, const glm::vec4& color) {
@@ -25,6 +29,7 @@ GameObject::GameObject(const glm::vec2& position, const glm::vec2& scale, float 
     rotation_ = rotation;
     color_ = color;
     name_ = "Unnamed";
+    computeAABB(); // Compute AABB based on position, scale,
 }
 
 glm::mat4 GameObject::getModelMatrix() const {
@@ -34,4 +39,25 @@ glm::mat4 GameObject::getModelMatrix() const {
     model = glm::rotate(model, rotation_, glm::vec3(0.0f, 0.0f, 1.0f)); // Rotate around Z-axis
     model = glm::scale(model, glm::vec3(scale_, 1.0f)); // Scale in X and Y directions
     return model;
+}
+
+const void GameObject::computeAABB() {
+    // Compute the Axis-Aligned Bounding Box (AABB) based on position, scale, and rotation
+    float halfWidth = scale_.x / 2.0f;
+    float halfHeight = scale_.y / 2.0f;
+
+    aabb_.left = position_.x - halfWidth;
+    aabb_.right = position_.x + halfWidth;
+    aabb_.top = position_.y + halfHeight;
+    aabb_.bottom = position_.y - halfHeight;
+}
+
+bool checkCollision(const AABB& a, const AABB& b) {
+    bool collision;
+    if(a.left < b.right && a.right > b.left && a.top > b.bottom && a.bottom < b.top){
+        collision = true;
+    }else{
+        collision = false;
+    }
+    return (collision);
 }
