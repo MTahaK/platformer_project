@@ -21,13 +21,14 @@ void Action::validateActions(const std::vector<GameObject>& allObjects) {
                         action.actor->setGrounded(true); // Set grounded if it was not before
                         std::cout << "Object " << action.actor->getName() << " is now grounded after downward movement.\n";
                     }
+                    action.actor->setVelocity(glm::vec2(action.actor->getVelocity().x, 0.0f));
                 }
                 // If a collision is detected, remove the action from the action queue
                 action.valid = false; // Mark the action as invalid
                 collided = true;
             }
         }
-            // After checking *all* objects
+        // After checking *all* objects
         if (action.offset.y > 0 && action.actor->isGrounded()) {
             action.actor->setGrounded(false);
             std::cout << "Object " << action.actor->getName() << " is no longer grounded after upward movement.\n";

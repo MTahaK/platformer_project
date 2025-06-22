@@ -36,17 +36,29 @@ class GameObject {
         void setColor(const glm::vec4& color) { color_ = color; }
         void setName(const std::string& name) { name_ = name; }
 
+        void setVelocity(const glm::vec2& velocity) { velocity_ = velocity; } // Set the velocity vector
+        void addVelocity(const glm::vec2& delta) { velocity_ += delta; } // Add to the velocity vector
+
         void setGrounded(bool grounded) { isgrounded_ = grounded; } // Set whether the object is grounded
 
         // Getters
         const glm::vec2& getPosition() const { return position_; }
         const glm::vec2& getScale() const { return scale_; }
         float getRotation() const { return rotation_; }
+
         const glm::vec4& getColor() const { return color_; }
         const std::string& getName() const { return name_; }
+
+        const glm::vec2& getVelocity() const { return velocity_; } // Returns the velocity vector
+        
+        
+        void applyVelocity(float deltaTime) { 
+            offsetPosition(velocity_ * deltaTime); // Apply velocity to position based on deltaTime
+        }
+
         bool isGrounded() const { return isgrounded_; } // Returns whether the object is grounded
 
-
+        // AABB-related methods
         const void computeAABB();
         const AABB computeOffsetAABB(const glm::vec2& offset); // Computes AABB based on next position
         // NOTE: This EXPLICITLY DOES NOT UPDATE THE INTERNAL AABB.
@@ -58,8 +70,12 @@ class GameObject {
         glm::vec2 position_;    // X, Y position
         glm::vec2 scale_;       // Scaling coefficient (in each direction)
         float rotation_;        // Angle in radians
+
         glm::vec4 color_;
         std::string name_;
+
+        glm::vec2 velocity_ = glm::vec2(0.0f);    // Velocity vector
         AABB aabb_;             // Axis-aligned bounding box for collision detection
+        
         bool isgrounded_ = false;
 };

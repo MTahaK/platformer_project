@@ -17,6 +17,7 @@
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 
+const float gravity = -15.0f;
 
 int main(void){
     // Create a window instance
@@ -160,6 +161,22 @@ int main(void){
             .affectedObjects = {}
         });
 
+        for (auto& obj : objects) {
+            if (!obj.isGrounded()) {
+                obj.addVelocity(glm::vec2(0.0f, gravity * deltaTime));
+            }
+
+            // Convert velocity into a queued action
+            glm::vec2 displacement = obj.getVelocity() * deltaTime;
+            if (displacement != glm::vec2(0.0f)) {
+                actionSystem.addAction({
+                    .offset = displacement,
+                    .actor = &obj,
+                    .affectedObjects = {}
+                });
+            }
+        }
+
         // Get current framebuffer size
         int fbWidth, fbHeight;
         window.getFramebufferSize(fbWidth, fbHeight);
@@ -178,6 +195,8 @@ int main(void){
 
         // View matrix: identity for now (no camera)
         glm::mat4 view = glm::mat4(1.0f);
+
+        
 
         renderer.beginScene(shader, view, projection); // Begin the scene
 
