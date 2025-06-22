@@ -6,6 +6,7 @@ void Action::validateActions(const std::vector<GameObject>& allObjects) {
     for(auto& action : actions) {
         // Compute the AABB of the actor after applying the offset
         AABB nextAABB = action.actor->computeOffsetAABB(action.offset);
+        bool collided = false;
         // Check collision with all other objects
         for (const auto& obj : allObjects) {
 
@@ -23,15 +24,17 @@ void Action::validateActions(const std::vector<GameObject>& allObjects) {
                 }
                 // If a collision is detected, remove the action from the action queue
                 action.valid = false; // Mark the action as invalid
+                collided = true;
             }
-            if (action.offset.y > 0) {
-                if(action.actor->isGrounded()){
-                    action.actor->setGrounded(false); // Jumping = no longer grounded
-                    std::cout << "Object " << action.actor->getName() << " is no longer grounded after upward movement.\n";
-                }
-                
-                
-            }
+        }
+            // After checking *all* objects
+        if (action.offset.y > 0 && action.actor->isGrounded()) {
+            action.actor->setGrounded(false);
+            std::cout << "Object " << action.actor->getName() << " is no longer grounded after upward movement.\n";
+        }
+        if (action.offset.y < 0 && !collided && action.actor->isGrounded()) {
+            action.actor->setGrounded(false);
+            std::cout << "Object " << action.actor->getName() << " is no longer grounded after falling.\n";
         }
     }
 }
