@@ -49,9 +49,20 @@ int main(void){
         { {initialWorldWidth * 0.7f, initialWorldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
     };
     
+    
     objects[0].setName("Left Object");
     objects[1].setName("Player Object");
     objects[2].setName("Right Object");
+
+    // Add a ground object (static platform)
+    GameObject ground(
+        { initialWorldWidth / 2.0f, 0.3f },         // centered horizontally, near bottom
+        { initialWorldWidth, 1.0f },               // full width, 1 unit tall
+        0.0f,
+        { 0.5f, 0.25f, 0.0f, 1.0f }                // brown-ish color
+    );
+    ground.setName("Ground");
+    objects.push_back(ground);
     // Initialize input system
     Input::initialize(window.getWindow());
 
@@ -171,7 +182,9 @@ int main(void){
         renderer.beginScene(shader, view, projection); // Begin the scene
 
         for(const auto& object : objects){
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(object.getPosition(), 0.0f));
+            glm::mat4 model = object.getModelMatrix();
+            // glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(object.getPosition(), 0.0f));
+            // model = glm::rotate(model, object.getRotation(), glm::vec3(object.getRotation(), 0.0f, 1.0f));
             renderer.drawQuad(shader, model, object.getColor());
         }
 
