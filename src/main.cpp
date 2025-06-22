@@ -56,8 +56,8 @@ int main(void){
 
     // Add a ground object (static platform)
     GameObject ground(
-        { initialWorldWidth / 2.0f, 0.3f },         // centered horizontally, near bottom
-        { initialWorldWidth, 1.0f },               // full width, 1 unit tall
+        { initialWorldWidth / 2.0f, 0.45f },         // centered horizontally, near bottom
+        { initialWorldWidth*3, 1.0f },               // full width, 1 unit tall
         0.0f,
         { 0.5f, 0.25f, 0.0f, 1.0f }                // brown-ish color
     );
@@ -183,8 +183,6 @@ int main(void){
 
         for(const auto& object : objects){
             glm::mat4 model = object.getModelMatrix();
-            // glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(object.getPosition(), 0.0f));
-            // model = glm::rotate(model, object.getRotation(), glm::vec3(object.getRotation(), 0.0f, 1.0f));
             renderer.drawQuad(shader, model, object.getColor());
         }
 

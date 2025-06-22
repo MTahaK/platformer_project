@@ -14,8 +14,23 @@ void Action::validateActions(const std::vector<GameObject>& allObjects) {
             
             // Check if the next AABB collides with the object's AABB
             if (checkCollision(nextAABB, obj.getAABB())) {
+                if(action.offset.y < 0){
+                    // Downward movement was rejected, object is therefore grounded
+                    if(!action.actor->isGrounded()){
+                        action.actor->setGrounded(true); // Set grounded if it was not before
+                        std::cout << "Object " << action.actor->getName() << " is now grounded after downward movement.\n";
+                    }
+                }
                 // If a collision is detected, remove the action from the action queue
                 action.valid = false; // Mark the action as invalid
+            }
+            if (action.offset.y > 0) {
+                if(action.actor->isGrounded()){
+                    action.actor->setGrounded(false); // Jumping = no longer grounded
+                    std::cout << "Object " << action.actor->getName() << " is no longer grounded after upward movement.\n";
+                }
+                
+                
             }
         }
     }

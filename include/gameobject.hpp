@@ -36,12 +36,15 @@ class GameObject {
         void setColor(const glm::vec4& color) { color_ = color; }
         void setName(const std::string& name) { name_ = name; }
 
+        void setGrounded(bool grounded) { isgrounded_ = grounded; } // Set whether the object is grounded
+
         // Getters
         const glm::vec2& getPosition() const { return position_; }
         const glm::vec2& getScale() const { return scale_; }
         float getRotation() const { return rotation_; }
         const glm::vec4& getColor() const { return color_; }
         const std::string& getName() const { return name_; }
+        bool isGrounded() const { return isgrounded_; } // Returns whether the object is grounded
 
 
         const void computeAABB();
@@ -58,4 +61,5 @@ class GameObject {
         glm::vec4 color_;
         std::string name_;
         AABB aabb_;             // Axis-aligned bounding box for collision detection
+        bool isgrounded_ = false;
 };

@@ -28,4 +28,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 
 clean:
 	rm -rf $(BUILD_DIR) $(TARGET)
+
+rebuild:
+	rm -rf $(BUILD_DIR) $(TARGET) ; make
 .PHONY: all clean
