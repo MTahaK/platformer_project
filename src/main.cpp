@@ -17,7 +17,7 @@
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 
-const float gravity = -15.0f;
+const float gravity = -8.0f;
 
 int main(void){
     // Create a window instance
@@ -90,37 +90,26 @@ int main(void){
         glm::vec2 playerposoffset(0.0f, 0.0f); // Player position offset, used for movement 
 
         if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
-            // playerposoffset.x -= 1.0f * deltaTime; // Move left
-            // Create QueuedAction for left movement and add to action system
-            actionSystem.addAction({
-                .offset = glm::vec2(-playerspeed * deltaTime, 0.0f), // Small step left
-                .actor = &objects[1], // The player object
-                .affectedObjects = {}
-            });
+            objects[1].setVelocity(glm::vec2(-playerspeed, objects[1].getVelocity().y)); // Set velocity directly
         }
-        if(Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)){
-            // playerposoffset.x += 1.0f * deltaTime; // Move right
-            actionSystem.addAction({
-                .offset = glm::vec2(playerspeed * deltaTime, 0.0f), // Small step left
-                .actor = &objects[1], // The player object
-                .affectedObjects = {}
-            });
+        else if(Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)){
+            objects[1].setVelocity(glm::vec2(playerspeed, objects[1].getVelocity().y)); // Set velocity directly
         }
-        if(Input::isKeyPressed(GLFW_KEY_UP) || Input::isKeyPressed(GLFW_KEY_W)){
-            // playerposoffset.y += 1.0f * deltaTime; // Move up
-            actionSystem.addAction({
-                .offset = glm::vec2(0.0f, playerspeed * deltaTime), // Small step left
-                .actor = &objects[1], // The player object
-                .affectedObjects = {}
-            });
+        else{
+            // If no horizontal movement keys are pressed, reset player velocity to zero
+            objects[1].setVelocity(glm::vec2(0.0f, objects[1].getVelocity().y)); // Keep vertical velocity
+        }
+        if(Input::isKeyJustPressed(GLFW_KEY_UP) || Input::isKeyPressed(GLFW_KEY_W)){
+            if(objects[1].isGrounded()){
+                // objects[1].setGrounded(false); // Set player to not grounded
+                objects[1].addVelocity(glm::vec2(0.0f, 5.0f)); // Apply upward velocity
+            }
         }
         if(Input::isKeyPressed(GLFW_KEY_DOWN) || Input::isKeyPressed(GLFW_KEY_S)){
-            // playerposoffset.y -= 1.0f * deltaTime; // Move down
-            actionSystem.addAction({
-                .offset = glm::vec2(0.0f, -playerspeed * deltaTime), // Small step left
-                .actor = &objects[1], // The player object
-                .affectedObjects = {}
-            });
+            // Increase freefall speed
+            if(!objects[1].isGrounded()){
+                objects[1].setVelocity(glm::vec2(objects[1].getVelocity().x, -10.0f)); // Apply downward velocity
+            }
         }
         if(Input::isKeyJustPressed(GLFW_KEY_LEFT_SHIFT)){
             playerspeed = 2.0f;
@@ -131,7 +120,12 @@ int main(void){
         if(Input::isKeyJustPressed(GLFW_KEY_ESCAPE)){
             break; // Exit the loop
         }
-
+        std::ostringstream oss;
+        glm::vec2 velocity = objects[1].getVelocity();
+        oss << "Player speed (X, Y): (" << velocity.x << ", " << velocity.y << ")";
+        std::string output = oss.str();
+        output.resize(50, ' '); // Ensure line is at least 50 characters long
+        std::cout << "\r" << output << std::flush;
         // Secondary object movement
         
         // If the left object hits the left world boundary, reverse direction
@@ -162,15 +156,33 @@ int main(void){
         });
 
         for (auto& obj : objects) {
+            if(obj.getName() == "Ground") {
+                continue; // Skip ground object for velocity application
+            }
             if (!obj.isGrounded()) {
                 obj.addVelocity(glm::vec2(0.0f, gravity * deltaTime));
             }
 
             // Convert velocity into a queued action
             glm::vec2 displacement = obj.getVelocity() * deltaTime;
-            if (displacement != glm::vec2(0.0f)) {
+            // if (displacement != glm::vec2(0.0f)) {
+            //     actionSystem.addAction({
+            //         .offset = displacement,
+            //         .actor = &obj,
+            //         .affectedObjects = {}
+            //     });
+            // }
+            // Queue x and y displacements separately
+            if (displacement.x != 0.0f) {
                 actionSystem.addAction({
-                    .offset = displacement,
+                    .offset = glm::vec2(displacement.x, 0.0f),
+                    .actor = &obj,
+                    .affectedObjects = {}
+                });
+            }
+            if (displacement.y != 0.0f) {
+                actionSystem.addAction({
+                    .offset = glm::vec2(0.0f, displacement.y),
                     .actor = &obj,
                     .affectedObjects = {}
                 });

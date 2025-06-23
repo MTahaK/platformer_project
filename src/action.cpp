@@ -19,7 +19,7 @@ void Action::validateActions(const std::vector<GameObject>& allObjects) {
                     // Downward movement was rejected, object is therefore grounded
                     if(!action.actor->isGrounded()){
                         action.actor->setGrounded(true); // Set grounded if it was not before
-                        std::cout << "Object " << action.actor->getName() << " is now grounded after downward movement.\n";
+                        // std::cout << "Object " << action.actor->getName() << " is now grounded after downward movement.\n";
                     }
                     action.actor->setVelocity(glm::vec2(action.actor->getVelocity().x, 0.0f));
                 }
@@ -31,11 +31,11 @@ void Action::validateActions(const std::vector<GameObject>& allObjects) {
         // After checking *all* objects
         if (action.offset.y > 0 && action.actor->isGrounded()) {
             action.actor->setGrounded(false);
-            std::cout << "Object " << action.actor->getName() << " is no longer grounded after upward movement.\n";
+            // std::cout << "Object " << action.actor->getName() << " is no longer grounded after upward movement.\n";
         }
         if (action.offset.y < 0 && !collided && action.actor->isGrounded()) {
             action.actor->setGrounded(false);
-            std::cout << "Object " << action.actor->getName() << " is no longer grounded after falling.\n";
+            // std::cout << "Object " << action.actor->getName() << " is no longer grounded after falling.\n";
         }
     }
 }
