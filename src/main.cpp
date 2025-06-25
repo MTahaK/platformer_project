@@ -1,18 +1,4 @@
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <chrono>
-#include <vector>
-#include "window.hpp"
-#include "shader.hpp"
-#include "renderer2d.hpp"
-#include "gameobject.hpp"
-#include "input.hpp"
-#include "action.hpp"
+#include "helpers.hpp"
 
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
@@ -20,50 +6,23 @@ constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 const float gravity = -8.0f;
 
 int main(void){
-    // Create a window instance
     Window window(1920, 1080, "OpenGL Window");
     
-    // Create shader instance, load shaders, and check for success
     Shader shader;
-    if(!shader.load("shaders/vertex.glsl", "shaders/fragment.glsl")){
-        std::cerr << "Failed to load shaders. Exiting application." << std::endl;
-        return -1; // Exit if shader loading fails
-    }
-
-    // Set up renderer
     Renderer2D renderer;
-    if(!renderer.init(shader)){
-        std::cerr << "Failed to initialize renderer. Exiting application." << std::endl;
-        return -1; // Exit if renderer initialization fails
+
+    if(initializeVisuals(shader, renderer) != 0){
+        return -1; // Exit if initialization fails
     }
 
-    
     // --- INITIAL WORLD DIMENSIONS (used only to set initial object positions) ---
     float initialWorldHeight = 5.0f;
     float initialAspectRatio = 1920.0f / 1080.0f;
     float initialWorldWidth = initialWorldHeight * initialAspectRatio;
 
-    // --- Create game objects ONCE (they persist across frames) ---
-    std::vector<GameObject> objects = {
-        { {initialWorldWidth * 0.3f, initialWorldHeight * 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f} }, // blue, left
-        { {initialWorldWidth * 0.5f, initialWorldHeight * 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} }, // green, center
-        { {initialWorldWidth * 0.7f, initialWorldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
-    };
-    
-    
-    objects[0].setName("Left Object");
-    objects[1].setName("Player Object");
-    objects[2].setName("Right Object");
+    // Set up game objects
+    std::vector<GameObject> objects = setupObjects(initialWorldHeight, initialWorldWidth);
 
-    // Add a ground object (static platform)
-    GameObject ground(
-        { initialWorldWidth / 2.0f, 0.45f },         // centered horizontally, near bottom
-        { initialWorldWidth*3, 1.0f },               // full width, 1 unit tall
-        0.0f,
-        { 0.5f, 0.25f, 0.0f, 1.0f }                // brown-ish color
-    );
-    ground.setName("Ground");
-    objects.push_back(ground);
     // Initialize input system
     Input::initialize(window.getWindow());
 
@@ -77,48 +36,22 @@ int main(void){
     float lastFrameTime = glfwGetTime(); // seconds
 
     while(!window.shouldClose()){
+
         float currentFrameTime = glfwGetTime();
         auto frameStart = std::chrono::high_resolution_clock::now();
         float deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
+
         // Poll for events
         window.pollEvents();
 
         // Key polling for basic movement
-        Input::update();
+        // Input::update();
 
-        glm::vec2 playerposoffset(0.0f, 0.0f); // Player position offset, used for movement 
+        // glm::vec2 playerposoffset(0.0f, 0.0f); // Player position offset, used for movement 
 
-        if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
-            objects[1].setVelocity(glm::vec2(-playerspeed, objects[1].getVelocity().y)); // Set velocity directly
-        }
-        else if(Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)){
-            objects[1].setVelocity(glm::vec2(playerspeed, objects[1].getVelocity().y)); // Set velocity directly
-        }
-        else{
-            // If no horizontal movement keys are pressed, reset player velocity to zero
-            objects[1].setVelocity(glm::vec2(0.0f, objects[1].getVelocity().y)); // Keep vertical velocity
-        }
-        if(Input::isKeyJustPressed(GLFW_KEY_UP) || Input::isKeyPressed(GLFW_KEY_W)){
-            if(objects[1].isGrounded()){
-                // objects[1].setGrounded(false); // Set player to not grounded
-                objects[1].addVelocity(glm::vec2(0.0f, 5.0f)); // Apply upward velocity
-            }
-        }
-        if(Input::isKeyPressed(GLFW_KEY_DOWN) || Input::isKeyPressed(GLFW_KEY_S)){
-            // Increase freefall speed
-            if(!objects[1].isGrounded()){
-                objects[1].setVelocity(glm::vec2(objects[1].getVelocity().x, -10.0f)); // Apply downward velocity
-            }
-        }
-        if(Input::isKeyJustPressed(GLFW_KEY_LEFT_SHIFT)){
-            playerspeed = 2.0f;
-        }
-        if(Input::isKeyJustReleased(GLFW_KEY_LEFT_SHIFT)){
-            playerspeed = 1.0f;
-        }
-        if(Input::isKeyJustPressed(GLFW_KEY_ESCAPE)){
-            break; // Exit the loop
+        if(playerInput(objects[1], playerspeed) == -2){
+            break; // Exit the loop if escape is pressed
         }
         std::ostringstream oss;
         glm::vec2 velocity = objects[1].getVelocity();
