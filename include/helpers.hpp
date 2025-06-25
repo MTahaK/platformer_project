@@ -144,7 +144,8 @@ void miscMovement(std::vector<GameObject>& objects, float initialWorldWidth, int
 
 void queueActions(std::vector<GameObject>& objects, Action& actionSystem, float deltaTime) {
     for (auto& obj : objects) {
-        if(obj.getName() == "Ground") {
+        if(obj.getName() == "Ground" || obj.getName() == "Player Object") {
+            // Decouple player movement from action queue
             continue; // Skip ground object for velocity application
         }
         if (!obj.isGrounded()) {
