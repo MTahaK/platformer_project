@@ -21,7 +21,8 @@ constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 
 const float gravity = -8.0f;
 const float movementAccel = 5.0f; // Acceleration applied when moving left/right
-const float slowdownAccel = 8.0f; // Acceleration applied when slowing down
+const float slowdownAccel = 16.0f; // Acceleration applied when slowing down
+const float midairDrag = 1.0f;
 
 int initializeVisuals(Shader& shader, Renderer2D& renderer){
     // Loader shaders
@@ -69,6 +70,10 @@ int playerInput(GameObject& player, float& playerspeed) {
     // Key polling for basic movement
     Input::update();
 
+    if(Input::isKeyJustPressed(GLFW_KEY_G)){
+        // Debug grounding key
+        player.setGrounded(!player.isGrounded());
+    }
     if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
         // player.setVelocity(glm::vec2(-playerspeed, player.getVelocity().y)); // Set velocity directly
         player.setAcceleration(glm::vec2(-movementAccel, player.getAcceleration().y)); // Set acceleration directly
@@ -82,11 +87,18 @@ int playerInput(GameObject& player, float& playerspeed) {
         // player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Keep vertical velocity
         // player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
         // Simulate mid-air drag
+        float accel = 0;
+        if(player.isGrounded()){
+            accel = slowdownAccel;
+        } else if(!player.isGrounded()){
+            accel = midairDrag;
+        }
+
         if(player.getVelocity().x > 0.0f){
-            player.setAcceleration(glm::vec2(-slowdownAccel, player.getAcceleration().y)); // Apply leftward acceleration
+            player.setAcceleration(glm::vec2(-accel, player.getAcceleration().y)); // Apply leftward acceleration
         }
         else if(player.getVelocity().x < 0.0f){
-            player.setAcceleration(glm::vec2(slowdownAccel, player.getAcceleration().y)); // Apply rightward acceleration
+            player.setAcceleration(glm::vec2(accel, player.getAcceleration().y)); // Apply rightward acceleration
         }
         else{
             player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // No horizontal acceleration
@@ -117,11 +129,13 @@ int playerInput(GameObject& player, float& playerspeed) {
     std::ostringstream oss;
     glm::vec2 velocity = player.getVelocity();
     glm::vec2 acceleration = player.getAcceleration(); // Assuming this method exists
+    bool grounded = player.isGrounded();
 
     oss << "Vel (X,Y): (" << velocity.x << ", " << velocity.y << ")  "
-        << "Acc (X,Y): (" << acceleration.x << ", " << acceleration.y << ")";
+        << "Acc (X,Y): (" << acceleration.x << ", " << acceleration.y << ")  "
+        << "Grounded?: " << std::boolalpha << grounded;
     std::string output = oss.str();
-    output.resize(80, ' '); // Pad to overwrite old output cleanly
+    output.resize(90, ' '); // Pad to overwrite old output cleanly
 
     std::cout << "\r" << output << std::flush;
     return 0;
