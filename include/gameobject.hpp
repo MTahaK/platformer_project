@@ -39,6 +39,8 @@ class GameObject {
         void setVelocity(const glm::vec2& velocity) { velocity_ = velocity; } // Set the velocity vector
         void addVelocity(const glm::vec2& delta) { velocity_ += delta; } // Add to the velocity vector
 
+        void setAcceleration(const glm::vec2& acceleration) { acceleration_ = acceleration; } // Set the acceleration vector
+
         void setGrounded(bool grounded) { isgrounded_ = grounded; } // Set whether the object is grounded
 
         // Getters
@@ -51,6 +53,7 @@ class GameObject {
 
         const glm::vec2& getVelocity() const { return velocity_; } // Returns the velocity vector
         
+        const glm::vec2& getAcceleration() const { return acceleration_; } // Returns the acceleration vector
         
         void applyVelocity(float deltaTime) { 
             offsetPosition(velocity_ * deltaTime); // Apply velocity to position based on deltaTime
@@ -75,6 +78,7 @@ class GameObject {
         std::string name_;
 
         glm::vec2 velocity_ = glm::vec2(0.0f);    // Velocity vector
+        glm::vec2 acceleration_ = glm::vec2(0.0f); // Acceleration vector (not used yet)
         AABB aabb_;             // Axis-aligned bounding box for collision detection
         
         bool isgrounded_ = false;

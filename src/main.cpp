@@ -23,6 +23,7 @@ int main(void){
 
     // Initialize action system
     Action actionSystem;
+    Physics physicsSystem;
 
     int leftdir = -1;
     int rightdir = 1;
@@ -47,6 +48,8 @@ int main(void){
         // Secondary object movement
         miscMovement(objects, initialWorldWidth, leftdir, rightdir, actionSystem);
 
+        // Apply physics step
+        physicsSystem.movementStep(objects, deltaTime);
         queueActions(objects, actionSystem, deltaTime);
 
         // Compute MVP, draw objects
