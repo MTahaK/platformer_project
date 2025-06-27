@@ -19,7 +19,6 @@
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 
-const float gravity = -8.0f;
 const float movementAccel = 5.0f; // Acceleration applied when moving left/right
 const float slowdownAccel = 16.0f; // Acceleration applied when slowing down
 const float midairDrag = 1.0f;
@@ -83,16 +82,10 @@ int playerInput(GameObject& player, float& playerspeed) {
         player.setAcceleration(glm::vec2(movementAccel, player.getAcceleration().y)); // Set acceleration directly
     }
     else{
-        // If no horizontal movement keys are pressed, reset player velocity to zero
-        // player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Keep vertical velocity
-        // player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
-        // Simulate mid-air drag
+
         float accel = 0;
-        if(player.isGrounded()){
-            accel = slowdownAccel;
-        } else if(!player.isGrounded()){
-            accel = midairDrag;
-        }
+        // Change deceleration constant used based on whether or not player is grounded
+        accel = player.isGrounded() ? slowdownAccel : midairDrag;
 
         if(player.getVelocity().x > 0.0f){
             player.setAcceleration(glm::vec2(-accel, player.getAcceleration().y)); // Apply leftward acceleration

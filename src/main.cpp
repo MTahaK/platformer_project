@@ -18,6 +18,8 @@ int main(void){
     // Set up game objects
     std::vector<GameObject> objects = setupObjects(initialWorldHeight, initialWorldWidth);
 
+    objects[1].setGrounded(true); // Set the player object to be grounded initially
+
     // Initialize input system
     Input::initialize(window.getWindow());
 
@@ -49,7 +51,7 @@ int main(void){
         miscMovement(objects, initialWorldWidth, leftdir, rightdir, actionSystem);
 
         // Apply physics step
-        physicsSystem.movementStep(objects, deltaTime);
+        physicsSystem.playerMovementStep(objects[1], deltaTime);
         queueActions(objects, actionSystem, deltaTime);
 
         // Compute MVP, draw objects
