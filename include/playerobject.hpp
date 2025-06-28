@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "gameobject.hpp"
+#include "tilemap.hpp"
 
 struct Sensor {
     glm::vec2 position; // Position of the sensor relative to the player
@@ -9,6 +10,22 @@ struct Sensor {
 // PlayerObject class inherits from GameObject
 class PlayerObject : public GameObject {
 
+    public:
+
+        void sensorUpdate() {
+            // Update sensor positions based on player position and scale
+            leftSensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f, 0.0f);
+            rightSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f, 0.0f);
+            topSensor.position = getPosition() + glm::vec2(0.0f, getScale().y / 2.0f);
+            bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f);
+        }
+
+        bool tileCollision(Tilemap& tilemap, Sensor& sensor);
+        // Getters for sensors
+        const Sensor& getLeftSensor() const { return leftSensor; }
+        const Sensor& getRightSensor() const { return rightSensor; }
+        const Sensor& getTopSensor() const { return topSensor; }
+        const Sensor& getBottomSensor() const { return bottomSensor; }
     private:
         // PlayerObject adds four 'sensors' to detect collisions
         Sensor leftSensor;   // Left sensor for detecting walls

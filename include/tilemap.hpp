@@ -27,8 +27,9 @@ class Tilemap {
         Tile& getTile(int x, int y);    // Get tile at position (x, y)
         bool isSolidTile(int x, int y); // Check if the tile at (x, y) is solid
 
+        // Setters
         void setTile(int x, int y, const TileType& tileType); // Set tile at position (x, y) with a specific type
-
+        
         void renderTileMap(Shader& shader, Renderer2D& renderer) const; // Render the tilemap using the provided shader and renderer
 
         // World <-> Grid conversions
