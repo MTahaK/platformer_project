@@ -1,7 +1,12 @@
+#pragma once
 #include <glm/glm.hpp>
 #include <vector>
 #include "shader.hpp"
 #include "renderer2d.hpp"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 
 // Define Tile type enum
 enum class TileEnum {

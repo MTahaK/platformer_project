@@ -49,3 +49,41 @@ glm::ivec2 Tilemap::worldToTileIndex(const glm::vec2& pos) const {
 glm::vec2 Tilemap::tileIndexToWorldPos(int x, int y) const {
     return glm::vec2(x * tilesize_, y * tilesize_);
 }
+
+Tilemap loadTilemapFromFile(const std::string& filename, float tilesize) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open tilemap file: " << filename << std::endl;
+        throw std::runtime_error("Failed to open tilemap file");
+    }
+
+    int width, height;
+    file >> width >> height;
+
+    std::string line;
+    std::getline(file, line); // Consume the newline after height
+
+    Tilemap tilemap(width, height, tilesize);
+
+    for (int y = height - 1; y >= 0; --y) {
+        std::getline(file, line);
+        for (int x = 0; x < width && x < static_cast<int>(line.size()); ++x) {
+            char c = line[x];
+            TileType type;
+
+            switch (c) {
+                case '#': // Solid tile
+                    type = { TileEnum::SOLID, glm::vec4(0.3f, 0.3f, 0.3f, 1.0f) };
+                    break;
+                case '.': // Empty tile
+                default:
+                    type = { TileEnum::EMPTY, glm::vec4(0.8f, 0.8f, 0.8f, 1.0f) };
+                    break;
+            }
+
+            tilemap.setTile(x, y, type);
+        }
+    }
+
+    return tilemap;
+}
