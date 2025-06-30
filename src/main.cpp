@@ -10,6 +10,8 @@ int main(void){
         return -1; // Exit if initialization fails
     }
 
+    renderer.initLine(shader); // Initialize line rendering if needed
+
     // --- INITIAL WORLD DIMENSIONS (used only to set initial object positions) ---
     // float initialWorldHeight = 5.0f;
     // float initialAspectRatio = 1920.0f / 1080.0f;

@@ -316,6 +316,12 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
     glm::mat4 model = player.getModelMatrix();
     renderer.drawQuad(shader, model, player.getColor()); // Draw the player object
 
+    // Draw player sensors
+    if(g_debug_enabled){
+        renderer.drawLine(shader, player.getLeftSensor().position, player.getRightSensor().position, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red line for left-right sensors
+        renderer.drawLine(shader, player.getTopSensor().position, player.getBottomSensor().position, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)); // Blue line for top-bottom sensors
+    }
+
     // Swap buffers
     window.swap();
 }

@@ -47,7 +47,7 @@ bool Renderer2D::init(Shader& shader){
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Set vertex attribute pointers
-        glVertexAttribPointer(
+    glVertexAttribPointer(
         0,                  // attribute location (in vertex shader)
         2,                  // number of components (x, y)
         GL_FLOAT,           // data type
@@ -66,6 +66,42 @@ bool Renderer2D::init(Shader& shader){
     
     // Successful initialization
     std::cout << "[Renderer2D] Renderer initialized successfully." << std::endl;
+    return true;
+}
+
+bool Renderer2D::initLine(Shader& shader) {
+    // Shader object is passed in, use directly
+    if (!shader.getID()) {
+        std::cerr << "[Renderer2D] Shader program ID is 0, shader not loaded." << std::endl;
+        return false; // Shader not loaded
+    }
+    shaderLoaded_ = true;
+    shader_ = shader.getID();
+
+    float vertices[4] = { 0.0f, 0.0f, 0.0f, 0.0f }; // Placeholder; will update each frame.
+
+    // Set up vertex array object (VAO), vertex buffer object (VBO) for line
+    glGenVertexArrays(1, &lineVAO_);
+    glBindVertexArray(lineVAO_);
+
+    glGenBuffers(1, &lineVBO_);
+    glBindBuffer(GL_ARRAY_BUFFER, lineVBO_);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+
+    glVertexAttribPointer(
+        0,                  // attribute location (in vertex shader)
+        2,                  // number of components (x, y)
+        GL_FLOAT,           // data type
+        GL_FALSE,           // normalize?
+        2 * sizeof(float),  // stride (bytes between vertices)
+        (void*)0            // offset into data
+    );
+
+    glEnableVertexAttribArray(0); // Enable the vertex attribute at location 0
+
+    // Unbind VAO to avoid accidental modification
+    glBindVertexArray(0);
+
     return true;
 }
 
@@ -122,4 +158,25 @@ void Renderer2D::drawQuad(Shader& shader, const glm::mat4& transform, const glm:
 
     // Draw the quad using the EBO, VAO already bound in beginScene
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void Renderer2D::drawLine(Shader& shader, const glm::vec2& start, const glm::vec2& end, const glm::vec4& color) {
+    // Update the vertex buffer with the line endpoints
+    float vertices[] = { start.x, start.y, end.x, end.y };
+    glBindVertexArray(lineVAO_);
+
+    glBindBuffer(GL_ARRAY_BUFFER, lineVBO_);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    
+    shader.use();
+
+    glm::mat4 mvp = proj_ * view_ * glm::mat4(1.0f);
+    shader.setMat4("MVP", mvp);
+    
+    // Set the color uniform
+    shader.setVec4("color", color);
+    
+    
+    glDrawArrays(GL_LINES, 0, 2); // Draw two vertices as a line
+    glBindVertexArray(0); // Unbind VAO after drawing
 }

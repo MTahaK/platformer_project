@@ -20,6 +20,7 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
     // Vertical pass + gravity
     if (player.isGrounded()) {
         player.setVelocity(glm::vec2(player.getVelocity().x, 0));
+        player.sensorUpdate();
         return;
     }
     float velY = (player.getAcceleration().y + gravity) * deltaTime; // Calculate vertical velocity
@@ -33,4 +34,7 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
             player.setVelocity(glm::vec2(player.getVelocity().x, -MAX_VELOCITY)); // Limit to -MAX_VELOCITY
         }
     }
+
+    // Update sensor positions
+    player.sensorUpdate();
 }
