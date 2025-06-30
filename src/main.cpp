@@ -10,7 +10,7 @@ int main(void){
         return -1; // Exit if initialization fails
     }
 
-    // // --- INITIAL WORLD DIMENSIONS (used only to set initial object positions) ---
+    // --- INITIAL WORLD DIMENSIONS (used only to set initial object positions) ---
     // float initialWorldHeight = 5.0f;
     // float initialAspectRatio = 1920.0f / 1080.0f;
     // float initialWorldWidth = initialWorldHeight * initialAspectRatio;
@@ -21,6 +21,7 @@ int main(void){
     Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
 
     // Verify that tilemap loaded correctly by printing it out to console, line by line
+    std::cout<<"Loaded tilema data:"<<std::endl;
     for(int y = tilemap.getHeight() - 1; y >= 0; --y) {
         for(int x = 0; x < tilemap.getWidth(); ++x) {
             Tile& tile = tilemap.getTile(x, y);
@@ -28,6 +29,7 @@ int main(void){
         }
         std::cout << std::endl;
     }
+    std::cout << std::endl;
     // Set player position in tilemap
     PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
 

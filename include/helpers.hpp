@@ -17,6 +17,7 @@
 #include "action.hpp"
 #include "physics.hpp"
 #include "tilemap.hpp"
+#include "debug.hpp"
 
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
@@ -94,6 +95,9 @@ int playerInput(GameObject& player, float& playerspeed) {
         // Debug grounding key
         player.setGrounded(!player.isGrounded());
     }
+    if(Input::isKeyJustPressed(GLFW_KEY_O)){
+        g_debug_enabled = !g_debug_enabled; // Toggle debug mode
+    }
     if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
         // player.setVelocity(glm::vec2(-playerspeed, player.getVelocity().y)); // Set velocity directly
         player.setAcceleration(glm::vec2(-movementAccel, player.getAcceleration().y)); // Set acceleration directly
@@ -148,7 +152,8 @@ int playerInput(GameObject& player, float& playerspeed) {
 
     oss << "Vel (X,Y): (" << velocity.x << ", " << velocity.y << ")  "
         << "Acc (X,Y): (" << acceleration.x << ", " << acceleration.y << ")  "
-        << "Grounded?: " << std::boolalpha << grounded;
+        << "Grounded?: " << std::boolalpha << grounded << "  "
+        << "Debug: " << g_debug_enabled;
     std::string output = oss.str();
     output.resize(90, ' '); // Pad to overwrite old output cleanly
 
