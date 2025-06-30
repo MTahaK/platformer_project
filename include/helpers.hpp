@@ -12,9 +12,11 @@
 #include "shader.hpp"
 #include "renderer2d.hpp"
 #include "gameobject.hpp"
+#include "playerobject.hpp"
 #include "input.hpp"
 #include "action.hpp"
 #include "physics.hpp"
+#include "tilemap.hpp"
 
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
@@ -38,6 +40,25 @@ int initializeVisuals(Shader& shader, Renderer2D& renderer){
 
     return 0;
 }
+
+PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
+    // Convert tile index to world-space position
+    glm::vec2 playerWorldPos = tilemap.tileIndexToWorldPos(tileX, tileY);
+
+    // Create the PlayerObject
+    PlayerObject player;
+    player.setPosition(playerWorldPos);
+    player.setScale(glm::vec2(1.0f, 1.0f)); // One tile wide/high
+    player.setRotation(0.0f);
+    player.setColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)); // Green color
+    player.setName("Player Object");
+
+    // Initialize sensor positions
+    player.sensorUpdate();
+
+    return player;
+}
+
 
 std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth) {
 

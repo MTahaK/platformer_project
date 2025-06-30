@@ -34,6 +34,7 @@ class Tilemap {
 
         // Setters
         void setTile(int x, int y, const TileType& tileType); // Set tile at position (x, y) with a specific type
+        void setPlayerPosition(int x, int y) { playerpos_ = glm::ivec2(x, y); } // Set initial player position in tile indices
         
         void renderTileMap(Shader& shader, Renderer2D& renderer) const; // Render the tilemap using the provided shader and renderer
 
@@ -44,11 +45,17 @@ class Tilemap {
          // Getters
         int getWidth() const { return width_; }
         int getHeight() const { return height_; }
+        glm::ivec2 getPlayerPosition() const { return playerpos_; }
         float getTileSize() const { return tilesize_; }
+
 
     private:
         std::vector<std::vector<Tile>> tiles; // 2D vector to hold tiles
+
         int width_; // Width of the tilemap in tiles
         int height_; // Height of the tilemap in tiles
+        glm::ivec2 playerpos_; // Initial player position in tile indices
+
         float tilesize_; // Size of one tile in world units
+
 }; 
