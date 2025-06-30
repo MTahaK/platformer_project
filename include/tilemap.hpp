@@ -14,6 +14,7 @@ enum class TileEnum {
     SOLID,
 };
 
+
 struct TileType {
     TileEnum type; // Type of the tile (e.g., EMPTY, SOLID)
     glm::vec4 color; // Color of the tile
@@ -59,3 +60,5 @@ class Tilemap {
         float tilesize_; // Size of one tile in world units
 
 }; 
+
+Tilemap loadTilemapFromFile(const std::string& filename, float tilesize);

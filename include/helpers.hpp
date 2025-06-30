@@ -122,6 +122,7 @@ int playerInput(GameObject& player, float& playerspeed) {
         if(player.isGrounded()){
             // player.setGrounded(false); // Set player to not grounded
             player.addVelocity(glm::vec2(0.0f, 5.0f)); // Apply upward velocity
+            player.setGrounded(false); // Set player to not grounded`
         }
     }
     if(Input::isKeyPressed(GLFW_KEY_DOWN) || Input::isKeyPressed(GLFW_KEY_S)){
@@ -247,6 +248,68 @@ void drawStep(Window& window, Renderer2D& renderer, Shader& shader, const std::v
         glm::mat4 model = object.getModelMatrix();
         renderer.drawQuad(shader, model, object.getColor());
     }
+
+    // Swap buffers
+    window.swap();
+}
+
+void drawStepPlayer(Window& window, Renderer2D& renderer, Shader& shader, const PlayerObject& player) {
+    
+    // Get current framebuffer size
+    int fbWidth, fbHeight;
+    window.getFramebufferSize(fbWidth, fbHeight);
+    float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
+
+    // Define a fixed vertical size for the in-game "world"
+    float worldHeight = 5.0f;
+    float worldWidth = worldHeight * aspect;
+
+    // Projection matrix (orthographic): dynamic, based on aspect
+    glm::mat4 projection = glm::ortho(
+        0.0f, worldWidth,
+        0.0f, worldHeight,
+        -1.0f, 1.0f
+    );
+
+    // View matrix: identity for now (no camera)
+    glm::mat4 view = glm::mat4(1.0f);
+
+    renderer.beginScene(shader, view, projection); // Begin the scene
+
+    glm::mat4 model = player.getModelMatrix();
+    renderer.drawQuad(shader, model, player.getColor());
+
+    // Swap buffers
+    // window.swap();
+}
+
+void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, const Tilemap& tilemap, const PlayerObject& player) {
+    
+    // Get current framebuffer size
+    int fbWidth, fbHeight;
+    window.getFramebufferSize(fbWidth, fbHeight);
+    float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
+
+    // Define a fixed vertical size for the in-game "world"
+    float worldHeight = 5.0f;
+    float worldWidth = worldHeight * aspect;
+
+    // Projection matrix (orthographic): dynamic, based on aspect
+    glm::mat4 projection = glm::ortho(
+        0.0f, worldWidth,
+        0.0f, worldHeight,
+        -1.0f, 1.0f
+    );
+
+    // View matrix: identity for now (no camera)
+    glm::mat4 view = glm::mat4(1.0f);
+
+    renderer.beginScene(shader, view, projection); // Begin the scene
+
+    tilemap.renderTileMap(shader, renderer); // Render the tilemap
+
+    glm::mat4 model = player.getModelMatrix();
+    renderer.drawQuad(shader, model, player.getColor()); // Draw the player object
 
     // Swap buffers
     window.swap();

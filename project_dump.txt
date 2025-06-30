@@ -1,0 +1,1520 @@
+
+// ===== Begin action.hpp =====
+#pragma once
+#include <vector>
+#include <glm/glm.hpp>
+#include "gameobject.hpp"
+
+struct QueuedAction {
+    // Note: currently only supports movement actions
+    glm::vec2 offset;
+    GameObject* actor;           // The one initiating the action
+    std::vector<GameObject*> affectedObjects; // Any objects potentially affected
+    // enum class Type { Move, Attack, Push };  // For later
+    // Type actionType;
+    bool valid = true; // Whether the action is valid after validation checks
+};
+
+class Action{
+
+    public:
+        void addAction(const QueuedAction& action) {
+            actions.push_back(action);
+        }
+        void validateActions(const std::vector<GameObject>& allObjects); // Process and validate actions in the queue
+        void processActions(); // Execute the actions in the queue
+        void clearActions() {
+            actions.clear();
+        }
+
+    private:
+        std::vector<QueuedAction> actions; // Queue of actions to be processed
+
+};
+// ===== End action.hpp =====
+
+// ===== Begin action.cpp =====
+#include "action.hpp"
+#include <iostream>
+
+void Action::validateActions(const std::vector<GameObject>& allObjects) {
+    // For now, check collisions between an actor and ALL objects
+    for(auto& action : actions) {
+        // Compute the AABB of the actor after applying the offset
+        AABB nextAABB = action.actor->computeOffsetAABB(action.offset);
+        bool collided = false;
+        // Check collision with all other objects
+        for (const auto& obj : allObjects) {
+
+            // Skip collision check with itself
+            if (action.actor == &obj) continue;
+            
+            // Check if the next AABB collides with the object's AABB
+            if (checkCollision(nextAABB, obj.getAABB())) {
+                if(action.offset.y < 0){
+                    // Downward movement was rejected, object is therefore grounded
+                    if(!action.actor->isGrounded()){
+                        action.actor->setGrounded(true); // Set grounded if it was not before
+                        // std::cout << "Object " << action.actor->getName() << " is now grounded after downward movement.\n";
+                    }
+                    action.actor->setVelocity(glm::vec2(action.actor->getVelocity().x, 0.0f));
+                }
+                // If a collision is detected, remove the action from the action queue
+                action.valid = false; // Mark the action as invalid
+                collided = true;
+            }
+        }
+        // After checking *all* objects
+        if (action.offset.y > 0 && action.actor->isGrounded()) {
+            action.actor->setGrounded(false);
+            // std::cout << "Object " << action.actor->getName() << " is no longer grounded after upward movement.\n";
+        }
+        if (action.offset.y < 0 && !collided && action.actor->isGrounded()) {
+            action.actor->setGrounded(false);
+            // std::cout << "Object " << action.actor->getName() << " is no longer grounded after falling.\n";
+        }
+    }
+}
+
+void Action::processActions() {
+    // Placeholder for processing logic - applies the actions to the game objects.
+    // For now, this will just apply the offsets to the actors.
+    for (auto& action : actions) {
+        if(!action.valid) {
+            continue; // Skip invalid actions
+        }
+        action.actor->offsetPosition(action.offset);
+    }
+}
+// ===== End action.cpp =====
+
+// ===== Begin gameobject.hpp =====
+#pragma once
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <string>
+#include <vector>
+struct AABB{
+    float left, right, top, bottom;
+};
+
+bool checkCollision(const AABB& a, const AABB& b);
+
+class GameObject {
+
+    public:
+        // Default constructor
+        GameObject();
+        // Position + color (default scale = (1,1), rotation = 0)
+        GameObject(const glm::vec2& position, const glm::vec4& color);
+        // Full constructor
+        GameObject(const glm::vec2& position, const glm::vec2& scale, float rotation, const glm::vec4& color);
+
+        // Setters
+        // After any transformation, AABB must be recomputed
+        void setPosition(const glm::vec2& position) { position_ = position; computeAABB();}
+        void offsetPosition(const glm::vec2& offset) { position_ += offset; computeAABB();}
+        void multPosition(const glm::vec2& multiplier) { position_ *= multiplier; computeAABB();}
+
+        void setScale(const glm::vec2& scale) { scale_ = scale; computeAABB();}
+        void offsetScale(const glm::vec2& offset) { scale_ += offset; computeAABB();}
+        void multScale(const glm::vec2& multiplier) { scale_ *= multiplier; computeAABB();}
+
+        void setRotation(float rotation) { rotation_ = rotation; computeAABB();}
+        void offsetRotation(float offset) { rotation_ += offset; computeAABB();}
+        void multRotation(float multiplier) { rotation_ *= multiplier; computeAABB();}
+        
+        void setColor(const glm::vec4& color) { color_ = color; }
+        void setName(const std::string& name) { name_ = name; }
+
+        void setVelocity(const glm::vec2& velocity) { velocity_ = velocity; } // Set the velocity vector
+        void addVelocity(const glm::vec2& delta) { velocity_ += delta; } // Add to the velocity vector
+
+        void setAcceleration(const glm::vec2& acceleration) { acceleration_ = acceleration; } // Set the acceleration vector
+
+        void setGrounded(bool grounded) { isgrounded_ = grounded; } // Set whether the object is grounded
+
+        // Getters
+        const glm::vec2& getPosition() const { return position_; }
+        const glm::vec2& getScale() const { return scale_; }
+        float getRotation() const { return rotation_; }
+
+        const glm::vec4& getColor() const { return color_; }
+        const std::string& getName() const { return name_; }
+
+        const glm::vec2& getVelocity() const { return velocity_; } // Returns the velocity vector
+        
+        const glm::vec2& getAcceleration() const { return acceleration_; } // Returns the acceleration vector
+        
+        void applyVelocity(float deltaTime) { 
+            offsetPosition(velocity_ * deltaTime); // Apply velocity to position based on deltaTime
+        }
+
+        bool isGrounded() const { return isgrounded_; } // Returns whether the object is grounded
+
+        // AABB-related methods
+        const void computeAABB();
+        const AABB computeOffsetAABB(const glm::vec2& offset); // Computes AABB based on next position
+        // NOTE: This EXPLICITLY DOES NOT UPDATE THE INTERNAL AABB.
+        const AABB& getAABB() const { return aabb_; } // Returns the computed AABB
+        
+        glm::mat4 getModelMatrix() const; // Computes and returns model matrix
+
+    private:
+        glm::vec2 position_;    // X, Y position
+        glm::vec2 scale_;       // Scaling coefficient (in each direction)
+        float rotation_;        // Angle in radians
+
+        glm::vec4 color_;
+        std::string name_;
+
+        glm::vec2 velocity_ = glm::vec2(0.0f);    // Velocity vector
+        glm::vec2 acceleration_ = glm::vec2(0.0f); // Acceleration vector (not used yet)
+        AABB aabb_;             // Axis-aligned bounding box for collision detection
+        
+        bool isgrounded_ = false;
+};
+// ===== End gameobject.hpp =====
+
+// ===== Begin gameobject.cpp =====
+#include "gameobject.hpp"
+#include <iostream>
+
+GameObject::GameObject() {
+    // Initialize with default values
+    position_ = glm::vec2(0.0f, 0.0f);
+    scale_ = glm::vec2(1.0f, 1.0f);
+    rotation_ = 0.0f;
+    color_ = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); // Default white color
+    name_ = "Unnamed";
+    computeAABB(); // Compute AABB based on default position and scale
+}
+
+GameObject::GameObject(const glm::vec2& position, const glm::vec4& color){
+    // Initialize with just position and color - convenient for simple objects
+    position_ = position;
+    scale_ = glm::vec2(1.0f, 1.0f); // Default scale
+    rotation_ = 0.0f; // Default rotation
+    color_ = color;
+    name_ = "Unnamed";
+    computeAABB(); // Compute AABB based on position and scale
+    // Note: AABB will be computed with default scale (1,1) and rotation
+}
+
+GameObject::GameObject(const glm::vec2& position, const glm::vec2& scale, float rotation, const glm::vec4& color) {
+    // Full constructor
+    position_ = position;
+    scale_ = scale;
+    rotation_ = rotation;
+    color_ = color;
+    name_ = "Unnamed";
+    computeAABB(); // Compute AABB based on position, scale,
+}
+
+glm::mat4 GameObject::getModelMatrix() const {
+    // Compute the model matrix based on position, scale, and rotation
+    glm::mat4 model = glm::mat4(1.0f); // Start with identity matrix
+    model = glm::translate(model, glm::vec3(position_, 0.0f)); // Translate to position
+    model = glm::rotate(model, rotation_, glm::vec3(0.0f, 0.0f, 1.0f)); // Rotate around Z-axis
+    model = glm::scale(model, glm::vec3(scale_, 1.0f)); // Scale in X and Y directions
+    return model;
+}
+
+const void GameObject::computeAABB() {
+    // Compute the Axis-Aligned Bounding Box (AABB) based on position, scale, and rotation
+    float halfWidth = scale_.x / 2.0f;
+    float halfHeight = scale_.y / 2.0f;
+
+    aabb_.left = position_.x - halfWidth;
+    aabb_.right = position_.x + halfWidth;
+    aabb_.top = position_.y + halfHeight;
+    aabb_.bottom = position_.y - halfHeight;
+}
+
+bool checkCollision(const AABB& a, const AABB& b) {
+    bool collision;
+    if(a.left < b.right && a.right > b.left && a.top > b.bottom && a.bottom < b.top){
+        collision = true;
+    }else{
+        collision = false;
+    }
+    return (collision);
+}
+
+const AABB GameObject::computeOffsetAABB(const glm::vec2& offset) {
+    // Computes AABB based on next position after applying offset
+    AABB offsetAABB;
+    float halfWidth = scale_.x / 2.0f;
+    float halfHeight = scale_.y / 2.0f;
+
+    offsetAABB.left = (position_.x + offset.x) - halfWidth;
+    offsetAABB.right = (position_.x + offset.x) + halfWidth;
+    offsetAABB.top = (position_.y + offset.y) + halfHeight;
+    offsetAABB.bottom = (position_.y + offset.y) - halfHeight;
+
+    return offsetAABB;
+}
+// ===== End gameobject.cpp =====
+
+// ===== Begin helpers.hpp =====
+#pragma once
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <chrono>
+#include <vector>
+#include "window.hpp"
+#include "shader.hpp"
+#include "renderer2d.hpp"
+#include "gameobject.hpp"
+#include "playerobject.hpp"
+#include "input.hpp"
+#include "action.hpp"
+#include "physics.hpp"
+#include "tilemap.hpp"
+
+constexpr double targetFPS = 120.0;
+constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
+
+const float movementAccel = 5.0f; // Acceleration applied when moving left/right
+const float slowdownAccel = 16.0f; // Acceleration applied when slowing down
+const float midairDrag = 1.0f;
+
+int initializeVisuals(Shader& shader, Renderer2D& renderer){
+    // Loader shaders
+    if(!shader.load("shaders/vertex.glsl", "shaders/fragment.glsl")){
+        std::cerr << "Failed to load shaders. Exiting application." << std::endl;
+        return -1; // Exit if shader loading fails
+    }
+
+    // Initialize renderer
+    if(!renderer.init(shader)){
+        std::cerr << "Failed to initialize renderer. Exiting application." << std::endl;
+        return -1; // Exit if renderer initialization fails
+    }
+
+    return 0;
+}
+
+PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
+    // Convert tile index to world-space position
+    glm::vec2 playerWorldPos = tilemap.tileIndexToWorldPos(tileX, tileY);
+
+    // Create the PlayerObject
+    PlayerObject player;
+    player.setPosition(playerWorldPos);
+    player.setScale(glm::vec2(1.0f, 1.0f)); // One tile wide/high
+    player.setRotation(0.0f);
+    player.setColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)); // Green color
+    player.setName("Player Object");
+
+    // Initialize sensor positions
+    player.sensorUpdate();
+
+    return player;
+}
+
+
+std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth) {
+
+    // --- Create game objects ONCE (they persist across frames) ---
+    std::vector<GameObject> objects = {
+        { {worldWidth * 0.3f, worldHeight * 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f} }, // blue, left
+        { {worldWidth * 0.5f, worldHeight * 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} }, // green, center
+        { {worldWidth * 0.7f, worldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
+    };
+    
+    objects[0].setName("Left Object");
+    objects[1].setName("Player Object");
+    objects[2].setName("Right Object");
+
+       // Add a ground object (static platform)
+    GameObject ground(
+        { worldWidth / 2.0f, 0.45f },         // centered horizontally, near bottom
+        { worldWidth*3, 1.0f },               // full width, 1 unit tall
+        0.0f,
+        { 0.5f, 0.25f, 0.0f, 1.0f }                // brown-ish color
+    );
+    ground.setName("Ground");
+    objects.push_back(ground);
+
+    return objects;
+}
+
+int playerInput(GameObject& player, float& playerspeed) {
+    // Key polling for basic movement
+    Input::update();
+
+    if(Input::isKeyJustPressed(GLFW_KEY_G)){
+        // Debug grounding key
+        player.setGrounded(!player.isGrounded());
+    }
+    if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
+        // player.setVelocity(glm::vec2(-playerspeed, player.getVelocity().y)); // Set velocity directly
+        player.setAcceleration(glm::vec2(-movementAccel, player.getAcceleration().y)); // Set acceleration directly
+    }
+    else if(Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)){
+        // player.setVelocity(glm::vec2(playerspeed, player.getVelocity().y)); // Set velocity directly
+        player.setAcceleration(glm::vec2(movementAccel, player.getAcceleration().y)); // Set acceleration directly
+    }
+    else{
+
+        float accel = 0;
+        // Change deceleration constant used based on whether or not player is grounded
+        accel = player.isGrounded() ? slowdownAccel : midairDrag;
+
+        if(player.getVelocity().x > 0.0f){
+            player.setAcceleration(glm::vec2(-accel, player.getAcceleration().y)); // Apply leftward acceleration
+        }
+        else if(player.getVelocity().x < 0.0f){
+            player.setAcceleration(glm::vec2(accel, player.getAcceleration().y)); // Apply rightward acceleration
+        }
+        else{
+            player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // No horizontal acceleration
+        }
+    }
+    if(Input::isKeyJustPressed(GLFW_KEY_UP) || Input::isKeyPressed(GLFW_KEY_W)){
+        if(player.isGrounded()){
+            // player.setGrounded(false); // Set player to not grounded
+            player.addVelocity(glm::vec2(0.0f, 5.0f)); // Apply upward velocity
+        }
+    }
+    if(Input::isKeyPressed(GLFW_KEY_DOWN) || Input::isKeyPressed(GLFW_KEY_S)){
+        // Increase freefall speed
+        if(!player.isGrounded()){
+            player.setVelocity(glm::vec2(player.getVelocity().x, -10.0f)); // Apply downward velocity
+        }
+    }
+    if(Input::isKeyJustPressed(GLFW_KEY_LEFT_SHIFT)){
+        playerspeed = 2.0f;
+    }
+    if(Input::isKeyJustReleased(GLFW_KEY_LEFT_SHIFT)){
+        playerspeed = 1.0f;
+    }
+    if(Input::isKeyJustPressed(GLFW_KEY_ESCAPE)){
+        return -2; // "break" signal to exit the loop
+    }
+
+    std::ostringstream oss;
+    glm::vec2 velocity = player.getVelocity();
+    glm::vec2 acceleration = player.getAcceleration(); // Assuming this method exists
+    bool grounded = player.isGrounded();
+
+    oss << "Vel (X,Y): (" << velocity.x << ", " << velocity.y << ")  "
+        << "Acc (X,Y): (" << acceleration.x << ", " << acceleration.y << ")  "
+        << "Grounded?: " << std::boolalpha << grounded;
+    std::string output = oss.str();
+    output.resize(90, ' '); // Pad to overwrite old output cleanly
+
+    std::cout << "\r" << output << std::flush;
+    return 0;
+}
+
+void miscMovement(std::vector<GameObject>& objects, float initialWorldWidth, int& leftdir, int& rightdir, Action& actionSystem) {
+    // Secondary object movement
+
+    // If the left object hits the left world boundary, reverse direction
+    if(objects[0].getPosition().x <= 0.0f){
+        leftdir = 1; // Reverse direction
+    }
+    // If it hits the right world boundary, reverse direction
+    if(objects[0].getPosition().x >= initialWorldWidth){
+        leftdir = -1; // Reverse direction
+    }
+    // If the right object hits the right world boundary, reverse direction
+    if(objects[2].getPosition().x >= initialWorldWidth){
+        rightdir = -1; // Reverse direction
+    }
+    // If it hits the left world boundary, reverse direction
+    if(objects[2].getPosition().x <= 0.0f){
+        rightdir = 1; // Reverse direction
+    }
+    
+    actionSystem.addAction({
+            .offset = glm::vec2(leftdir*0.001f, 0.0f), // Move left
+            .actor = &objects[0], // The left object
+            .affectedObjects = {}
+        });
+    actionSystem.addAction({
+        .offset = glm::vec2(rightdir*0.001f, 0.0f), // Move right
+        .actor = &objects[2], // The right object
+        .affectedObjects = {}
+    });
+
+    // objects[0].setVelocity(glm::vec2(leftdir * 0.001f, objects[0].getVelocity().y)); // Move left
+    // objects[2].setVelocity(glm::vec2(rightdir * 0.001f, objects[2].getVelocity().y)); // Move right
+}
+
+void queueActions(std::vector<GameObject>& objects, Action& actionSystem, float deltaTime) {
+    for (auto& obj : objects) {
+        if(obj.getName() == "Ground" || obj.getName() == "Player Object") {
+            // Decouple player movement from action queue
+            continue; // Skip ground object for velocity application
+        }
+        if (!obj.isGrounded()) {
+            obj.addVelocity(glm::vec2(0.0f, gravity * deltaTime));
+        }
+
+        // Convert velocity into a queued action
+        glm::vec2 displacement = obj.getVelocity() * deltaTime;
+
+        // Queue x and y displacements separately
+        if (displacement.x != 0.0f) {
+            actionSystem.addAction({
+                .offset = glm::vec2(displacement.x, 0.0f),
+                .actor = &obj,
+                .affectedObjects = {}
+            });
+        }
+        if (displacement.y != 0.0f) {
+            actionSystem.addAction({
+                .offset = glm::vec2(0.0f, displacement.y),
+                .actor = &obj,
+                .affectedObjects = {}
+            });
+        }
+    }
+}
+void drawStep(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects) {
+    
+    // Get current framebuffer size
+    int fbWidth, fbHeight;
+    window.getFramebufferSize(fbWidth, fbHeight);
+    float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
+
+    // Define a fixed vertical size for the in-game "world"
+    float worldHeight = 5.0f;
+    float worldWidth = worldHeight * aspect;
+
+    // Projection matrix (orthographic): dynamic, based on aspect
+    glm::mat4 projection = glm::ortho(
+        0.0f, worldWidth,
+        0.0f, worldHeight,
+        -1.0f, 1.0f
+    );
+
+    // View matrix: identity for now (no camera)
+    glm::mat4 view = glm::mat4(1.0f);
+
+    renderer.beginScene(shader, view, projection); // Begin the scene
+
+    for(const auto& object : objects){
+        glm::mat4 model = object.getModelMatrix();
+        renderer.drawQuad(shader, model, object.getColor());
+    }
+
+    // Swap buffers
+    window.swap();
+}
+
+void drawStepPlayer(Window& window, Renderer2D& renderer, Shader& shader, const PlayerObject& player) {
+    
+    // Get current framebuffer size
+    int fbWidth, fbHeight;
+    window.getFramebufferSize(fbWidth, fbHeight);
+    float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
+
+    // Define a fixed vertical size for the in-game "world"
+    float worldHeight = 5.0f;
+    float worldWidth = worldHeight * aspect;
+
+    // Projection matrix (orthographic): dynamic, based on aspect
+    glm::mat4 projection = glm::ortho(
+        0.0f, worldWidth,
+        0.0f, worldHeight,
+        -1.0f, 1.0f
+    );
+
+    // View matrix: identity for now (no camera)
+    glm::mat4 view = glm::mat4(1.0f);
+
+    renderer.beginScene(shader, view, projection); // Begin the scene
+
+    glm::mat4 model = player.getModelMatrix();
+    renderer.drawQuad(shader, model, player.getColor());
+
+    // Swap buffers
+    window.swap();
+}
+
+void applyActions( std::vector<GameObject>& objects, Action& actionSystem) {
+    // Process actions in the action system
+    actionSystem.validateActions(objects); // Validate actions (e.g., check for collisions)
+    actionSystem.processActions(); // Apply the actions to the game objects
+    actionSystem.clearActions(); // Clear the action queue for next frame
+}
+// ===== End helpers.hpp =====
+
+// ===== Begin input.hpp =====
+#pragma once
+#include <GLFW/glfw3.h>
+#include <vector>
+#include <unordered_map>
+
+// Input class handles polling-style keyboard and mouse input
+// For now, assumes a single window and static usage pattern
+class Input {
+public:
+    // Initialize with the active GLFW window
+    static void initialize(GLFWwindow* window);
+
+    // Update key/mouse state (called once per frame)
+    static void update();
+
+    // --- Key State Queries ---
+    static bool isKeyPressed(int key);      // Currently held down
+    static bool isKeyJustPressed(int key);  // Transitioned from up to down this frame
+    static bool isKeyJustReleased(int key); // Transitioned from down to up this frame
+
+private:
+    static GLFWwindow* s_window;
+
+    static std::vector<int> tracked_keys;
+    
+    static std::unordered_map<int, int> s_curr;
+    static std::unordered_map<int, int> s_prev;;
+
+};
+
+// ===== End input.hpp =====
+
+// ===== Begin input.cpp =====
+#include "input.hpp"
+
+// Define static members
+GLFWwindow* Input::s_window = nullptr;
+
+std::unordered_map<int, int> Input::s_curr;
+std::unordered_map<int, int> Input::s_prev;
+
+void Input::initialize(GLFWwindow* window){
+    s_window = window;
+    // Might try pre-filling key map to improve performance later
+}
+
+void Input::update(){
+    s_prev = s_curr; // Store previous state
+
+    // Iterate only over tracked keys
+    // Update logic for tracked keys may come if remapping added
+    for(int key : tracked_keys){
+        int state = glfwGetKey(s_window, key);
+        // 0 -> GLFW_RELEASED, 1-> GLFW_PRESS
+        s_curr[key] = state;
+    }
+}
+
+bool Input::isKeyPressed(int key){
+    auto it = s_curr.find(key);
+    return it != s_curr.end() && it->second == GLFW_PRESS;
+    // Prevents insertion of unadded keys into map
+}
+
+bool Input::isKeyJustPressed(int key){
+    auto it_curr = s_curr.find(key);
+    auto it_prev = s_prev.find(key);
+    // Calling find() on the key prevents insertion
+    if(it_curr != s_curr.end() && it_prev != s_prev.end()){
+        if(it_curr->second == GLFW_PRESS && it_prev->second == GLFW_RELEASE){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Input::isKeyJustReleased(int key){
+    auto it_curr = s_curr.find(key);
+    auto it_prev = s_prev.find(key);
+    // Calling find() on the key prevents insertion
+    if(it_curr != s_curr.end() && it_prev != s_prev.end()){
+        if(it_curr->second == GLFW_RELEASE && it_prev->second == GLFW_PRESS){
+            return true;
+        }
+    }
+    return false;
+}
+
+std::vector<int> Input::tracked_keys = {
+    GLFW_KEY_SPACE, GLFW_KEY_ENTER, GLFW_KEY_ESCAPE,
+    GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP, GLFW_KEY_DOWN, GLFW_KEY_LEFT_SHIFT,
+    GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_Q, GLFW_KEY_E,
+    GLFW_KEY_F, GLFW_KEY_G, GLFW_KEY_H, GLFW_KEY_J, GLFW_KEY_K, GLFW_KEY_L,
+    GLFW_KEY_Z, GLFW_KEY_X, GLFW_KEY_Y, GLFW_KEY_T, GLFW_KEY_P, GLFW_KEY_O
+};
+// ===== End input.cpp =====
+
+// ===== Begin physics.hpp =====
+#pragma once
+#include <glm/glm.hpp>
+#include <vector>
+#include <iostream>
+#include <cmath>
+#include "gameobject.hpp"
+#include "playerobject.hpp"
+
+const float gravity = -8.0f;
+const float MAX_VELOCITY = 5.0f; // Maximum velocity limit
+class Physics {
+
+    public:
+
+        void playerMovementStep(PlayerObject& player, float deltaTime);
+        void checkPlayerWorldCollisions(GameObject& obj);    // Will use tilemap-sensor method
+        void checkPlayerEntityCollisions(GameObject& obj, const std::vector<GameObject>& entities); // May end up unused
+
+};
+// ===== End physics.hpp =====
+
+// ===== Begin physics.cpp =====
+#include "physics.hpp"
+
+void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
+    // Horizontal pass
+    float velX = player.getAcceleration().x * deltaTime; // Calculate velocity based on acceleration
+    player.addVelocity(glm::vec2(velX, 0.0f)); // Add horizontal velocity
+
+    if(std::abs(player.getVelocity().x) >= MAX_VELOCITY) { // Limit horizontal velocity
+        if(velX > 0.0f)
+            player.setVelocity(glm::vec2(MAX_VELOCITY, player.getVelocity().y)); // Limit to MAX_VELOCITY
+        else if(velX < 0.0f) {
+            player.setVelocity(glm::vec2(-MAX_VELOCITY, player.getVelocity().y)); // Limit to -MAX_VELOCITY
+        }
+    }
+    player.applyVelocity(deltaTime); // Apply velocity to each object
+    if (std::abs(player.getVelocity().x) < 0.01f) {
+        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
+    }
+    
+    // Vertical pass + gravity
+    if (player.isGrounded()) {
+        player.setVelocity(glm::vec2(player.getVelocity().x, 0));
+        return;
+    }
+    float velY = (player.getAcceleration().y + gravity) * deltaTime; // Calculate vertical velocity
+    
+    player.addVelocity(glm::vec2(0.0f, velY));
+
+    if(std::abs(player.getVelocity().y) >= MAX_VELOCITY) { // Limit vertical velocity
+        if(velY > 0.0f)
+            player.setVelocity(glm::vec2(player.getVelocity().x, MAX_VELOCITY)); // Limit to MAX_VELOCITY
+        else if(velY < 0.0f) {
+            player.setVelocity(glm::vec2(player.getVelocity().x, -MAX_VELOCITY)); // Limit to -MAX_VELOCITY
+        }
+    }
+}
+// ===== End physics.cpp =====
+
+// ===== Begin playerobject.hpp =====
+#pragma once
+#include <glm/glm.hpp>
+#include "gameobject.hpp"
+#include "tilemap.hpp"
+
+struct Sensor {
+    glm::vec2 position; // Position of the sensor relative to the player
+};
+
+// PlayerObject class inherits from GameObject
+class PlayerObject : public GameObject {
+
+    public:
+
+        void sensorUpdate() {
+            // Update sensor positions based on player position and scale
+            leftSensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f, 0.0f);
+            rightSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f, 0.0f);
+            topSensor.position = getPosition() + glm::vec2(0.0f, getScale().y / 2.0f);
+            bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f);
+        }
+
+        bool tileCollision(Tilemap& tilemap, Sensor& sensor);
+        // Getters for sensors
+        const Sensor& getLeftSensor() const { return leftSensor; }
+        const Sensor& getRightSensor() const { return rightSensor; }
+        const Sensor& getTopSensor() const { return topSensor; }
+        const Sensor& getBottomSensor() const { return bottomSensor; }
+    private:
+        // PlayerObject adds four 'sensors' to detect collisions
+        Sensor leftSensor;   // Left sensor for detecting walls
+        Sensor rightSensor;  // Right sensor for detecting walls
+        Sensor topSensor;    // Top sensor for detecting ceilings
+        Sensor bottomSensor; // Bottom sensor for detecting floors
+
+};
+// ===== End playerobject.hpp =====
+
+// ===== Begin renderer2d.hpp =====
+#pragma once
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include "shader.hpp"
+#include <string>
+
+// Renderer2D class for 2D rendering operations
+class Renderer2D {
+
+    public:
+        Renderer2D() = default;
+        ~Renderer2D();
+        // bool init(); // returns true on success, false on failure
+        bool init(Shader& shader);
+        void shutdown();
+        void beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj); // Runs at start of frame before drawing
+        void drawQuad(Shader& shader, const glm::mat4& transform, const glm::vec4& color);
+        void endScene();  // Runs at end of frame after drawing
+        // Doesn't really do anything now, as I'm using immediate rendering
+
+    private:
+
+        GLuint shader_ = 0;
+        GLuint vao_;
+        GLuint vbo_;
+        GLuint ebo_;
+
+        glm::mat4 model_;
+        glm::mat4 view_;
+        glm::mat4 proj_;
+
+        bool shaderLoaded_ = false;
+};
+
+
+// ===== End renderer2d.hpp =====
+
+// ===== Begin renderer2d.cpp =====
+#include "renderer2d.hpp"
+#include "shader.hpp"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+Renderer2D::~Renderer2D() {
+    shutdown();
+}
+
+bool Renderer2D::init(Shader& shader){
+    // Shader object is passed in, use directly
+    if (!shader.getID()) {
+        std::cerr << "[Renderer2D] Shader program ID is 0, shader not loaded." << std::endl;
+        return false; // Shader not loaded
+    }
+    shaderLoaded_ = true;
+    shader_ = shader.getID();
+
+    // Set up vertex array object (VAO), vertex buffer object (VBO), and element buffer object (EBO)
+    glGenVertexArrays(1, &vao_);
+    glBindVertexArray(vao_);
+
+    glGenBuffers(1, &vbo_);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+
+    // Define the vertex data for a quad
+        float vertices[] = {
+        // x, y
+        -0.5f, -0.5f, // Bottom-left
+         0.5f, -0.5f, // Bottom-right
+         0.5f,  0.5f, // Top-right
+        -0.5f,  0.5f  // Top-left
+    };
+    
+    // Indices for the quad
+    unsigned int indices[] = {
+        0, 1, 2, // First triangle
+        2, 3, 0  // Second triangle
+    };
+
+    // Upload vertex data to the VBO, create EBO, bind, and upload index data
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &ebo_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // Set vertex attribute pointers
+        glVertexAttribPointer(
+        0,                  // attribute location (in vertex shader)
+        2,                  // number of components (x, y)
+        GL_FLOAT,           // data type
+        GL_FALSE,           // normalize?
+        2 * sizeof(float),  // stride (bytes between vertices)
+        (void*)0            // offset into data
+    );
+
+    glEnableVertexAttribArray(0); // Enable the vertex attribute at location 0
+
+    // Unbind VAO to avoid accidental modification
+    glBindVertexArray(0);
+
+    // Set up glClearColor
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark grey
+    
+    // Successful initialization
+    std::cout << "[Renderer2D] Renderer initialized successfully." << std::endl;
+    return true;
+}
+
+void Renderer2D::shutdown() {
+    // Clean up resources
+    if (vao_) {
+        glDeleteVertexArrays(1, &vao_);
+        vao_ = 0;
+    }
+    if (vbo_) {
+        glDeleteBuffers(1, &vbo_);
+        vbo_ = 0;
+    }
+    if (ebo_) {
+        glDeleteBuffers(1, &ebo_);
+        ebo_ = 0;
+    }
+    shaderLoaded_ = false;
+    shader_ = 0;
+
+    std::cout << "[Renderer2D] Renderer shutdown successfully." << std::endl;
+}
+
+void Renderer2D::beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj){
+    glClear(GL_COLOR_BUFFER_BIT); // Clear color
+
+    // Use the shader program
+    shader.use();
+
+    // Set the view and projection matrices in the shader
+    // shader.setMat4("view", view);
+    // shader.setMat4("projection", proj);
+
+    // Save view and proj matrices
+    view_ = view;
+    proj_ = proj;
+    // Set the model matrix to identity for now
+    model_ = glm::mat4(1.0f);
+
+    // Reactivate the VAO for drawing
+    glBindVertexArray(vao_);
+}
+
+void Renderer2D::drawQuad(Shader& shader, const glm::mat4& transform, const glm::vec4& color) {
+    // Set the model matrix to the provided transform
+    model_ = transform;
+
+    // Compute MVP
+    glm::mat4 mvp = proj_ * view_ * model_;
+
+    // Set the MVP matrix in the shader
+    shader.setMat4("MVP", mvp);
+    shader.setVec4("color", color); // Set the color uniform
+
+    // Draw the quad using the EBO, VAO already bound in beginScene
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+// ===== End renderer2d.cpp =====
+
+// ===== Begin shader.hpp =====
+#pragma once
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <string>
+
+class Shader{
+
+    public:
+        Shader();
+        ~Shader();
+
+        // Load shaders, compile, and link into shader program
+        bool load(const std::string& vertexPath, const std::string& fragmentPath);
+        void shutdown();
+
+        void use() const;
+
+        GLuint getID() const { return shaderID; }
+
+        // Utility functions to set uniforms
+        void setBool(const std::string& name, bool value) const;
+        void setInt(const std::string& name, int value) const;
+        void setFloat(const std::string& name, float value) const;
+        void setVec2(const std::string& name, const glm::vec2& value) const;
+        void setVec3(const std::string& name, const glm::vec3& value) const;
+        void setVec4(const std::string& name, const glm::vec4& value) const;
+        void setMat4(const std::string& name, const glm::mat4& mat) const;
+
+    private:
+        GLuint shaderID; // Shader program ID, 0 if load failed/at initialization
+        std::string vertexPath_;
+        std::string fragmentPath_;
+        
+        std::string loadShaderSource(const std::string& path);
+        GLuint compileShader(const std::string& source, GLenum type);
+
+};
+
+// ===== End shader.hpp =====
+
+// ===== Begin shader.cpp =====
+#include "shader.hpp"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+Shader::Shader(){
+    // Initialize shaderID to 0, indicating no shader program is loaded
+    shaderID = 0;
+}
+Shader::~Shader() {
+    shutdown();
+}
+
+void Shader::shutdown() {
+    // Deletes the shader program if it exists
+    if(shaderID != 0){
+        glDeleteProgram(shaderID);
+        shaderID = 0; // Reset to 0 after deletion
+    }
+}
+
+std::string Shader::loadShaderSource(const std::string& path) {
+    // Reads from shader file, creates buffer containing contents
+    // of shader file
+    std::ifstream file(path);
+    std::stringstream buf;
+
+    if(!file.is_open()){
+        std::cerr<< "[Shader] Failed to open shader file: " << path <<". Load aborting...\n";
+        return "";
+    }
+
+    buf << file.rdbuf(); // Read the entire file into the buffer
+    file.close();
+    return buf.str();
+}
+
+GLuint Shader::compileShader(const std::string& source, GLenum type){
+
+    // Compile a shader from source code
+    GLuint shader = glCreateShader(type); // type is GL_VERTEX_SHADER or GL_FRAGMENT_SHADER
+
+    const char* src = source.c_str(); /// Needs to be a C-style string
+    glShaderSource(shader, 1, &src, nullptr);
+    glCompileShader(shader);
+
+    // Check for compilation errors
+    int pass;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &pass);
+    
+    if(pass == GL_FALSE){
+        int length;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+        std::string log(length, ' ');
+        glGetShaderInfoLog(shader, length, &length, &log[0]);
+        std::cerr << "[Shader] Compilation failed: " << log << std::endl;
+        glDeleteShader(shader);
+        return 0; // Return 0 on failure
+    }
+    return shader; // Return the shader ID on success
+}
+
+bool Shader::load(const std::string& vertexPath, const std::string& fragmentPath) {
+    
+    // Load vertex and fragment shaders from files, compile them, and link them into a shader program
+
+    // Before loading in, check if the shader has already been loaded
+    if(shaderID != 0){
+        std::cerr << "[Shader] Shader already loaded. Cannot load again." << std::endl;
+        return false;
+    }
+
+    vertexPath_ = vertexPath;
+    fragmentPath_ = fragmentPath;
+
+    std::string vertexSource = loadShaderSource(vertexPath_);
+    if(vertexSource.empty()){
+        std::cerr << "[Shader] Failed to load vertex shader source from: " << vertexPath_ << std::endl;
+        return false;
+    }
+    std::string fragmentSource = loadShaderSource(fragmentPath_);
+    if(fragmentSource.empty()){
+        std::cerr << "[Shader] Failed to load fragment shader source from: " << fragmentPath_ << std::endl;
+        return false;
+    }
+
+    // Shaders are loaded into memory buffers, now compile
+
+    GLuint vertexShader = compileShader(vertexSource, GL_VERTEX_SHADER);
+    if(vertexShader == 0){
+        std::cerr << "[Shader] Vertex shader compilation failed." << std::endl;
+        return false;
+    }
+    GLuint fragmentShader = compileShader(fragmentSource, GL_FRAGMENT_SHADER);
+    if(fragmentShader == 0){
+        std::cerr << "[Shader] Fragment shader compilation failed." << std::endl;
+        glDeleteShader(vertexShader); // Clean up vertex shader, since already compiled here
+        return false;
+    }
+
+    // Shaders compiled successfully, now link them into a shader program
+    shaderID = glCreateProgram();
+    glAttachShader(shaderID, vertexShader);
+    glAttachShader(shaderID, fragmentShader);
+
+    glLinkProgram(shaderID);
+    int pass;
+    // Check for linking errors
+    glGetProgramiv(shaderID, GL_LINK_STATUS, &pass);
+    if(pass == GL_FALSE){
+        int length;
+        glGetProgramiv(shaderID, GL_INFO_LOG_LENGTH, &length);
+        std::string log(length, ' ');
+        glGetProgramInfoLog(shaderID, length, &length, &log[0]);
+        std::cerr << "[Shader] Linking failed: " << log << std::endl;
+        glDeleteProgram(shaderID);
+        shaderID = 0; // Reset shaderID to indicate failure
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+        return false;
+    }
+
+    // Successfully linked, now delete the individual shaders
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    return true; // Return true on success
+}
+
+void Shader::use() const {
+    // Use the shader program
+    if(shaderID != 0){
+        glUseProgram(shaderID);
+    } else {
+        std::cerr << "[Shader] Cannot use shader, shaderID is 0." << std::endl;
+    }
+}
+
+void Shader::setBool(const std::string& name, bool value) const {
+    glUniform1i(glGetUniformLocation(shaderID, name.c_str()), (int)value);
+}
+void Shader::setInt(const std::string& name, int value) const {
+    glUniform1i(glGetUniformLocation(shaderID, name.c_str()), value);
+}
+void Shader::setFloat(const std::string& name, float value) const {
+    glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
+}
+void Shader::setVec2(const std::string& name, const glm::vec2& value) const {
+    glUniform2fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(value));
+}
+void Shader::setVec3(const std::string& name, const glm::vec3& value) const {
+    glUniform3fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(value));
+}
+void Shader::setVec4(const std::string& name, const glm::vec4& value) const {
+    glUniform4fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(value));
+}
+void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
+    glUniformMatrix4fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
+}
+
+
+// ===== End shader.cpp =====
+
+// ===== Begin tilemap.hpp =====
+#pragma once
+#include <glm/glm.hpp>
+#include <vector>
+#include "shader.hpp"
+#include "renderer2d.hpp"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+
+// Define Tile type enum
+enum class TileEnum {
+    EMPTY,
+    SOLID,
+};
+
+
+struct TileType {
+    TileEnum type; // Type of the tile (e.g., EMPTY, SOLID)
+    glm::vec4 color; // Color of the tile
+};
+
+struct Tile {
+    glm::vec2 position; // Position of the tile in world coordinates
+    TileType tileType; // Type and color of the tile
+};
+
+class Tilemap {
+
+    public:
+        Tilemap(int width, int height, float tilesize);
+
+        Tile& getTile(int x, int y);    // Get tile at position (x, y)
+        bool isSolidTile(int x, int y); // Check if the tile at (x, y) is solid
+
+        // Setters
+        void setTile(int x, int y, const TileType& tileType); // Set tile at position (x, y) with a specific type
+        void setPlayerPosition(int x, int y) { playerpos_ = glm::ivec2(x, y); } // Set initial player position in tile indices
+        
+        void renderTileMap(Shader& shader, Renderer2D& renderer) const; // Render the tilemap using the provided shader and renderer
+
+        // World <-> Grid conversions
+        glm::ivec2 worldToTileIndex(const glm::vec2& pos) const;
+        glm::vec2 tileIndexToWorldPos(int x, int y) const;
+
+         // Getters
+        int getWidth() const { return width_; }
+        int getHeight() const { return height_; }
+        glm::ivec2 getPlayerPosition() const { return playerpos_; }
+        float getTileSize() const { return tilesize_; }
+
+
+    private:
+        std::vector<std::vector<Tile>> tiles; // 2D vector to hold tiles
+
+        int width_; // Width of the tilemap in tiles
+        int height_; // Height of the tilemap in tiles
+        glm::ivec2 playerpos_; // Initial player position in tile indices
+
+        float tilesize_; // Size of one tile in world units
+
+}; 
+
+Tilemap loadTilemapFromFile(const std::string& filename, float tilesize);
+
+// ===== End tilemap.hpp =====
+
+// ===== Begin tilemap.cpp =====
+#include "tilemap.hpp"
+
+Tilemap::Tilemap(int width, int height, float tilesize)
+    : width_(width), height_(height), tilesize_(tilesize){
+
+    tiles.resize(height_, std::vector<Tile>(width_));
+    for (int y = 0; y < height_; ++y) {
+        for (int x = 0; x < width_; ++x) {
+            // Initialize empty
+            tiles[y][x].position = tileIndexToWorldPos(x, y);
+            tiles[y][x].tileType = { TileEnum::EMPTY, glm::vec4(0.0f) };
+        }
+    }
+}
+
+Tile& Tilemap::getTile(int x, int y) {
+    return tiles[y][x];
+}
+
+bool Tilemap::isSolidTile(int x, int y) {
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) return false;
+    return tiles[y][x].tileType.type == TileEnum::SOLID;
+}
+
+void Tilemap::setTile(int x, int y, const TileType& tileType) {
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
+    tiles[y][x].tileType = tileType;
+}
+
+void Tilemap::renderTileMap(Shader& shader, Renderer2D& renderer) const {
+    for (int y = 0; y < height_; ++y) {
+        for (int x = 0; x < width_; ++x) {
+            const Tile& tile = tiles[y][x];
+            if (tile.tileType.type != TileEnum::EMPTY) {
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(tile.position, 0.0f));
+                model = glm::scale(model, glm::vec3(tilesize_, tilesize_, 1.0f));
+                renderer.drawQuad(shader, model, tile.tileType.color);
+            }
+        }
+    }
+}
+
+glm::ivec2 Tilemap::worldToTileIndex(const glm::vec2& pos) const {
+    int x = static_cast<int>(std::floor(pos.x / tilesize_));
+    int y = static_cast<int>(std::floor(pos.y / tilesize_));
+    return glm::ivec2(x, y);
+}
+
+glm::vec2 Tilemap::tileIndexToWorldPos(int x, int y) const {
+    return glm::vec2(x * tilesize_, y * tilesize_);
+}
+
+Tilemap loadTilemapFromFile(const std::string& filename, float tilesize) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open tilemap file: " << filename << std::endl;
+        throw std::runtime_error("Failed to open tilemap file");
+    }
+
+    int width, height;
+    file >> width >> height;
+
+    std::string line;
+    std::getline(file, line); // Consume the newline after height
+
+    Tilemap tilemap(width, height, tilesize);
+
+    for (int y = height - 1; y >= 0; --y) {
+        std::getline(file, line);
+        for (int x = 0; x < width && x < static_cast<int>(line.size()); ++x) {
+            char c = line[x];
+            TileType type;
+
+            switch (c) {
+                case '#': // Solid tile
+                    type = { TileEnum::SOLID, glm::vec4(0.3f, 0.3f, 0.3f, 1.0f) };
+                    break;
+                case '.': // Empty tile
+                default:
+                    type = { TileEnum::EMPTY, glm::vec4(0.8f, 0.8f, 0.8f, 1.0f) };
+                    break;
+                case 'P': // Player start position
+                    type = { TileEnum::EMPTY, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) }; // Green for player
+                    tilemap.setPlayerPosition(x, y); // Set player position
+                    break;
+            }
+
+            tilemap.setTile(x, y, type);
+        }
+    }
+
+    return tilemap;
+}
+
+// ===== End tilemap.cpp =====
+
+// ===== Begin window.hpp =====
+#pragma once
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <string>
+
+// GLFW Window class
+class Window {
+    public:
+        Window(int width, int height, const std::string& title){
+            createWindow(width, height, title);
+        };
+        ~Window() { destroy(); }
+
+        bool createWindow(int width, int height, const std::string& title);
+        void destroy();
+        
+        GLFWwindow* getWindow() const { return window_; }
+        
+        void pollEvents() {
+            glfwPollEvents();
+        }
+        void swap() {
+            glfwSwapBuffers(window_);
+        }
+        void getFramebufferSize(int& width, int& height) const {
+            width = width_;
+            height = height_;
+        }
+        bool shouldClose() const {
+            return glfwWindowShouldClose(window_);
+        }
+        
+
+    private:
+        GLFWwindow* window_ = nullptr;
+        int width_ = 0;
+        int height_ = 0;
+        static bool glfwInitialized_;
+};
+// ===== End window.hpp =====
+
+// ===== Begin window.cpp =====
+#include "window.hpp"
+#include <iostream>
+
+bool Window::glfwInitialized_ = false;
+
+bool Window::createWindow(int width, int height, const std::string& title) {
+    
+    // First, ensure that a window has not already been initialized
+    if(glfwInitialized_) {
+        std::cerr << "[Window] GLFW has already been initialized." << std::endl;
+        return false;
+        
+    }
+    // Initialize GLFW
+    if(!glfwInit()) {
+        std::cerr << "[Window] Failed to initialize GLFW." << std::endl;
+        return false;
+    }
+    glfwInitialized_ = true;
+
+    // Set window hints (for OpenGL 3.3 Core)
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // Specifies OpenGL 3.x
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // Specifies OpenGL x.3
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // OpenGL Core
+
+    // Create the GLFW window
+    window_ = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+    if(!window_) {
+        std::cerr << "[Window] Failed to create GLFW window." << std::endl;
+        glfwTerminate();
+        return false;
+    }
+
+    // Set OpenGL context to newly created (ie current) window
+    glfwMakeContextCurrent(window_);
+    glfwSwapInterval(1); // Enables vsync (1 = on, 0 = off)
+
+
+    // Load OpenGL function pointers using GLAD
+    if(!gladLoadGL()) {
+        std::cerr << "[Window] Failed to initialize GLAD." << std::endl;
+        // glfwDestroyWindow(window_);
+        // glfwTerminate();
+        destroy();
+        return false;
+    }
+
+    // The GLFW window viewport must resize to match the window (ie framebuffer) size
+    // Therefore, first get the framebuffer size and set the framebuffer size callback
+    // Framebuffer size is stored in the class's height_ and width_ members
+
+    // 1. Query the initial framebuffer size **once** after the window is created.
+    //    This accounts for HiDPI scaling where physical pixels ≠ window width/height
+    glfwGetFramebufferSize(window_, &width_, &height_);
+
+    // 2. Store `this` pointer in the GLFW window so any GLFW callback
+    //    can retrieve the owning `Window` object later.
+    glfwSetWindowUserPointer(window_, this);
+
+    // 3. Register a framebuffer-resize callback.
+    //    Signature required by GLFW:
+    //        void callback(GLFWwindow* win, int newW, int newH);
+    glfwSetFramebufferSizeCallback(
+        window_,
+        [](GLFWwindow* win, int new_w, int new_h)
+        {
+            // 3-a. Recover the `Window*` that owns this GLFWwindow.
+            //      glfwGetWindowUserPointer returns the same opaque void* we stored.
+            auto self = static_cast<Window*>(glfwGetWindowUserPointer(win));
+            
+            // 3-b. Persist the new size inside the object so the rest of the engine
+            //      can query `window.size()` without calling GLFW.
+            self->width_ = new_w;
+            self->height_ = new_h;
+
+            // 3-c. Resize the OpenGL viewport to match the new framebuffer size,
+            //      so that OpenGL renders to the entire window.
+            //      0, 0 is the lower-left corner of the window, and new_w, new_h
+            //      are the new width and height of the framebuffer.
+            glViewport(0, 0, new_w, new_h);
+            // std::cout << "[Window] Framebuffer resized to " << new_w << "x" << new_h << "." << std::endl;
+        }
+    );
+
+    // Window creation successful
+    std::cout << "[Window] GLFW window created successfully." << std::endl;
+    return true;
+}
+
+void Window::destroy() {
+    if(window_) {
+        glfwDestroyWindow(window_);
+        window_ = nullptr;
+    }
+    if(glfwInitialized_) {
+        glfwTerminate();
+        glfwInitialized_ = false;
+    }
+}
+// ===== End window.cpp =====
+
+// ===== Begin main.cpp =====
+#include "helpers.hpp"
+
+int main(void){
+    Window window(1920, 1080, "OpenGL Window");
+    
+    Shader shader;
+    Renderer2D renderer;
+
+    if(initializeVisuals(shader, renderer) != 0){
+        return -1; // Exit if initialization fails
+    }
+
+    // --- INITIAL WORLD DIMENSIONS (used only to set initial object positions) ---
+    float initialWorldHeight = 5.0f;
+    float initialAspectRatio = 1920.0f / 1080.0f;
+    float initialWorldWidth = initialWorldHeight * initialAspectRatio;
+
+    // --- TILEMAP SETUP ---
+    std::string tilemapFile = "./assets/test.tilemap";
+
+    Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
+
+    // Set player position in tilemap
+    PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
+
+    // Set up game objects
+    // std::vector<GameObject> objects = setupObjects(initialWorldHeight, initialWorldWidth);
+
+    // objects[1].setGrounded(true); // Set the player object to be grounded initially
+    player.setGrounded(true); // Set the player object to be grounded initially
+
+    // Initialize input system
+    Input::initialize(window.getWindow());
+
+    // Initialize action system
+    Action actionSystem;
+    Physics physicsSystem;
+
+    int leftdir = -1;
+    int rightdir = 1;
+    float playerspeed = 1.0f;
+        
+    float lastFrameTime = glfwGetTime(); // seconds
+
+    while(!window.shouldClose()){
+
+        float currentFrameTime = glfwGetTime();
+        auto frameStart = std::chrono::high_resolution_clock::now();
+        float deltaTime = currentFrameTime - lastFrameTime;
+        lastFrameTime = currentFrameTime;
+
+        // Poll for events
+        window.pollEvents();
+
+        if(playerInput(player, playerspeed) == -2){
+            break; // Exit the loop if escape is pressed
+        }
+
+        // Secondary object movement
+        // miscMovement(objects, initialWorldWidth, leftdir, rightdir, actionSystem);
+
+        // Apply physics step
+        physicsSystem.playerMovementStep(player, deltaTime);
+        // queueActions(objects, actionSystem, deltaTime);
+
+        // Compute MVP, draw objects
+        // drawStep(window, renderer, shader, objects);
+        tilemap.renderTileMap(shader, renderer);
+        drawStepPlayer(window, renderer, shader, player);
+        // Render tilemap
+
+        // applyActions(objects, actionSystem);
+        
+        auto frameEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = frameEnd - frameStart;
+    }
+    // Cleanup and exit
+    renderer.shutdown();
+    shader.shutdown();
+    window.destroy();
+    std::cout << "Exiting application." << std::endl;
+    return 0;
+}
+// ===== End main.cpp =====
