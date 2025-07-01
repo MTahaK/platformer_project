@@ -68,6 +68,9 @@ int main(void){
             break; // Exit the loop if escape is pressed
         }
 
+        // Check player collisions with tilemap
+        physicsSystem.checkPlayerWorldCollisions(player, tilemap);
+        
         // Secondary object movement
         // miscMovement(objects, initialWorldWidth, leftdir, rightdir, actionSystem);
 

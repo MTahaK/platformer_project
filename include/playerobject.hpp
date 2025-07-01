@@ -7,6 +7,8 @@ struct Sensor {
     glm::vec2 position; // Position of the sensor relative to the player
 };
 
+const float epsilon = 0.01f; // Small offset to avoid sticking to tiles
+
 // PlayerObject class inherits from GameObject
 class PlayerObject : public GameObject {
 
@@ -14,13 +16,13 @@ class PlayerObject : public GameObject {
 
         void sensorUpdate() {
             // Update sensor positions based on player position and scale
-            leftSensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f, 0.0f);
-            rightSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f, 0.0f);
-            topSensor.position = getPosition() + glm::vec2(0.0f, getScale().y / 2.0f);
-            bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f);
+            leftSensor.position   = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
+            rightSensor.position  = getPosition() + glm::vec2( getScale().x / 2.0f + epsilon, 0.0f);
+            topSensor.position    = getPosition() + glm::vec2(0.0f,  getScale().y / 2.0f + epsilon);
+            bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
         }
 
-        bool tileCollision(Tilemap& tilemap, Sensor& sensor);
+        bool tileCollision(Tilemap& tilemap, const Sensor& sensor);
         // Getters for sensors
         const Sensor& getLeftSensor() const { return leftSensor; }
         const Sensor& getRightSensor() const { return rightSensor; }

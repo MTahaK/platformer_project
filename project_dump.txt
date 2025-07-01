@@ -569,7 +569,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
     float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
 
     // Define a fixed vertical size for the in-game "world"
-    float worldHeight = 5.0f;
+    float worldHeight = 5.5f;
     float worldWidth = worldHeight * aspect;
 
     // Projection matrix (orthographic): dynamic, based on aspect
@@ -580,7 +580,11 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
     );
 
     // View matrix: identity for now (no camera)
-    glm::mat4 view = glm::mat4(1.0f);
+    glm::vec2 cameraCenter = player.getPosition();
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(
+        -cameraCenter.x + worldWidth / 2.0f - 0.3f, // Camera slightly to the right of player
+        -cameraCenter.y + worldHeight / 2.0f - 0.7f, // Camera slightly above player
+        0.0f));
 
     renderer.beginScene(shader, view, projection); // Begin the scene
 
@@ -592,7 +596,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
     // Draw player sensors
     if(g_debug_enabled){
         renderer.drawLine(shader, player.getLeftSensor().position, player.getRightSensor().position, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red line for left-right sensors
-        renderer.drawLine(shader, player.getTopSensor().position, player.getBottomSensor().position, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)); // Green line for top-bottom sensors
+        renderer.drawLine(shader, player.getTopSensor().position, player.getBottomSensor().position, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)); // Blue line for top-bottom sensors
     }
 
     // Swap buffers
@@ -713,6 +717,7 @@ std::vector<int> Input::tracked_keys = {
 #include <cmath>
 #include "gameobject.hpp"
 #include "playerobject.hpp"
+#include "tilemap.hpp"
 
 const float gravity = -8.0f;
 const float MAX_VELOCITY = 5.0f; // Maximum velocity limit
@@ -721,7 +726,7 @@ class Physics {
     public:
 
         void playerMovementStep(PlayerObject& player, float deltaTime);
-        void checkPlayerWorldCollisions(GameObject& obj);    // Will use tilemap-sensor method
+        void checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap);
         void checkPlayerEntityCollisions(GameObject& obj, const std::vector<GameObject>& entities); // May end up unused
 
 };
@@ -750,6 +755,7 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
     // Vertical pass + gravity
     if (player.isGrounded()) {
         player.setVelocity(glm::vec2(player.getVelocity().x, 0));
+        player.sensorUpdate();
         return;
     }
     float velY = (player.getAcceleration().y + gravity) * deltaTime; // Calculate vertical velocity
@@ -767,6 +773,33 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
     // Update sensor positions
     player.sensorUpdate();
 }
+
+void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {
+    // Check collisions with the tilemap using sensors
+    if (player.tileCollision(tilemap, player.getLeftSensor())) {
+
+        std::cout << "Left collision detected at position: "<< player.getLeftSensor().position.x << ", " << player.getLeftSensor().position.y << std::endl;
+
+        // player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
+        // player.offsetPosition(glm::vec2(0.01f, 0.0f)); // Offset to avoid sticking
+    }
+    if (player.tileCollision(tilemap, player.getRightSensor())) {
+        std::cout << "Right collision detected at position: "<< player.getRightSensor().position.x << ", " << player.getRightSensor().position.y << std::endl;
+        // player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
+        // player.offsetPosition(glm::vec2(-0.01f, 0.0f)); // Offset to avoid sticking
+    }
+    if (player.tileCollision(tilemap, player.getTopSensor())) {
+        std::cout << "Top collision detected at position: "<< player.getTopSensor().position.x << ", " << player.getTopSensor().position.y << std::endl;
+        // player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f)); // Stop vertical movement
+        // player.offsetPosition(glm::vec2(0.0f, -0.01f)); // Offset to avoid sticking
+    }
+    if (player.tileCollision(tilemap, player.getBottomSensor())) {
+        std::cout << "Bottom collision detected at position: "<< player.getBottomSensor().position.x << ", " << player.getBottomSensor().position.y << std::endl;
+        // player.setGrounded(true); // Set grounded state
+        // player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f)); // Stop vertical movement
+        // player.offsetPosition(glm::vec2(0.0f, 0.01f)); // Offset to avoid sticking
+    }
+}
 // ===== End physics.cpp =====
 
 // ===== Begin playerobject.hpp =====
@@ -779,6 +812,8 @@ struct Sensor {
     glm::vec2 position; // Position of the sensor relative to the player
 };
 
+const float epsilon = 0.01f; // Small offset to avoid sticking to tiles
+
 // PlayerObject class inherits from GameObject
 class PlayerObject : public GameObject {
 
@@ -786,13 +821,13 @@ class PlayerObject : public GameObject {
 
         void sensorUpdate() {
             // Update sensor positions based on player position and scale
-            leftSensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f, 0.0f);
-            rightSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f, 0.0f);
-            topSensor.position = getPosition() + glm::vec2(0.0f, getScale().y / 2.0f);
-            bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f);
+            leftSensor.position   = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
+            rightSensor.position  = getPosition() + glm::vec2( getScale().x / 2.0f + epsilon, 0.0f);
+            topSensor.position    = getPosition() + glm::vec2(0.0f,  getScale().y / 2.0f + epsilon);
+            bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
         }
 
-        bool tileCollision(Tilemap& tilemap, Sensor& sensor);
+        bool tileCollision(Tilemap& tilemap, const Sensor& sensor);
         // Getters for sensors
         const Sensor& getLeftSensor() const { return leftSensor; }
         const Sensor& getRightSensor() const { return rightSensor; }
@@ -807,6 +842,18 @@ class PlayerObject : public GameObject {
 
 };
 // ===== End playerobject.hpp =====
+
+// ===== Begin playerobject.cpp =====
+#include "playerobject.hpp"
+#include "debug.hpp"
+
+bool PlayerObject::tileCollision(Tilemap& tilemap, const Sensor& sensor) {
+    glm::ivec2 tileIndex = tilemap.worldToTileIndex(sensor.position);
+    bool isSolid = tilemap.isSolidTile(tileIndex.x, tileIndex.y);
+    return isSolid; // Check if the tile at the sensor's position is solid
+    // return tilemap.isSolidTile(tileIndex.x, tileIndex.y);
+}
+// ===== End playerobject.cpp =====
 
 // ===== Begin renderer2d.hpp =====
 #pragma once
@@ -961,23 +1008,6 @@ bool Renderer2D::initLine(Shader& shader) {
     return true;
 }
 
-void Renderer2D::drawLine(Shader& shader, const glm::vec2& start, const glm::vec2& end, const glm::vec4& color) {
-    // Update the vertex buffer with the line endpoints
-    float vertices[] = { start.x, start.y, end.x, end.y };
-    glBindVertexArray(lineVAO_);
-
-    glBindBuffer(GL_ARRAY_BUFFER, lineVBO_);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-    
-    shader.use();
-    
-    // Set the color uniform
-    shader.setVec4("color", color);
-    
-    glDrawArrays(GL_LINES, 0, 2); // Draw two vertices as a line
-    glBindVertexArray(0); // Unbind VAO after drawing
-}
-
 void Renderer2D::shutdown() {
     // Clean up resources
     if (vao_) {
@@ -1032,6 +1062,28 @@ void Renderer2D::drawQuad(Shader& shader, const glm::mat4& transform, const glm:
     // Draw the quad using the EBO, VAO already bound in beginScene
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
+
+void Renderer2D::drawLine(Shader& shader, const glm::vec2& start, const glm::vec2& end, const glm::vec4& color) {
+    // Update the vertex buffer with the line endpoints
+    float vertices[] = { start.x, start.y, end.x, end.y };
+    glBindVertexArray(lineVAO_);
+
+    glBindBuffer(GL_ARRAY_BUFFER, lineVBO_);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    
+    shader.use();
+
+    glm::mat4 mvp = proj_ * view_ * glm::mat4(1.0f);
+    shader.setMat4("MVP", mvp);
+    
+    // Set the color uniform
+    shader.setVec4("color", color);
+    
+    
+    glDrawArrays(GL_LINES, 0, 2); // Draw two vertices as a line
+    glBindVertexArray(0); // Unbind VAO after drawing
+}
+
 // ===== End renderer2d.cpp =====
 
 // ===== Begin shader.hpp =====
@@ -1629,6 +1681,9 @@ int main(void){
             break; // Exit the loop if escape is pressed
         }
 
+        // Check player collisions with tilemap
+        physicsSystem.checkPlayerWorldCollisions(player, tilemap);
+        
         // Secondary object movement
         // miscMovement(objects, initialWorldWidth, leftdir, rightdir, actionSystem);
 
