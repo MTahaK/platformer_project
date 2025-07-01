@@ -270,6 +270,12 @@ const AABB GameObject::computeOffsetAABB(const glm::vec2& offset) {
 }
 // ===== End gameobject.cpp =====
 
+// ===== Begin globals.hpp =====
+#pragma once
+
+const float epsilon = 0.01f;
+// ===== End globals.hpp =====
+
 // ===== Begin helpers.hpp =====
 #pragma once
 #include <glm/glm.hpp>
@@ -294,10 +300,6 @@ const AABB GameObject::computeOffsetAABB(const glm::vec2& offset) {
 
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
-
-const float movementAccel = 5.0f; // Acceleration applied when moving left/right
-const float slowdownAccel = 16.0f; // Acceleration applied when slowing down
-const float midairDrag = 1.0f;
 
 int initializeVisuals(Shader& shader, Renderer2D& renderer){
     // Loader shaders
@@ -715,12 +717,17 @@ std::vector<int> Input::tracked_keys = {
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include "globals.hpp"
 #include "gameobject.hpp"
 #include "playerobject.hpp"
 #include "tilemap.hpp"
 
 const float gravity = -8.0f;
 const float MAX_VELOCITY = 5.0f; // Maximum velocity limit
+
+const float movementAccel = 5.0f; // Acceleration applied when moving left/right
+const float slowdownAccel = 16.0f; // Acceleration applied when slowing down
+const float midairDrag = 1.0f;
 class Physics {
 
     public:
@@ -777,28 +784,49 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {
     // Check collisions with the tilemap using sensors
     if (player.tileCollision(tilemap, player.getLeftSensor())) {
-
-        std::cout << "Left collision detected at position: "<< player.getLeftSensor().position.x << ", " << player.getLeftSensor().position.y << std::endl;
-
-        // player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
-        // player.offsetPosition(glm::vec2(0.01f, 0.0f)); // Offset to avoid sticking
+        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
+        player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
+        player.offsetPosition(glm::vec2(epsilon, 0.0f)); // Offset to avoid sticking
     }
     if (player.tileCollision(tilemap, player.getRightSensor())) {
-        std::cout << "Right collision detected at position: "<< player.getRightSensor().position.x << ", " << player.getRightSensor().position.y << std::endl;
-        // player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
-        // player.offsetPosition(glm::vec2(-0.01f, 0.0f)); // Offset to avoid sticking
+        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
+        player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y));
+        player.offsetPosition(glm::vec2(-epsilon, 0.0f));
     }
     if (player.tileCollision(tilemap, player.getTopSensor())) {
-        std::cout << "Top collision detected at position: "<< player.getTopSensor().position.x << ", " << player.getTopSensor().position.y << std::endl;
-        // player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f)); // Stop vertical movement
-        // player.offsetPosition(glm::vec2(0.0f, -0.01f)); // Offset to avoid sticking
+        player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+        player.offsetPosition(glm::vec2(0.0f, -epsilon));
     }
-    if (player.tileCollision(tilemap, player.getBottomSensor())) {
-        std::cout << "Bottom collision detected at position: "<< player.getBottomSensor().position.x << ", " << player.getBottomSensor().position.y << std::endl;
-        // player.setGrounded(true); // Set grounded state
-        // player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f)); // Stop vertical movement
-        // player.offsetPosition(glm::vec2(0.0f, 0.01f)); // Offset to avoid sticking
+    // if (player.tileCollision(tilemap, player.getBottomSensor())) {
+    //     // Snap player up to just above ground
+    //     float yTile = std::floor(player.getBottomSensor().position.y);
+    //     float ySnap = (yTile + 1) * tilemap.getTileSize() + player.getScale().y/2.0f + epsilon;
+    //     player.setPosition(glm::vec2(player.getPosition().x, ySnap));
+    //     player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+    //     player.setGrounded(true);
+    // } else{
+    //     player.setGrounded(false);
+    // }
+    // 1. Find the world Y position just above the tile the player should be standing on.
+    glm::vec2 sensorPos = player.getBottomSensor().position;
+    glm::ivec2 tileIndex = tilemap.worldToTileIndex(sensorPos);
+    float tileTop = (tileIndex.y + 1) * tilemap.getTileSize();
+
+    // 2. If the tile below is solid, and the sensor is within "snapDistance" above it, snap and ground
+    const float snapDistance = 0.07f; // Adjust as needed
+    if (tilemap.isSolidTile(tileIndex.x, tileIndex.y) && 
+        (sensorPos.y - tileTop) <= snapDistance && 
+        (sensorPos.y - tileTop) >= -snapDistance) // allow a little tolerance below too
+    {
+        // Snap to exactly tile top + half player height + epsilon
+        float ySnap = tileTop + player.getScale().y/2.0f + epsilon;
+        player.setPosition(glm::vec2(player.getPosition().x, ySnap));
+        player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+        player.setGrounded(true);
+    } else {
+        player.setGrounded(false);
     }
+
 }
 // ===== End physics.cpp =====
 
@@ -807,12 +835,11 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 #include <glm/glm.hpp>
 #include "gameobject.hpp"
 #include "tilemap.hpp"
+#include "globals.hpp"
 
 struct Sensor {
     glm::vec2 position; // Position of the sensor relative to the player
 };
-
-const float epsilon = 0.01f; // Small offset to avoid sticking to tiles
 
 // PlayerObject class inherits from GameObject
 class PlayerObject : public GameObject {
@@ -1397,14 +1424,16 @@ void Tilemap::renderTileMap(Shader& shader, Renderer2D& renderer) const {
     for (int y = 0; y < height_; ++y) {
         for (int x = 0; x < width_; ++x) {
             const Tile& tile = tiles[y][x];
-            
+
             if(g_debug_enabled){
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(tile.position, 0.0f));
+                glm::vec2 tileCenter = tile.position + glm::vec2(tilesize_ / 2.0f, tilesize_ / 2.0f);
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(tileCenter, 0.0f));
                 model = glm::scale(model, glm::vec3(tilesize_, tilesize_, 1.0f));
                 renderer.drawQuad(shader, model, tile.tileType.color);
             }
             if (tile.tileType.type != TileEnum::EMPTY) {
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(tile.position, 0.0f));
+                glm::vec2 tileCenter = tile.position + glm::vec2(tilesize_ / 2.0f, tilesize_ / 2.0f);
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(tileCenter, 0.0f));
                 model = glm::scale(model, glm::vec3(tilesize_, tilesize_, 1.0f));
                 renderer.drawQuad(shader, model, tile.tileType.color);
             }
@@ -1623,35 +1652,16 @@ int main(void){
         return -1; // Exit if initialization fails
     }
 
-    renderer.initLine(shader); // Initialize line rendering if needed
-
-    // --- INITIAL WORLD DIMENSIONS (used only to set initial object positions) ---
-    // float initialWorldHeight = 5.0f;
-    // float initialAspectRatio = 1920.0f / 1080.0f;
-    // float initialWorldWidth = initialWorldHeight * initialAspectRatio;
+    renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
 
     // --- TILEMAP SETUP ---
-    std::string tilemapFile = "./assets/test.tilemap";
+    std::string tilemapFile = "./assets/test.tmap";
 
     Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
 
-    // Verify that tilemap loaded correctly by printing it out to console, line by line
-    std::cout<<"Loaded tilema data:"<<std::endl;
-    for(int y = tilemap.getHeight() - 1; y >= 0; --y) {
-        for(int x = 0; x < tilemap.getWidth(); ++x) {
-            Tile& tile = tilemap.getTile(x, y);
-            std::cout << (tile.tileType.type == TileEnum::SOLID ? '#' : '.');
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
     // Set player position in tilemap
     PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
 
-    // Set up game objects
-    // std::vector<GameObject> objects = setupObjects(initialWorldHeight, initialWorldWidth);
-
-    // objects[1].setGrounded(true); // Set the player object to be grounded initially
     player.setGrounded(true); // Set the player object to be grounded initially
 
     // Initialize input system
@@ -1661,8 +1671,6 @@ int main(void){
     Action actionSystem;
     Physics physicsSystem;
 
-    // int leftdir = -1;
-    // int rightdir = 1;
     float playerspeed = 1.0f;
         
     float lastFrameTime = glfwGetTime(); // seconds
@@ -1681,26 +1689,11 @@ int main(void){
             break; // Exit the loop if escape is pressed
         }
 
-        // Check player collisions with tilemap
-        physicsSystem.checkPlayerWorldCollisions(player, tilemap);
-        
-        // Secondary object movement
-        // miscMovement(objects, initialWorldWidth, leftdir, rightdir, actionSystem);
-
-        // Apply physics step
+        // Check player collisions with tilemap, then move accordingly
         physicsSystem.playerMovementStep(player, deltaTime);
-        // queueActions(objects, actionSystem, deltaTime);
-
-        // Compute MVP, draw objects
-        // drawStep(window, renderer, shader, objects);
-        // tilemap.renderTileMap(shader, renderer);
-        // drawStepPlayer(window, renderer, shader, player);
-        // window.swap();
+        physicsSystem.checkPlayerWorldCollisions(player, tilemap);
 
         drawTilemapAndPlayer(window, renderer, shader, tilemap, player);
-        // Render tilemap
-
-        // applyActions(objects, actionSystem);
         
         auto frameEnd = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = frameEnd - frameStart;

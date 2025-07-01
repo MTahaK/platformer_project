@@ -17,17 +17,6 @@ int main(void){
 
     Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
 
-    // Verify that tilemap loaded correctly by printing it out to console, line by line
-    std::cout<<"Loaded tilemap data:"<<std::endl;
-    for(int y = tilemap.getHeight() - 1; y >= 0; --y) {
-        for(int x = 0; x < tilemap.getWidth(); ++x) {
-            Tile& tile = tilemap.getTile(x, y);
-            std::cout << (tile.tileType.type == TileEnum::SOLID ? '#' : '.');
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
     // Set player position in tilemap
     PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
 
@@ -59,8 +48,8 @@ int main(void){
         }
 
         // Check player collisions with tilemap, then move accordingly
-        physicsSystem.checkPlayerWorldCollisions(player, tilemap);
         physicsSystem.playerMovementStep(player, deltaTime);
+        physicsSystem.checkPlayerWorldCollisions(player, tilemap);
 
         drawTilemapAndPlayer(window, renderer, shader, tilemap, player);
         

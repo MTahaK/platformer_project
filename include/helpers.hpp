@@ -22,10 +22,6 @@
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 
-const float movementAccel = 5.0f; // Acceleration applied when moving left/right
-const float slowdownAccel = 16.0f; // Acceleration applied when slowing down
-const float midairDrag = 1.0f;
-
 int initializeVisuals(Shader& shader, Renderer2D& renderer){
     // Loader shaders
     if(!shader.load("shaders/vertex.glsl", "shaders/fragment.glsl")){
@@ -125,7 +121,7 @@ int playerInput(GameObject& player, float& playerspeed) {
     if(Input::isKeyJustPressed(GLFW_KEY_UP) || Input::isKeyPressed(GLFW_KEY_W)){
         if(player.isGrounded()){
             // player.setGrounded(false); // Set player to not grounded
-            player.addVelocity(glm::vec2(0.0f, 5.0f)); // Apply upward velocity
+            player.addVelocity(glm::vec2(0.0f, 7.0f)); // Apply upward velocity
             player.setGrounded(false); // Set player to not grounded`
         }
     }

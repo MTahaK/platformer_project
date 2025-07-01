@@ -2,12 +2,11 @@
 #include <glm/glm.hpp>
 #include "gameobject.hpp"
 #include "tilemap.hpp"
+#include "globals.hpp"
 
 struct Sensor {
     glm::vec2 position; // Position of the sensor relative to the player
 };
-
-const float epsilon = 0.0001f; // Small offset to avoid sticking to tiles
 
 // PlayerObject class inherits from GameObject
 class PlayerObject : public GameObject {
