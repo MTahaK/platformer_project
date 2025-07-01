@@ -11,6 +11,9 @@ SRC  := $(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/*.c)
 OBJ  := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(filter %.cpp,$(SRC)))
 OBJ += $(patsubst $(SRC_DIR)/%.c,  $(BUILD_DIR)/%.o,$(filter %.c,  $(SRC)))
 
+# Dependency files
+DEPS := $(OBJ:.o=.d)
+
 TARGET := game
 
 all: $(TARGET)
@@ -25,6 +28,8 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+-include $(DEPS)
 
 clean:
 	rm -rf $(BUILD_DIR) $(TARGET)

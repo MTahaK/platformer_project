@@ -55,28 +55,17 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
         player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
         player.offsetPosition(glm::vec2(0.0f, -epsilon));
     }
-    // if (player.tileCollision(tilemap, player.getBottomSensor())) {
-    //     // Snap player up to just above ground
-    //     float yTile = std::floor(player.getBottomSensor().position.y);
-    //     float ySnap = (yTile + 1) * tilemap.getTileSize() + player.getScale().y/2.0f + epsilon;
-    //     player.setPosition(glm::vec2(player.getPosition().x, ySnap));
-    //     player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
-    //     player.setGrounded(true);
-    // } else{
-    //     player.setGrounded(false);
-    // }
-    const float groundSnapDist = 0.02f; // or slightly > epsilon
+    const float groundSnapDist = 0.02f;
 
     bool isOnGround = false;
     if (player.tileCollision(tilemap, player.getBottomSensor())) {
         isOnGround = true;
     } else {
-        // Probe a bit below the player (anti-hysteresis): is there ground just below?
+        // Probe a bit below the player: is there ground just below?
         glm::vec2 probe = player.getBottomSensor().position + glm::vec2(0, -groundSnapDist);
         glm::ivec2 idx = tilemap.worldToTileIndex(probe);
         if (tilemap.isSolidTile(idx.x, idx.y) && player.getVelocity().y <= 0.1f) {
             isOnGround = true;
-            // Optionally snap player up to ground height here if you wish.
         }
     }
     player.setGrounded(isOnGround);
