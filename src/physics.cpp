@@ -40,28 +40,25 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 }
 
 void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {
+    float epsilon = 0.001f; // Small offset to avoid sticking to tiles
     // Check collisions with the tilemap using sensors
     if (player.tileCollision(tilemap, player.getLeftSensor())) {
-
-        std::cout << "Left collision detected at position: "<< player.getLeftSensor().position.x << ", " << player.getLeftSensor().position.y << std::endl;
-
-        // player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
-        // player.offsetPosition(glm::vec2(0.01f, 0.0f)); // Offset to avoid sticking
+        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
+        player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
+        player.offsetPosition(glm::vec2(epsilon, 0.0f)); // Offset to avoid sticking
     }
     if (player.tileCollision(tilemap, player.getRightSensor())) {
-        std::cout << "Right collision detected at position: "<< player.getRightSensor().position.x << ", " << player.getRightSensor().position.y << std::endl;
-        // player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
-        // player.offsetPosition(glm::vec2(-0.01f, 0.0f)); // Offset to avoid sticking
+        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
+        player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y));
+        player.offsetPosition(glm::vec2(-epsilon, 0.0f));
     }
     if (player.tileCollision(tilemap, player.getTopSensor())) {
-        std::cout << "Top collision detected at position: "<< player.getTopSensor().position.x << ", " << player.getTopSensor().position.y << std::endl;
-        // player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f)); // Stop vertical movement
-        // player.offsetPosition(glm::vec2(0.0f, -0.01f)); // Offset to avoid sticking
+        player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+        player.offsetPosition(glm::vec2(0.0f, -epsilon));
     }
     if (player.tileCollision(tilemap, player.getBottomSensor())) {
-        std::cout << "Bottom collision detected at position: "<< player.getBottomSensor().position.x << ", " << player.getBottomSensor().position.y << std::endl;
-        // player.setGrounded(true); // Set grounded state
-        // player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f)); // Stop vertical movement
-        // player.offsetPosition(glm::vec2(0.0f, 0.01f)); // Offset to avoid sticking
+        player.setGrounded(true);
+        player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+        player.offsetPosition(glm::vec2(0.0f, epsilon));
     }
 }

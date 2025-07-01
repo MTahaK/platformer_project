@@ -7,7 +7,7 @@ struct Sensor {
     glm::vec2 position; // Position of the sensor relative to the player
 };
 
-const float epsilon = 0.01f; // Small offset to avoid sticking to tiles
+const float epsilon = 0.0001f; // Small offset to avoid sticking to tiles
 
 // PlayerObject class inherits from GameObject
 class PlayerObject : public GameObject {
