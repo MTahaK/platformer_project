@@ -86,10 +86,10 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tilesize) {
                     break;
                 case '.': // Empty tile
                 default:
-                    type = { TileEnum::EMPTY, glm::vec4(0.9f, 0.9f, 0.9f, 1.0f) };
+                    type = { TileEnum::EMPTY, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f) };
                     break;
                 case 'P': // Player start position
-                    type = { TileEnum::EMPTY, glm::vec4(0.9f, 0.9f, 0.9f, 1.0f) }; // Green for player
+                    type = { TileEnum::EMPTY, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f) }; // Green for player
                     tilemap.setPlayerPosition(x, y); // Set player position
                     break;
             }

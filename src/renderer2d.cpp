@@ -131,10 +131,6 @@ void Renderer2D::beginScene(Shader& shader, const glm::mat4& view, const glm::ma
     // Use the shader program
     shader.use();
 
-    // Set the view and projection matrices in the shader
-    // shader.setMat4("view", view);
-    // shader.setMat4("projection", proj);
-
     // Save view and proj matrices
     view_ = view;
     proj_ = proj;

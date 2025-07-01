@@ -47,11 +47,11 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
     player.setPosition(playerWorldPos);
     player.setScale(glm::vec2(1.0f, 1.0f)); // One tile wide/high
     player.setRotation(0.0f);
-    player.setColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)); // Green color
+    player.setColor(glm::vec4(0.0, 0.149, 0.557, 1.0));
     player.setName("Player Object");
 
     // Initialize sensor positions
-    player.sensorUpdate();
+    player.setUpSensors();
 
     return player;
 }
@@ -318,8 +318,20 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 
     // Draw player sensors
     if(g_debug_enabled){
-        renderer.drawLine(shader, player.getLeftSensor().position, player.getRightSensor().position, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red line for left-right sensors
-        renderer.drawLine(shader, player.getTopSensor().position, player.getBottomSensor().position, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)); // Blue line for top-bottom sensors
+        
+        glm::vec2 pOrigin = player.getPosition();
+        // Bottom-Left sensor starts from middle-left and goes down
+        renderer.drawLine(shader, pOrigin + glm::vec2(-player.getScale().x / 2.0f - epsilon, 0.0f), player.getASensor().position, player.getASensor().color);
+        // Bottom-Right sensor starts from middle-right and goes down
+        renderer.drawLine(shader, pOrigin + glm::vec2(player.getScale().x / 2.0f + epsilon, 0.0f), player.getBSensor().position, player.getBSensor().color);
+        // Top-Left sensor starts from middle-left and goes up
+        renderer.drawLine(shader, pOrigin + glm::vec2(-player.getScale().x / 2.0f - epsilon, 0.0f), player.getCSensor().position, player.getCSensor().color);
+        // Top-Right sensor starts from middle-right and goes up
+        renderer.drawLine(shader, pOrigin + glm::vec2(player.getScale().x / 2.0f + epsilon, 0.0f), player.getDSensor().position, player.getDSensor().color);
+        // Left sensor starts from middle and goes left
+        renderer.drawLine(shader, pOrigin, player.getESensor().position, player.getESensor().color);
+        // Right sensor starts from middle and goes right
+        renderer.drawLine(shader, pOrigin, player.getFSensor().position, player.getFSensor().color);
     }
 
     // Swap buffers

@@ -41,35 +41,35 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 
 void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {
     // Check collisions with the tilemap using sensors
-    if (player.tileCollision(tilemap, player.getLeftSensor())) {
-        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
-        player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
-        player.offsetPosition(glm::vec2(epsilon, 0.0f)); // Offset to avoid sticking
-    }
-    if (player.tileCollision(tilemap, player.getRightSensor())) {
-        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
-        player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y));
-        player.offsetPosition(glm::vec2(-epsilon, 0.0f));
-    }
-    if (player.tileCollision(tilemap, player.getTopSensor())) {
-        player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
-        player.offsetPosition(glm::vec2(0.0f, -epsilon));
-    }
-    const float groundSnapDist = 0.02f;
+    // if (player.tileCollision(tilemap, player.getLeftSensor())) {
+    //     player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
+    //     player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
+    //     player.offsetPosition(glm::vec2(epsilon, 0.0f)); // Offset to avoid sticking
+    // }
+    // if (player.tileCollision(tilemap, player.getRightSensor())) {
+    //     player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
+    //     player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y));
+    //     player.offsetPosition(glm::vec2(-epsilon, 0.0f));
+    // }
+    // if (player.tileCollision(tilemap, player.getTopSensor())) {
+    //     player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+    //     player.offsetPosition(glm::vec2(0.0f, -epsilon));
+    // }
+    // const float groundSnapDist = 0.02f;
 
-    bool isOnGround = false;
-    if (player.tileCollision(tilemap, player.getBottomSensor())) {
-        isOnGround = true;
-    } else {
-        // Probe a bit below the player: is there ground just below?
-        glm::vec2 probe = player.getBottomSensor().position + glm::vec2(0, -groundSnapDist);
-        glm::ivec2 idx = tilemap.worldToTileIndex(probe);
-        if (tilemap.isSolidTile(idx.x, idx.y) && player.getVelocity().y <= 0.1f) {
-            isOnGround = true;
-        }
-    }
-    player.setGrounded(isOnGround);
-    if(isOnGround){
-        player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
-    }
+    // bool isOnGround = false;
+    // if (player.tileCollision(tilemap, player.getBottomSensor())) {
+    //     isOnGround = true;
+    // } else {
+    //     // Probe a bit below the player: is there ground just below?
+    //     glm::vec2 probe = player.getBottomSensor().position + glm::vec2(0, -groundSnapDist);
+    //     glm::ivec2 idx = tilemap.worldToTileIndex(probe);
+    //     if (tilemap.isSolidTile(idx.x, idx.y) && player.getVelocity().y <= 0.1f) {
+    //         isOnGround = true;
+    //     }
+    // }
+    // player.setGrounded(isOnGround);
+    // if(isOnGround){
+    //     player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+    // }
 }
