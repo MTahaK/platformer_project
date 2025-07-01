@@ -296,7 +296,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
     float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
 
     // Define a fixed vertical size for the in-game "world"
-    float worldHeight = 5.0f;
+    float worldHeight = 5.5f;
     float worldWidth = worldHeight * aspect;
 
     // Projection matrix (orthographic): dynamic, based on aspect
@@ -307,7 +307,11 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
     );
 
     // View matrix: identity for now (no camera)
-    glm::mat4 view = glm::mat4(1.0f);
+    glm::vec2 cameraCenter = player.getPosition();
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(
+        -cameraCenter.x + worldWidth / 2.0f - 0.3f, // Camera slightly to the right of player
+        -cameraCenter.y + worldHeight / 2.0f - 0.7f, // Camera slightly above player
+        0.0f));
 
     renderer.beginScene(shader, view, projection); // Begin the scene
 
