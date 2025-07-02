@@ -25,10 +25,10 @@ void PlayerObject::setUpSensors(){
     // // Debugging: Print sensor positions
     // std::cout << "PlayerObject sensors initialized:" << std::endl;
 
-    // leftSensor.position   = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
-    // rightSensor.position  = getPosition() + glm::vec2( getScale().x / 2.0f + epsilon, 0.0f);
-    // topSensor.position    = getPosition() + glm::vec2(0.0f,  getScale().y / 2.0f + epsilon);
-    // bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
+    leftSensor.position   = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
+    rightSensor.position  = getPosition() + glm::vec2( getScale().x / 2.0f + epsilon, 0.0f);
+    topSensor.position    = getPosition() + glm::vec2(0.0f,  getScale().y / 2.0f + epsilon);
+    bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
 
     bottomSensor.color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
     topSensor.color = glm::vec4(0.0f, 0.8f, 1.0f, 1.0f);
