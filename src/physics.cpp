@@ -117,43 +117,83 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 // }
 
 void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {
+
+    // ! NOTE: TILE STRUCT POSITION STARTS AT BOTTOM LEFT CORNER, NOT CENTER
     // Check collisions with the tilemap using sensors
     if (player.tileCollision(tilemap, player.getLeftSensor())) {
-        std::cout<<"Left sensor collision detected\n";
         player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
         player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
-        player.offsetPosition(glm::vec2(epsilon, 0.0f)); // Offset to avoid sticking
+
+        glm::ivec2 tileidx = tilemap.worldToTileIndex(player.getLeftSensor().position);
+        auto tile = tilemap.getTile(tileidx.x, tileidx.y);
+        float tileposx = tile.position.x;
+        float tileright = tileposx + tilemap.getTileSize();
+
+        DEBUG_ONLY(
+        std::cout<<"Left sensor position: "<<player.getLeftSensor().position.x<<"\n";
+        std::cout<<"Tile right position: "<<tileright<<"\n";);
+
+        if(player.getLeftSensor().position.x < tileright) {
+            // If left sensor is to left of right tile edge, snap it to the right edge
+            player.offsetPosition(glm::vec2(tileright - player.getLeftSensor().position.x + epsilon, 0.0f));
+        }
         player.sensorUpdate();  // Immediate sensor update after any movement
     }
     if (player.tileCollision(tilemap, player.getRightSensor())) {
         player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
         player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y));
-        player.offsetPosition(glm::vec2(-epsilon, 0.0f));
+
+        glm::ivec2 tileidx = tilemap.worldToTileIndex(player.getRightSensor().position);
+        auto tile = tilemap.getTile(tileidx.x, tileidx.y);
+        float tileleft = tile.position.x; // Tile position is bottom left corner, can just use position.x
+
+        DEBUG_ONLY(
+        std::cout<<"Right sensor position: "<<player.getRightSensor().position.x<<"\n";
+        std::cout<<"Tile left position: "<<tileleft<<"\n";);
+
+        if(player.getRightSensor().position.x > tileleft) {
+            // If right sensor is to right of left tile edge, snap it to the left edge
+            player.offsetPosition(glm::vec2(tileleft - player.getRightSensor().position.x - epsilon, 0.0f));
+        }
         player.sensorUpdate();
     }
     if (player.tileCollision(tilemap, player.getTopSensor())) {
         player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
-        player.offsetPosition(glm::vec2(0.0f, -epsilon));
+        player.setAcceleration(glm::vec2(player.getAcceleration().x, gravity)); // Reset vertical acceleration
+
+        glm::ivec2 tileidx = tilemap.worldToTileIndex(player.getTopSensor().position);
+        auto tile = tilemap.getTile(tileidx.x, tileidx.y);
+        float tilebot = tile.position.y; // Tile position is bottom left corner, can just use position.y
+
+        DEBUG_ONLY(
+        std::cout<<"Top sensor position: "<<player.getTopSensor().position.x<<"\n";
+        std::cout<<"Tile bottom position: "<<tilebot<<"\n";);
+        if( player.getTopSensor().position.y > tilebot) {
+            // If the bottom sensor is above the tile top, snap it to the tile top
+            player.offsetPosition(glm::vec2(0.0f, tilebot - player.getTopSensor().position.y - epsilon));
+        }
+
         player.sensorUpdate();
     }
     const float groundSnapDist = 0.02f;
 
     bool isOnGround = false;
     if (player.tileCollision(tilemap, player.getBottomSensor())) {
+
         isOnGround = true;
         glm::ivec2 tileidx = tilemap.worldToTileIndex(player.getBottomSensor().position);
         auto tile = tilemap.getTile(tileidx.x, tileidx.y);
         float tileposy = tile.position.y;
         float tiletop = tileposy + tilemap.getTileSize();
         DEBUG_ONLY(
-        std::cout<<"Bottom sensor position: "<<player.getBottomSensor().position.y<<"\n";
+        std::cout<<"Bottom sensor position: "<<player.getBottomSensor().position.x<<"\n";
         std::cout<<"Tile top position: "<<tiletop<<"\n";);
         if( player.getBottomSensor().position.y < tiletop) {
-            std::cout<<"Snapping player to tile top\n";
             // If the bottom sensor is above the tile top, snap it to the tile top
-            player.offsetPosition(glm::vec2(0.0f, tiletop - player.getBottomSensor().position.y));
+            player.offsetPosition(glm::vec2(0.0f, tiletop - player.getBottomSensor().position.y + epsilon));
         }
-    } else {
+    } 
+    else {
         // Probe a bit below the player: is there ground just below?
         glm::vec2 probe = player.getBottomSensor().position + glm::vec2(0, -groundSnapDist);
         glm::ivec2 idx = tilemap.worldToTileIndex(probe);
@@ -164,6 +204,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
     player.setGrounded(isOnGround);
     if(isOnGround){
         player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+        player.setAcceleration(glm::vec2(player.getAcceleration().x, 0.0f)); // Reset vertical acceleration
         player.sensorUpdate();
     }
 }
