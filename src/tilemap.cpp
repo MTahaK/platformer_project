@@ -32,13 +32,6 @@ void Tilemap::renderTileMap(Shader& shader, Renderer2D& renderer) const {
     for (int y = 0; y < height_; ++y) {
         for (int x = 0; x < width_; ++x) {
             const Tile& tile = tiles[y][x];
-
-            if(g_debug_enabled){
-                glm::vec2 tileCenter = tile.position + glm::vec2(tilesize_ / 2.0f, tilesize_ / 2.0f);
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(tileCenter, 0.0f));
-                model = glm::scale(model, glm::vec3(tilesize_, tilesize_, 1.0f));
-                renderer.drawQuad(shader, model, tile.tileType.color);
-            }
             if (tile.tileType.type != TileEnum::EMPTY) {
                 glm::vec2 tileCenter = tile.position + glm::vec2(tilesize_ / 2.0f, tilesize_ / 2.0f);
                 glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(tileCenter, 0.0f));

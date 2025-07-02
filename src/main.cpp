@@ -39,7 +39,7 @@ int main(void){
         auto frameStart = std::chrono::high_resolution_clock::now();
         float deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
-
+        player.sensorUpdate();
         // Poll for events
         window.pollEvents();
 
@@ -51,9 +51,9 @@ int main(void){
         
         physicsSystem.playerMovementStep(player, deltaTime);
         physicsSystem.checkPlayerWorldCollisions(player, tilemap);
-        if(g_debug_enabled && !player.isGrounded()){
-            std::cout<<"Player has left the ground\n";
-        }
+        // if(g_debug_enabled && !player.isGrounded()){
+        //     std::cout<<"Player has left the ground\n";
+        // }
 
         drawTilemapAndPlayer(window, renderer, shader, tilemap, player);
         

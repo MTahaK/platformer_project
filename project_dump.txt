@@ -273,7 +273,7 @@ const AABB GameObject::computeOffsetAABB(const glm::vec2& offset) {
 // ===== Begin globals.hpp =====
 #pragma once
 
-const float epsilon = 0.001f;
+const float epsilon = 0.001f;  // Increased for more reliable collision detection
 // ===== End globals.hpp =====
 
 // ===== Begin helpers.hpp =====
@@ -600,17 +600,29 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
         
         glm::vec2 pOrigin = player.getPosition();
         // Bottom-Left sensor starts from middle-left and goes down
-        renderer.drawLine(shader, pOrigin + glm::vec2(-player.getScale().x / 2.0f - epsilon, 0.0f), player.getASensor().position, player.getASensor().color);
-        // Bottom-Right sensor starts from middle-right and goes down
-        renderer.drawLine(shader, pOrigin + glm::vec2(player.getScale().x / 2.0f + epsilon, 0.0f), player.getBSensor().position, player.getBSensor().color);
-        // Top-Left sensor starts from middle-left and goes up
-        renderer.drawLine(shader, pOrigin + glm::vec2(-player.getScale().x / 2.0f - epsilon, 0.0f), player.getCSensor().position, player.getCSensor().color);
-        // Top-Right sensor starts from middle-right and goes up
-        renderer.drawLine(shader, pOrigin + glm::vec2(player.getScale().x / 2.0f + epsilon, 0.0f), player.getDSensor().position, player.getDSensor().color);
-        // Left sensor starts from middle and goes left
-        renderer.drawLine(shader, pOrigin, player.getESensor().position, player.getESensor().color);
-        // Right sensor starts from middle and goes right
-        renderer.drawLine(shader, pOrigin, player.getFSensor().position, player.getFSensor().color);
+        // renderer.drawLine(shader, pOrigin + glm::vec2(-player.getScale().x / 2.0f - epsilon, 0.0f), player.getASensor().position, player.getASensor().color);
+        // // Bottom-Right sensor starts from middle-right and goes down
+        // renderer.drawLine(shader, pOrigin + glm::vec2(player.getScale().x / 2.0f + epsilon, 0.0f), player.getBSensor().position, player.getBSensor().color);
+
+        // Bottom sensor starts from middle and goes down
+        // renderer.drawLine(shader, pOrigin, player.getBottomSensor().position, player.getBottomSensor().color);
+        // // Top-Left sensor starts from middle-left and goes up
+        // renderer.drawLine(shader, pOrigin + glm::vec2(-player.getScale().x / 2.0f - epsilon, 0.0f), player.getCSensor().position, player.getCSensor().color);
+        // // Top-Right sensor starts from middle-right and goes up
+        // renderer.drawLine(shader, pOrigin + glm::vec2(player.getScale().x / 2.0f + epsilon, 0.0f), player.getDSensor().position, player.getDSensor().color);
+        // // Left sensor starts from middle and goes left
+        // renderer.drawLine(shader, pOrigin, player.getESensor().position, player.getESensor().color);
+        // // Right sensor starts from middle and goes right
+        // renderer.drawLine(shader, pOrigin, player.getFSensor().position, player.getFSensor().color);
+
+        // Draw bottom sensor
+        renderer.drawLine(shader, pOrigin, player.getBottomSensor().position, player.getBottomSensor().color);
+        // Draw top sensor
+        renderer.drawLine(shader, pOrigin, player.getTopSensor().position, player.getTopSensor().color);
+        // Draw left sensor
+        renderer.drawLine(shader, pOrigin, player.getLeftSensor().position, player.getLeftSensor().color);
+        // Draw right sensor
+        renderer.drawLine(shader, pOrigin, player.getRightSensor().position, player.getRightSensor().color);
     }
 
     // Swap buffers
@@ -733,6 +745,7 @@ std::vector<int> Input::tracked_keys = {
 #include "gameobject.hpp"
 #include "playerobject.hpp"
 #include "tilemap.hpp"
+#include "debug.hpp"
 
 const float gravity = -8.0f;
 const float MAX_VELOCITY = 10.0f; // Maximum velocity limit
@@ -740,6 +753,7 @@ const float MAX_VELOCITY = 10.0f; // Maximum velocity limit
 const float movementAccel = 5.0f; // Acceleration applied when moving left/right
 const float slowdownAccel = 16.0f; // Acceleration applied when slowing down
 const float midairDrag = 1.0f;
+
 class Physics {
 
     public:
@@ -760,117 +774,108 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
     player.addVelocity(glm::vec2(velX, 0.0f)); // Add horizontal velocity
 
     if(std::abs(player.getVelocity().x) >= MAX_VELOCITY) { // Limit horizontal velocity
-        if(velX > 0.0f)
+        if(velX > 0.0f){
             player.setVelocity(glm::vec2(MAX_VELOCITY, player.getVelocity().y)); // Limit to MAX_VELOCITY
+            player.sensorUpdate();
+        }
         else if(velX < 0.0f) {
             player.setVelocity(glm::vec2(-MAX_VELOCITY, player.getVelocity().y)); // Limit to -MAX_VELOCITY
+            player.sensorUpdate();
         }
     }
     player.applyVelocity(deltaTime); // Apply velocity to each object
     if (std::abs(player.getVelocity().x) < 0.01f) {
         player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
+        player.sensorUpdate();
     }
     
     // Vertical pass + gravity
     if (player.isGrounded()) {
         player.setVelocity(glm::vec2(player.getVelocity().x, 0));
-        player.sensorUpdate();
-        return;
+        player.sensorUpdate();  // KEEP THIS UPDATE HERE! ESSENTIAL FOR PREVENTING SENSORS FROM LAGGING BEHIND
+
+        return;  // Early return, no vertical movement needed
     }
     float velY = (player.getAcceleration().y + gravity) * deltaTime; // Calculate vertical velocity
     
     player.addVelocity(glm::vec2(0.0f, velY));
 
     if(std::abs(player.getVelocity().y) >= MAX_VELOCITY) { // Limit vertical velocity
-        if(velY > 0.0f)
+        if(velY > 0.0f){
             player.setVelocity(glm::vec2(player.getVelocity().x, MAX_VELOCITY)); // Limit to MAX_VELOCITY
+            player.sensorUpdate();
+        }
         else if(velY < 0.0f) {
             player.setVelocity(glm::vec2(player.getVelocity().x, -MAX_VELOCITY)); // Limit to -MAX_VELOCITY
+            player.sensorUpdate();
         }
     }
+    player.sensorUpdate();  // KEEP THIS UPDATE HERE! ESSENTIAL FOR PREVENTING SENSORS FROM LAGGING BEHIND
 
-    // Update sensor positions
-    player.sensorUpdate();
-}
-
-void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {
-    player.sensorUpdate();
-    // Check collisions with the tilemap using sensors
-    if (player.tileCollision(tilemap, player.getESensor())) {
-        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
-        player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
-        player.offsetPosition(glm::vec2(epsilon, 0.0f)); // Offset to avoid sticking
-    }
-    if (player.tileCollision(tilemap, player.getFSensor())) {
-        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
-        player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y));
-        player.offsetPosition(glm::vec2(-epsilon, 0.0f));
-    }
-    if (player.tileCollision(tilemap, player.getCSensor()) ||
-        player.tileCollision(tilemap, player.getDSensor())) {
-        player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
-        player.offsetPosition(glm::vec2(0.0f, -epsilon));
-    }
-    const float groundSnapDist = 0.02f;
-
-    bool isOnGround = false;
-    if (player.tileCollision(tilemap, player.getASensor()) ||
-        player.tileCollision(tilemap, player.getBSensor())) {
-        isOnGround = true;
-    } else {
-        glm::vec2 leftprobe, rightprobe;
-        leftprobe = player.getASensor().position + glm::vec2(0, -groundSnapDist);
-        rightprobe = player.getBSensor().position + glm::vec2(0, -groundSnapDist);
-        
-        // Probe a bit below the player: is there ground just below?
-        // Left check
-        glm::ivec2 idx = tilemap.worldToTileIndex(leftprobe);
-        if(tilemap.isSolidTile(idx.x, idx.y) && player.getVelocity().y <= 0.1f){
-            // Probe triggered on left bottom sensor
-            isOnGround = true;
-        } else{
-            // If not on left, check right
-            idx = tilemap.worldToTileIndex(rightprobe);
-            if(tilemap.isSolidTile(idx.x, idx.y) && player.getVelocity().y <= 0.1f){
-                // Probe triggered on right bottom sensor
-                isOnGround = true;
-            }
-        }
-        
-    }
-    player.setGrounded(isOnGround);
-    if(isOnGround){
-        player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
-    }
 }
 
 // void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {
+//     player.sensorUpdate();
 //     // Check collisions with the tilemap using sensors
-//     if (player.tileCollision(tilemap, player.getLeftSensor())) {
+//     if (player.tileCollision(tilemap, player.getESensor())) {
 //         player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
 //         player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
-//         player.offsetPosition(glm::vec2(epsilon, 0.0f)); // Offset to avoid sticking
+//         player.offsetPosition(glm::vec2(2*epsilon, 0.0f)); // Offset to avoid sticking
 //     }
-//     if (player.tileCollision(tilemap, player.getRightSensor())) {
+//     if (player.tileCollision(tilemap, player.getFSensor())) {
 //         player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
 //         player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y));
-//         player.offsetPosition(glm::vec2(-epsilon, 0.0f));
+//         player.offsetPosition(glm::vec2(-2*epsilon, 0.0f));
 //     }
-//     if (player.tileCollision(tilemap, player.getTopSensor())) {
+//     if (player.tileCollision(tilemap, player.getCSensor()) ||
+//         player.tileCollision(tilemap, player.getDSensor())) {
 //         player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
 //         player.offsetPosition(glm::vec2(0.0f, -epsilon));
 //     }
-//     const float groundSnapDist = 0.02f;
+//     // const float groundSnapDist = 0.02f;
+
+//     // bool isOnGround = false;
+//     // if (player.tileCollision(tilemap, player.getASensor()) ||
+//     //     player.tileCollision(tilemap, player.getBSensor())) {
+//     //     isOnGround = true;
+//     // } else {
+//     //     glm::vec2 leftprobe, rightprobe;
+//     //     leftprobe = player.getASensor().position + glm::vec2(0, -groundSnapDist);
+//     //     rightprobe = player.getBSensor().position + glm::vec2(0, -groundSnapDist);
+        
+//     //     // Probe a bit below the player: is there ground just below?
+//     //     // Left check
+//     //     glm::ivec2 idx = tilemap.worldToTileIndex(leftprobe);
+//     //     if(tilemap.isSolidTile(idx.x, idx.y) && player.getVelocity().y <= 0.1f){
+//     //         // Probe triggered on left bottom sensor
+//     //         isOnGround = true;
+//     //     } else{
+//     //         // If not on left, check right
+//     //         idx = tilemap.worldToTileIndex(rightprobe);
+//     //         if(tilemap.isSolidTile(idx.x, idx.y) && player.getVelocity().y <= 0.1f){
+//     //             // Probe triggered on right bottom sensor
+//     //             isOnGround = true;
+//     //         }
+//     //     }
+        
+//     // }
+//     // player.setGrounded(isOnGround);
+//     // if(isOnGround){
+//     //     player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+//     // }
+
+//     const float groundSnapDist = 0.02f; // or slightly > epsilon
 
 //     bool isOnGround = false;
 //     if (player.tileCollision(tilemap, player.getBottomSensor())) {
 //         isOnGround = true;
 //     } else {
-//         // Probe a bit below the player: is there ground just below?
+//         // Probe a bit below the player (anti-hysteresis): is there ground just below?
 //         glm::vec2 probe = player.getBottomSensor().position + glm::vec2(0, -groundSnapDist);
 //         glm::ivec2 idx = tilemap.worldToTileIndex(probe);
 //         if (tilemap.isSolidTile(idx.x, idx.y) && player.getVelocity().y <= 0.1f) {
 //             isOnGround = true;
+//             // Optionally snap player up to ground height here if you wish.
 //         }
 //     }
 //     player.setGrounded(isOnGround);
@@ -878,6 +883,58 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 //         player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
 //     }
 // }
+
+void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {
+    // Check collisions with the tilemap using sensors
+    if (player.tileCollision(tilemap, player.getLeftSensor())) {
+        std::cout<<"Left sensor collision detected\n";
+        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y)); // Stop horizontal movement
+        player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
+        player.offsetPosition(glm::vec2(epsilon, 0.0f)); // Offset to avoid sticking
+        player.sensorUpdate();  // Immediate sensor update after any movement
+    }
+    if (player.tileCollision(tilemap, player.getRightSensor())) {
+        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
+        player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y));
+        player.offsetPosition(glm::vec2(-epsilon, 0.0f));
+        player.sensorUpdate();
+    }
+    if (player.tileCollision(tilemap, player.getTopSensor())) {
+        player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+        player.offsetPosition(glm::vec2(0.0f, -epsilon));
+        player.sensorUpdate();
+    }
+    const float groundSnapDist = 0.02f;
+
+    bool isOnGround = false;
+    if (player.tileCollision(tilemap, player.getBottomSensor())) {
+        isOnGround = true;
+        glm::ivec2 tileidx = tilemap.worldToTileIndex(player.getBottomSensor().position);
+        auto tile = tilemap.getTile(tileidx.x, tileidx.y);
+        float tileposy = tile.position.y;
+        float tiletop = tileposy + 0.5f * tilemap.getTileSize();
+        DEBUG_ONLY(
+        std::cout<<"Bottom sensor position: "<<player.getBottomSensor().position.y<<"\n";
+        std::cout<<"Tile top position: "<<tiletop<<"\n";);
+        if( player.getBottomSensor().position.y < tiletop) {
+            std::cout<<"Snapping player to tile top\n";
+            // If the bottom sensor is above the tile top, snap it to the tile top
+            player.offsetPosition(glm::vec2(0.0f, tiletop - player.getBottomSensor().position.y));
+        }
+    } else {
+        // Probe a bit below the player: is there ground just below?
+        glm::vec2 probe = player.getBottomSensor().position + glm::vec2(0, -groundSnapDist);
+        glm::ivec2 idx = tilemap.worldToTileIndex(probe);
+        if (tilemap.isSolidTile(idx.x, idx.y) && player.getVelocity().y <= 0.1f) {
+            isOnGround = true;
+        }
+    }
+    player.setGrounded(isOnGround);
+    if(isOnGround){
+        player.setVelocity(glm::vec2(player.getVelocity().x, 0.0f));
+        player.sensorUpdate();
+    }
+}
 // ===== End physics.cpp =====
 
 // ===== Begin playerobject.hpp =====
@@ -901,13 +958,18 @@ class PlayerObject : public GameObject {
 
         bool tileCollision(Tilemap& tilemap, const Sensor& sensor);
         // Getters for sensors
-        const Sensor& getASensor() const { return ASensor; }
-        const Sensor& getBSensor() const { return BSensor; }
-        const Sensor& getCSensor() const { return CSensor; }
-        const Sensor& getDSensor() const { return DSensor; }
-        const Sensor& getESensor() const { return ESensor; }
-        const Sensor& getFSensor() const { return FSensor; }
+        // const Sensor& getASensor() const { return ASensor; }
+        // const Sensor& getBSensor() const { return BSensor; }
+        // const Sensor& getBottomSensor() const { return bottom; }
+        // const Sensor& getCSensor() const { return CSensor; }
+        // const Sensor& getDSensor() const { return DSensor; }
+        // const Sensor& getESensor() const { return ESensor; }
+        // const Sensor& getFSensor() const { return FSensor; }
 
+        const Sensor& getLeftSensor() const { return leftSensor; }
+        const Sensor& getRightSensor() const { return rightSensor; }
+        const Sensor& getTopSensor() const { return topSensor; }
+        const Sensor& getBottomSensor() const { return bottomSensor; }
 
     private:
         // PlayerObject adds six 'sensors' to detect collisions
@@ -917,12 +979,18 @@ class PlayerObject : public GameObject {
         // C-D: Ceiling collisions
         // E-F: Wall collisions
 
-        Sensor ASensor; // Left sensor for ground collision
-        Sensor BSensor; // Right sensor for ground collision
-        Sensor CSensor; // Left sensor for ceiling collision
-        Sensor DSensor; // Right sensor for ceiling collision
-        Sensor ESensor; // Left sensor for wall collision
-        Sensor FSensor; // Right sensor for wall collision
+        // Sensor ASensor; // Left sensor for ground collision
+        // Sensor BSensor; // Right sensor for ground collision
+        // Sensor bottom;
+        // Sensor CSensor; // Left sensor for ceiling collision
+        // Sensor DSensor; // Right sensor for ceiling collision
+        // Sensor ESensor; // Left sensor for wall collision
+        // Sensor FSensor; // Right sensor for wall collision
+
+        Sensor leftSensor;   // Left sensor for detecting walls
+        Sensor rightSensor;  // Right sensor for detecting walls
+        Sensor topSensor;    // Top sensor for detecting ceilings
+        Sensor bottomSensor; // Bottom sensor for detecting floors
 
 };
 // ===== End playerobject.hpp =====
@@ -934,32 +1002,58 @@ class PlayerObject : public GameObject {
 
 void PlayerObject::setUpSensors(){
     // Set starting positions and colours for sensors
-    ASensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, -getScale().y / 2.0f - epsilon);
-    BSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, -getScale().y / 2.0f - epsilon);
-    CSensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, getScale().y / 2.0f + epsilon);
-    DSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, getScale().y / 2.0f + epsilon);
-    ESensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
-    FSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, 0.0f);
+    // ASensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, -getScale().y / 2.0f - epsilon);
+    // BSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, -getScale().y / 2.0f - epsilon);
+    // ASensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
+    // BSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
+    // bottom.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);;
+    // CSensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, getScale().y / 2.0f + epsilon);
+    // DSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, getScale().y / 2.0f + epsilon);
+    // ESensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
+    // FSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, 0.0f);
 
-    // Set sensor colors for debug view
-    ASensor.color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-    BSensor.color = glm::vec4(0.0f, 1.0f, 0.8f, 1.0f);
-    CSensor.color = glm::vec4(0.0f, 0.8f, 1.0f, 1.0f);
-    DSensor.color = glm::vec4(1.0f, 0.9333f, 0.0f, 1.0f);
-    ESensor.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-    FSensor.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    // Debugging: Print sensor positions
-    std::cout << "PlayerObject sensors initialized:" << std::endl;
+    // // Set sensor colors for debug view
+    // // ASensor.color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    // // BSensor.color = glm::vec4(0.0f, 1.0f, 0.8f, 1.0f);
+    // bottom.color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    // CSensor.color = glm::vec4(0.0f, 0.8f, 1.0f, 1.0f);
+    // DSensor.color = glm::vec4(1.0f, 0.9333f, 0.0f, 1.0f);
+    // ESensor.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    // FSensor.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    // // Debugging: Print sensor positions
+    // std::cout << "PlayerObject sensors initialized:" << std::endl;
+
+    // leftSensor.position   = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
+    // rightSensor.position  = getPosition() + glm::vec2( getScale().x / 2.0f + epsilon, 0.0f);
+    // topSensor.position    = getPosition() + glm::vec2(0.0f,  getScale().y / 2.0f + epsilon);
+    // bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
+
+    bottomSensor.color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    topSensor.color = glm::vec4(0.0f, 0.8f, 1.0f, 1.0f);
+    leftSensor.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    rightSensor.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+
 }
 
 void PlayerObject::sensorUpdate() {
     // Update sensor positions based on player position and scale
-    ASensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, -getScale().y / 2.0f - epsilon);
-    BSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, -getScale().y / 2.0f - epsilon);
-    CSensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, getScale().y / 2.0f + epsilon);
-    DSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, getScale().y / 2.0f + epsilon);
-    ESensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
-    FSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, 0.0f);
+    // ASensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, -getScale().y / 2.0f - epsilon);
+    // BSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, -getScale().y / 2.0f - epsilon);
+    // ASensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
+    // BSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
+    // bottom.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
+
+    // CSensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, getScale().y / 2.0f + epsilon);
+    // DSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, getScale().y / 2.0f + epsilon);
+    // ESensor.position = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
+    // FSensor.position = getPosition() + glm::vec2(getScale().x / 2.0f + epsilon, 0.0f);
+
+    leftSensor.position   = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
+    rightSensor.position  = getPosition() + glm::vec2( getScale().x / 2.0f + epsilon, 0.0f);
+    topSensor.position    = getPosition() + glm::vec2(0.0f,  getScale().y / 2.0f + epsilon);
+    bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
+    
 }
 
 bool PlayerObject::tileCollision(Tilemap& tilemap, const Sensor& sensor) {
@@ -1190,6 +1284,8 @@ void Renderer2D::drawLine(Shader& shader, const glm::vec2& start, const glm::vec
     // Set the color uniform
     shader.setVec4("color", color);
     
+    glEnable(GL_LINE_SMOOTH);
+    glLineWidth(2.0f);
     
     glDrawArrays(GL_LINES, 0, 2); // Draw two vertices as a line
     glBindVertexArray(0); // Unbind VAO after drawing
@@ -1508,13 +1604,6 @@ void Tilemap::renderTileMap(Shader& shader, Renderer2D& renderer) const {
     for (int y = 0; y < height_; ++y) {
         for (int x = 0; x < width_; ++x) {
             const Tile& tile = tiles[y][x];
-
-            if(g_debug_enabled){
-                glm::vec2 tileCenter = tile.position + glm::vec2(tilesize_ / 2.0f, tilesize_ / 2.0f);
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(tileCenter, 0.0f));
-                model = glm::scale(model, glm::vec3(tilesize_, tilesize_, 1.0f));
-                renderer.drawQuad(shader, model, tile.tileType.color);
-            }
             if (tile.tileType.type != TileEnum::EMPTY) {
                 glm::vec2 tileCenter = tile.position + glm::vec2(tilesize_ / 2.0f, tilesize_ / 2.0f);
                 glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(tileCenter, 0.0f));
@@ -1765,7 +1854,7 @@ int main(void){
         auto frameStart = std::chrono::high_resolution_clock::now();
         float deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
-
+        player.sensorUpdate();
         // Poll for events
         window.pollEvents();
 
@@ -1774,8 +1863,12 @@ int main(void){
         }
 
         // Check player collisions with tilemap, then move accordingly
+        
         physicsSystem.playerMovementStep(player, deltaTime);
         physicsSystem.checkPlayerWorldCollisions(player, tilemap);
+        // if(g_debug_enabled && !player.isGrounded()){
+        //     std::cout<<"Player has left the ground\n";
+        // }
 
         drawTilemapAndPlayer(window, renderer, shader, tilemap, player);
         

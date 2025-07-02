@@ -317,7 +317,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
     renderer.drawQuad(shader, model, player.getColor()); // Draw the player object
 
     // Draw player sensors
-    // if(g_debug_enabled){
+    if(g_debug_enabled){
         
         glm::vec2 pOrigin = player.getPosition();
         // Bottom-Left sensor starts from middle-left and goes down
@@ -344,7 +344,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
         renderer.drawLine(shader, pOrigin, player.getLeftSensor().position, player.getLeftSensor().color);
         // Draw right sensor
         renderer.drawLine(shader, pOrigin, player.getRightSensor().position, player.getRightSensor().color);
-    // }
+    }
 
     // Swap buffers
     window.swap();
