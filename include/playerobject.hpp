@@ -18,13 +18,18 @@ class PlayerObject : public GameObject {
 
         bool tileCollision(Tilemap& tilemap, const Sensor& sensor);
         // Getters for sensors
-        const Sensor& getASensor() const { return ASensor; }
-        const Sensor& getBSensor() const { return BSensor; }
-        const Sensor& getCSensor() const { return CSensor; }
-        const Sensor& getDSensor() const { return DSensor; }
-        const Sensor& getESensor() const { return ESensor; }
-        const Sensor& getFSensor() const { return FSensor; }
+        // const Sensor& getASensor() const { return ASensor; }
+        // const Sensor& getBSensor() const { return BSensor; }
+        // const Sensor& getBottomSensor() const { return bottom; }
+        // const Sensor& getCSensor() const { return CSensor; }
+        // const Sensor& getDSensor() const { return DSensor; }
+        // const Sensor& getESensor() const { return ESensor; }
+        // const Sensor& getFSensor() const { return FSensor; }
 
+        const Sensor& getLeftSensor() const { return leftSensor; }
+        const Sensor& getRightSensor() const { return rightSensor; }
+        const Sensor& getTopSensor() const { return topSensor; }
+        const Sensor& getBottomSensor() const { return bottomSensor; }
 
     private:
         // PlayerObject adds six 'sensors' to detect collisions
@@ -34,11 +39,17 @@ class PlayerObject : public GameObject {
         // C-D: Ceiling collisions
         // E-F: Wall collisions
 
-        Sensor ASensor; // Left sensor for ground collision
-        Sensor BSensor; // Right sensor for ground collision
-        Sensor CSensor; // Left sensor for ceiling collision
-        Sensor DSensor; // Right sensor for ceiling collision
-        Sensor ESensor; // Left sensor for wall collision
-        Sensor FSensor; // Right sensor for wall collision
+        // Sensor ASensor; // Left sensor for ground collision
+        // Sensor BSensor; // Right sensor for ground collision
+        // Sensor bottom;
+        // Sensor CSensor; // Left sensor for ceiling collision
+        // Sensor DSensor; // Right sensor for ceiling collision
+        // Sensor ESensor; // Left sensor for wall collision
+        // Sensor FSensor; // Right sensor for wall collision
+
+        Sensor leftSensor;   // Left sensor for detecting walls
+        Sensor rightSensor;  // Right sensor for detecting walls
+        Sensor topSensor;    // Top sensor for detecting ceilings
+        Sensor bottomSensor; // Bottom sensor for detecting floors
 
 };

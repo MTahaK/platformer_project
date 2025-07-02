@@ -1,3 +1,3 @@
 #pragma once
 
-const float epsilon = 0.01f;
+const float epsilon = 0.001f;

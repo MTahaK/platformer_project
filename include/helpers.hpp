@@ -317,22 +317,34 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
     renderer.drawQuad(shader, model, player.getColor()); // Draw the player object
 
     // Draw player sensors
-    if(g_debug_enabled){
+    // if(g_debug_enabled){
         
         glm::vec2 pOrigin = player.getPosition();
         // Bottom-Left sensor starts from middle-left and goes down
-        renderer.drawLine(shader, pOrigin + glm::vec2(-player.getScale().x / 2.0f - epsilon, 0.0f), player.getASensor().position, player.getASensor().color);
-        // Bottom-Right sensor starts from middle-right and goes down
-        renderer.drawLine(shader, pOrigin + glm::vec2(player.getScale().x / 2.0f + epsilon, 0.0f), player.getBSensor().position, player.getBSensor().color);
-        // Top-Left sensor starts from middle-left and goes up
-        renderer.drawLine(shader, pOrigin + glm::vec2(-player.getScale().x / 2.0f - epsilon, 0.0f), player.getCSensor().position, player.getCSensor().color);
-        // Top-Right sensor starts from middle-right and goes up
-        renderer.drawLine(shader, pOrigin + glm::vec2(player.getScale().x / 2.0f + epsilon, 0.0f), player.getDSensor().position, player.getDSensor().color);
-        // Left sensor starts from middle and goes left
-        renderer.drawLine(shader, pOrigin, player.getESensor().position, player.getESensor().color);
-        // Right sensor starts from middle and goes right
-        renderer.drawLine(shader, pOrigin, player.getFSensor().position, player.getFSensor().color);
-    }
+        // renderer.drawLine(shader, pOrigin + glm::vec2(-player.getScale().x / 2.0f - epsilon, 0.0f), player.getASensor().position, player.getASensor().color);
+        // // Bottom-Right sensor starts from middle-right and goes down
+        // renderer.drawLine(shader, pOrigin + glm::vec2(player.getScale().x / 2.0f + epsilon, 0.0f), player.getBSensor().position, player.getBSensor().color);
+
+        // Bottom sensor starts from middle and goes down
+        // renderer.drawLine(shader, pOrigin, player.getBottomSensor().position, player.getBottomSensor().color);
+        // // Top-Left sensor starts from middle-left and goes up
+        // renderer.drawLine(shader, pOrigin + glm::vec2(-player.getScale().x / 2.0f - epsilon, 0.0f), player.getCSensor().position, player.getCSensor().color);
+        // // Top-Right sensor starts from middle-right and goes up
+        // renderer.drawLine(shader, pOrigin + glm::vec2(player.getScale().x / 2.0f + epsilon, 0.0f), player.getDSensor().position, player.getDSensor().color);
+        // // Left sensor starts from middle and goes left
+        // renderer.drawLine(shader, pOrigin, player.getESensor().position, player.getESensor().color);
+        // // Right sensor starts from middle and goes right
+        // renderer.drawLine(shader, pOrigin, player.getFSensor().position, player.getFSensor().color);
+
+        // Draw bottom sensor
+        renderer.drawLine(shader, pOrigin, player.getBottomSensor().position, player.getBottomSensor().color);
+        // Draw top sensor
+        renderer.drawLine(shader, pOrigin, player.getTopSensor().position, player.getTopSensor().color);
+        // Draw left sensor
+        renderer.drawLine(shader, pOrigin, player.getLeftSensor().position, player.getLeftSensor().color);
+        // Draw right sensor
+        renderer.drawLine(shader, pOrigin, player.getRightSensor().position, player.getRightSensor().color);
+    // }
 
     // Swap buffers
     window.swap();

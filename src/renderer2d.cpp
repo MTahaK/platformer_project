@@ -172,6 +172,8 @@ void Renderer2D::drawLine(Shader& shader, const glm::vec2& start, const glm::vec
     // Set the color uniform
     shader.setVec4("color", color);
     
+    glEnable(GL_LINE_SMOOTH);
+    glLineWidth(2.0f);
     
     glDrawArrays(GL_LINES, 0, 2); // Draw two vertices as a line
     glBindVertexArray(0); // Unbind VAO after drawing
