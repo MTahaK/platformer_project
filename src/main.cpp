@@ -20,6 +20,9 @@ int main(void){
     // Set player position in tilemap
     PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
 
+    // Set player scale to (0.6f, 1.0f)
+    // player.setScale(glm::vec2(0.6f, 1.0f)); // Set player scale to 0.6 tiles wide and 1 tile high
+
     player.setGrounded(true); // Set the player object to be grounded initially
 
     // Initialize input system
@@ -39,7 +42,7 @@ int main(void){
         auto frameStart = std::chrono::high_resolution_clock::now();
         float deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
-        player.sensorUpdate();
+
         // Poll for events
         window.pollEvents();
 

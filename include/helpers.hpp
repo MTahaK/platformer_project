@@ -95,12 +95,11 @@ int playerInput(GameObject& player, float& playerspeed) {
         g_debug_enabled = !g_debug_enabled; // Toggle debug mode
     }
     if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
-        // player.setVelocity(glm::vec2(-playerspeed, player.getVelocity().y)); // Set velocity directly
-        player.setAcceleration(glm::vec2(-movementAccel, player.getAcceleration().y)); // Set acceleration directly
+        player.setAcceleration(glm::vec2(-movementAccel, player.getAcceleration().y));
     }
     else if(Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)){
-        // player.setVelocity(glm::vec2(playerspeed, player.getVelocity().y)); // Set velocity directly
-        player.setAcceleration(glm::vec2(movementAccel, player.getAcceleration().y)); // Set acceleration directly
+
+        player.setAcceleration(glm::vec2(movementAccel, player.getAcceleration().y));
     }
     else{
 
@@ -109,18 +108,17 @@ int playerInput(GameObject& player, float& playerspeed) {
         accel = player.isGrounded() ? slowdownAccel : midairDrag;
 
         if(player.getVelocity().x > 0.0f){
-            player.setAcceleration(glm::vec2(-accel, player.getAcceleration().y)); // Apply leftward acceleration
+            player.setAcceleration(glm::vec2(-accel, player.getAcceleration().y));
         }
         else if(player.getVelocity().x < 0.0f){
-            player.setAcceleration(glm::vec2(accel, player.getAcceleration().y)); // Apply rightward acceleration
+            player.setAcceleration(glm::vec2(accel, player.getAcceleration().y));
         }
         else{
-            player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // No horizontal acceleration
+            player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y));
         }
     }
     if(Input::isKeyJustPressed(GLFW_KEY_UP) || Input::isKeyPressed(GLFW_KEY_W)){
         if(player.isGrounded()){
-            // player.setGrounded(false); // Set player to not grounded
             player.addVelocity(glm::vec2(0.0f, 7.0f)); // Apply upward velocity
             player.setGrounded(false); // Set player to not grounded`
         }
@@ -130,12 +128,6 @@ int playerInput(GameObject& player, float& playerspeed) {
         if(!player.isGrounded()){
             player.setVelocity(glm::vec2(player.getVelocity().x, -10.0f)); // Apply downward velocity
         }
-    }
-    if(Input::isKeyJustPressed(GLFW_KEY_LEFT_SHIFT)){
-        playerspeed = 2.0f;
-    }
-    if(Input::isKeyJustReleased(GLFW_KEY_LEFT_SHIFT)){
-        playerspeed = 1.0f;
     }
     if(Input::isKeyJustPressed(GLFW_KEY_ESCAPE)){
         return -2; // "break" signal to exit the loop

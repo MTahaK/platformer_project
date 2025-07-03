@@ -8,17 +8,17 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
     if(std::abs(player.getVelocity().x) >= MAX_VELOCITY) { // Limit horizontal velocity
         if(velX > 0.0f){
             player.setVelocity(glm::vec2(MAX_VELOCITY, player.getVelocity().y)); // Limit to MAX_VELOCITY
-            player.sensorUpdate();
+            // player.sensorUpdate();
         }
         else if(velX < 0.0f) {
             player.setVelocity(glm::vec2(-MAX_VELOCITY, player.getVelocity().y)); // Limit to -MAX_VELOCITY
-            player.sensorUpdate();
+            // player.sensorUpdate();
         }
     }
     player.applyVelocity(deltaTime); // Apply velocity to each object
     if (std::abs(player.getVelocity().x) < 0.01f) {
         player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
-        player.sensorUpdate();
+        // player.sensorUpdate();
     }
     
     // Vertical pass + gravity
@@ -35,11 +35,11 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
     if(std::abs(player.getVelocity().y) >= MAX_VELOCITY) { // Limit vertical velocity
         if(velY > 0.0f){
             player.setVelocity(glm::vec2(player.getVelocity().x, MAX_VELOCITY)); // Limit to MAX_VELOCITY
-            player.sensorUpdate();
+            // player.sensorUpdate();
         }
         else if(velY < 0.0f) {
             player.setVelocity(glm::vec2(player.getVelocity().x, -MAX_VELOCITY)); // Limit to -MAX_VELOCITY
-            player.sensorUpdate();
+            // player.sensorUpdate();
         }
     }
     player.sensorUpdate();  // KEEP THIS UPDATE HERE! ESSENTIAL FOR PREVENTING SENSORS FROM LAGGING BEHIND
