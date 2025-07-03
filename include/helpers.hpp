@@ -95,11 +95,20 @@ int playerInput(GameObject& player, float& playerspeed) {
         g_debug_enabled = !g_debug_enabled; // Toggle debug mode
     }
     if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
-        player.setAcceleration(glm::vec2(-movementAccel, player.getAcceleration().y));
+        if(player.getVelocity().x > 0){
+            // Player is currently moving right, increase acceleration in opposite direction
+            player.setAcceleration(glm::vec2(-turnaroundAccel, player.getAcceleration().y));
+        } else{
+            player.setAcceleration(glm::vec2(-movementAccel, player.getAcceleration().y));
+        }
     }
     else if(Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)){
-
-        player.setAcceleration(glm::vec2(movementAccel, player.getAcceleration().y));
+        if(player.getVelocity().x < 0){
+            // Player is currently moving left, increase acceleration in opposite direction
+            player.setAcceleration(glm::vec2(turnaroundAccel, player.getAcceleration().y));
+        } else{
+            player.setAcceleration(glm::vec2(movementAccel, player.getAcceleration().y));
+        }
     }
     else{
 

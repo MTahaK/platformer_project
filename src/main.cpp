@@ -15,7 +15,7 @@ int main(void){
     // --- TILEMAP SETUP ---
     std::string tilemapFile = "./assets/test.tmap";
 
-    Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
+    Tilemap tilemap = loadTilemapFromFile(tilemapFile, 0.9f); // Load tilemap with 1.0f tile size
 
     // Set player position in tilemap
     PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
