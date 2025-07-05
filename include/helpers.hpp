@@ -92,7 +92,7 @@ int playerInput(GameObject& player, float& playerspeed) {
         player.setGrounded(!player.isGrounded());
     }
     if(Input::isKeyJustPressed(GLFW_KEY_O)){
-        g_debug_enabled = !g_debug_enabled; // Toggle debug mode
+        toggleDebugMode();
     }
     if(Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)){
         if(player.getVelocity().x > 0){
