@@ -1,6 +1,16 @@
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S), Darwin)
+    GLFW_CFLAGS := -I/opt/homebrew/include
+    GLFW_LDFLAGS := -L/opt/homebrew/lib
+else
+    GLFW_CFLAGS :=
+    GLFW_LDFLAGS :=
+endif
+
 CXX      := g++
-CXXFLAGS := -std=c++17 -Wall -Iinclude
-LDFLAGS  := -lglfw -ldl -lGL
+CXXFLAGS := -std=c++17 -Wall -Iinclude $(GLFW_CFLAGS)
+LDFLAGS  := -lglfw -ldl -lGL $(GLFW_LDFLAGS)
 
 SRC_DIR   := src
 BUILD_DIR := build
