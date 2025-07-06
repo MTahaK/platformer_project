@@ -35,11 +35,14 @@ class Tilemap {
         Tilemap(int width, int height, float tilesize);
 
         Tile& getTile(int x, int y);    // Get tile at position (x, y)
+        glm::ivec2 getInitPlayerPos() { return playerpos_; }
+        glm::ivec2 getGoalPos() { return goalpos_; }
         bool isSolidTile(int x, int y); // Check if the tile at (x, y) is solid
 
         // Setters
         void setTile(int x, int y, const TileType& tileType); // Set tile at position (x, y) with a specific type
-        void setPlayerPosition(int x, int y) { playerpos_ = glm::ivec2(x, y); } // Set initial player position in tile indices
+        void setPlayerPos(int x, int y) { playerpos_ = glm::ivec2(x, y); } // Set initial player position in tile indices
+        void setGoalPos(int x, int y) { goalpos_ = glm::ivec2(x, y); } // Set goal position in tile indices
         
         void renderTileMap(Shader& shader, Renderer2D& renderer) const; // Render the tilemap using the provided shader and renderer
 
@@ -60,6 +63,7 @@ class Tilemap {
         int width_; // Width of the tilemap in tiles
         int height_; // Height of the tilemap in tiles
         glm::ivec2 playerpos_; // Initial player position in tile indices
+        glm::ivec2 goalpos_; // Goal position in tile indices
 
         float tilesize_; // Size of one tile in world units
 

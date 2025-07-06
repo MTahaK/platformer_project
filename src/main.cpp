@@ -50,13 +50,8 @@ int main(void){
             break; // Exit the loop if escape is pressed
         }
 
-        // Check player collisions with tilemap, then move accordingly
-        
         physicsSystem.playerMovementStep(player, deltaTime);
         physicsSystem.checkPlayerWorldCollisions(player, tilemap);
-        // if(g_debug_enabled && !player.isGrounded()){
-        //     std::cout<<"Player has left the ground\n";
-        // }
 
         drawTilemapAndPlayer(window, renderer, shader, tilemap, player);
         

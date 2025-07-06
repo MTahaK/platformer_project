@@ -83,10 +83,11 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tilesize) {
                     break;
                 case 'P': // Player start position
                     type = { TileEnum::PLAYER, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f) }; // Green for player
-                    tilemap.setPlayerPosition(x, y); // Set player position
+                    tilemap.setPlayerPos(x, y); // Set player position
                     break;
                 case 'G': // Goal tile
-                    type = { TileEnum::GOAL, true, rgbaToVec4("0, 74, 20, 255") }; 
+                    type = { TileEnum::GOAL, true, rgbaToVec4("0, 74, 20, 255") };
+                    tilemap.setGoalPos(x, y); // Set goal position
                     break;
             }
 

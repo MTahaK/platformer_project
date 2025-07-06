@@ -1,0 +1,30 @@
+name: macOS Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # allows manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install dependencies (GLFW and GLM)
+      run: |
+        brew install glfw glm
+
+    - name: Build game
+      run: |
+        make clean && make
+
+    - name: Archive built game binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: macOS-binary
+        path: ./game

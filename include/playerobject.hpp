@@ -31,6 +31,8 @@ class PlayerObject : public GameObject {
         const Sensor& getTopSensor() const { return topSensor; }
         const Sensor& getBottomSensor() const { return bottomSensor; }
 
+        bool checkIfWin(Tilemap& tilemap);
+
     private:
         // PlayerObject adds six 'sensors' to detect collisions
         // Their positioning and naming take after the sensors used in
