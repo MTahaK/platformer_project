@@ -3,6 +3,7 @@
 #include <vector>
 #include "shader.hpp"
 #include "renderer2d.hpp"
+#include "color.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -12,11 +13,14 @@
 enum class TileEnum {
     EMPTY,
     SOLID,
+    PLAYER,
+    GOAL
 };
 
 
 struct TileType {
     TileEnum type; // Type of the tile (e.g., EMPTY, SOLID)
+    bool visible;
     glm::vec4 color; // Color of the tile
 };
 

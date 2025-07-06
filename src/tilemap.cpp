@@ -9,7 +9,7 @@ Tilemap::Tilemap(int width, int height, float tilesize)
         for (int x = 0; x < width_; ++x) {
             // Initialize empty
             tiles[y][x].position = tileIndexToWorldPos(x, y);
-            tiles[y][x].tileType = { TileEnum::EMPTY, glm::vec4(0.0f) };
+            tiles[y][x].tileType = { TileEnum::EMPTY, false, glm::vec4(0.0f) };
         }
     }
 }
@@ -32,7 +32,7 @@ void Tilemap::renderTileMap(Shader& shader, Renderer2D& renderer) const {
     for (int y = 0; y < height_; ++y) {
         for (int x = 0; x < width_; ++x) {
             const Tile& tile = tiles[y][x];
-            if (tile.tileType.type != TileEnum::EMPTY) {
+            if (tile.tileType.visible) {
                 glm::vec2 tileCenter = tile.position + glm::vec2(tilesize_ / 2.0f, tilesize_ / 2.0f);
                 glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(tileCenter, 0.0f));
                 model = glm::scale(model, glm::vec3(tilesize_, tilesize_, 1.0f));
@@ -75,15 +75,18 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tilesize) {
 
             switch (c) {
                 case '#': // Solid tile
-                    type = { TileEnum::SOLID, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f) };
+                    type = { TileEnum::SOLID, true, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f) };
                     break;
                 case '.': // Empty tile
                 default:
-                    type = { TileEnum::EMPTY, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f) };
+                    type = { TileEnum::EMPTY, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f) };
                     break;
                 case 'P': // Player start position
-                    type = { TileEnum::EMPTY, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f) }; // Green for player
+                    type = { TileEnum::PLAYER, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f) }; // Green for player
                     tilemap.setPlayerPosition(x, y); // Set player position
+                    break;
+                case 'G': // Goal tile
+                    type = { TileEnum::GOAL, true, rgbaToVec4("0, 74, 20, 255") }; 
                     break;
             }
 
