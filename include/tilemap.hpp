@@ -38,6 +38,7 @@ class Tilemap {
         glm::ivec2 getInitPlayerPos() { return playerpos_; }
         glm::ivec2 getGoalPos() { return goalpos_; }
         bool isSolidTile(int x, int y); // Check if the tile at (x, y) is solid
+        bool isGoalTile(int x, int y);  // Check if the tile at (x, y) is a goal tile
 
         // Setters
         void setTile(int x, int y, const TileType& tileType); // Set tile at position (x, y) with a specific type

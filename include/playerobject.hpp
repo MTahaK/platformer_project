@@ -16,7 +16,12 @@ class PlayerObject : public GameObject {
         void setUpSensors();
         void sensorUpdate();
 
+        void setGoalCount(int count) { goal_count = count; } // Set the goal count
+        void incrementGoalCount() { goal_count++; } // Increment the goal count
+
+
         bool tileCollision(Tilemap& tilemap, const Sensor& sensor);
+        bool tileGoalCollision(Tilemap& tilemap, const Sensor& sensor);
         // Getters for sensors
         // const Sensor& getASensor() const { return ASensor; }
         // const Sensor& getBSensor() const { return BSensor; }
@@ -26,12 +31,17 @@ class PlayerObject : public GameObject {
         // const Sensor& getESensor() const { return ESensor; }
         // const Sensor& getFSensor() const { return FSensor; }
 
+        const glm::ivec2 getPlayerTileIdx(Tilemap& tilemap) const;
+        int getGoalCount() const { return goal_count; }
+
         const Sensor& getLeftSensor() const { return leftSensor; }
         const Sensor& getRightSensor() const { return rightSensor; }
         const Sensor& getTopSensor() const { return topSensor; }
         const Sensor& getBottomSensor() const { return bottomSensor; }
 
         bool checkIfWin(Tilemap& tilemap);
+
+        float goal_reach_timer = 5.0f; // Timer to track goal reach time
 
     private:
         // PlayerObject adds six 'sensors' to detect collisions
@@ -53,5 +63,7 @@ class PlayerObject : public GameObject {
         Sensor rightSensor;  // Right sensor for detecting walls
         Sensor topSensor;    // Top sensor for detecting ceilings
         Sensor bottomSensor; // Bottom sensor for detecting floors
+
+        int goal_count = 0; // Counter for the number of sensors that detect a goal tile
 
 };

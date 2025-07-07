@@ -50,6 +50,51 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 
     // ! NOTE: TILE STRUCT POSITION STARTS AT BOTTOM LEFT CORNER, NOT CENTER
 
+    // Goal-collision optimisation
+    // ---------------------------
+    // We skip expensive “all-sensor” checks until the player is very close to a goal:
+    //   • Proximity filter: Chebyshev distance (tile units) ≤ 5 to *any* goal tile.
+    //   • Precision check: when that filter passes, probe each of the four sensors.
+    //     A probe is just a tile lookup, so the per-frame cost is O(1) (4 lookups).
+    //
+    // Rationale: sensor probes, while cheap, still add measurable overhead if run
+    // every frame across the whole map. In our current level layouts goal tiles are
+    // either clustered or aligned along one axis, so a single distance test is
+    // enough to gate the precise checks.
+
+
+    // Proximity filter: Chebyshev distance (tile units) ≤ 5 to *any* goal tile.
+    glm::ivec2 playerTile = tilemap.worldToTileIndex(player.getPosition());
+    glm::ivec2 goalTile = tilemap.getGoalPos();
+    int goalDistance = std::max(std::abs(playerTile.x - goalTile.x), std::abs(playerTile.y - goalTile.y));
+
+    // TODO Will interleave this into the existing sensor checks later
+
+    if(goalDistance <= 5){
+        if(player.tileGoalCollision(tilemap, player.getLeftSensor()) ||
+        player.tileGoalCollision(tilemap, player.getRightSensor()) ||
+        player.tileGoalCollision(tilemap, player.getTopSensor()) ||
+        player.tileGoalCollision(tilemap, player.getBottomSensor())) {
+            // If any sensor collides with a goal tile, increment goal count
+            if(player.getGoalCount() >= 3){
+                // If all sensors have collided with a goal tile, the player has reached the goal
+                // Reset player to initial position after 5 second delay
+                DEBUG_ONLY(std::cout<<"Player has reached the goal! Waiting for reset...\n";);
+                if(player.goal_reach_timer > 0.0f) {
+                    player.goal_reach_timer -= deltaTime; // Decrease timer
+                    DEBUG_ONLY(std::cout<<"Goal reach timer: "<<player.goal_reach_timer<<"\n";);
+                    
+                } else {
+                    player.setPosition(tilemap.tileIndexToWorldPos(tilemap.getInitPlayerPos().x, tilemap.getInitPlayerPos().y));
+                    player.setVelocity(glm::vec2(0.0f, 0.0f)); // Reset velocity
+                    player.setAcceleration(glm::vec2(0.0f, 0.0f)); // Reset acceleration
+                    player.sensorUpdate(); // Update sensors after position reset
+                    player.goal_reach_timer = 5.0f; // Reset timer
+                    player.setGoalCount(0); // Reset goal count
+                }
+            }
+        }
+    }
     // Check collisions with the tilemap using sensors
     if(player.getVelocity().x < 0.0f){
         // Negative velocity, don't need to check right sensor

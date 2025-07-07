@@ -49,7 +49,8 @@ int main(void){
         if(playerInput(player, playerspeed) == -2){
             break; // Exit the loop if escape is pressed
         }
-
+        physicsSystem.deltaTime = deltaTime; // Update physics system delta time
+        
         physicsSystem.playerMovementStep(player, deltaTime);
         physicsSystem.checkPlayerWorldCollisions(player, tilemap);
 

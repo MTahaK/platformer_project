@@ -10,11 +10,11 @@
 #include "debug.hpp"
 
 const float gravity = -8.0f;
-const float MAX_VELOCITY = 10.0f; // Maximum velocity limit
+const float MAX_VELOCITY = 15.0f; // Maximum velocity limit
 
-const float movementAccel = 6.0f; // Acceleration applied when moving left/right
-const float slowdownAccel = 14.0f; // Acceleration applied when slowing down
-const float turnaroundAccel = 16.0f;
+const float movementAccel = 7.0f; // Acceleration applied when moving left/right
+const float slowdownAccel = 16.0f; // Acceleration applied when slowing down
+const float turnaroundAccel = 18.0f;
 const float midairDrag = 1.0f;
 
 class Physics {
@@ -24,5 +24,7 @@ class Physics {
         void playerMovementStep(PlayerObject& player, float deltaTime);
         void checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap);
         void checkPlayerEntityCollisions(GameObject& obj, const std::vector<GameObject>& entities); // May end up unused
+
+        float deltaTime = 0.0f;
 
 };

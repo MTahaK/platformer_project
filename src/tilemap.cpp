@@ -23,6 +23,11 @@ bool Tilemap::isSolidTile(int x, int y) {
     return tiles[y][x].tileType.type == TileEnum::SOLID;
 }
 
+bool Tilemap::isGoalTile(int x, int y) {
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) return false;
+    return tiles[y][x].tileType.type == TileEnum::GOAL;
+}
+
 void Tilemap::setTile(int x, int y, const TileType& tileType) {
     if (x < 0 || x >= width_ || y < 0 || y >= height_) return;
     tiles[y][x].tileType = tileType;
