@@ -3,19 +3,17 @@
 void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
     // Horizontal pass
     float velX = player.getAcceleration().x * deltaTime; // Calculate velocity based on acceleration
-    player.addVelocity(glm::vec2(velX, 0.0f)); // Add horizontal velocity
+    player.addVelocity(glm::vec2(velX, 0.0f)); // ! *Add* velocity
 
     if(std::abs(player.getVelocity().x) >= MAX_VELOCITY) { // Limit horizontal velocity
         if(velX > 0.0f){
-            player.setVelocity(glm::vec2(MAX_VELOCITY, player.getVelocity().y)); // Limit to MAX_VELOCITY
-            // player.sensorUpdate();
+            player.setVelocity(glm::vec2(MAX_VELOCITY, player.getVelocity().y));
         }
         else if(velX < 0.0f) {
-            player.setVelocity(glm::vec2(-MAX_VELOCITY, player.getVelocity().y)); // Limit to -MAX_VELOCITY
-            // player.sensorUpdate();
+            player.setVelocity(glm::vec2(-MAX_VELOCITY, player.getVelocity().y));
         }
     }
-    player.applyVelocity(deltaTime); // Apply velocity to each object
+    player.applyVelocity(deltaTime);
     if (std::abs(player.getVelocity().x) < 0.01f) {
         player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
         // player.sensorUpdate();
@@ -28,18 +26,16 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 
         return;  // Early return, no vertical movement needed
     }
-    float velY = (player.getAcceleration().y + gravity) * deltaTime; // Calculate vertical velocity
+    float velY = (player.getAcceleration().y + gravity) * deltaTime;
     
     player.addVelocity(glm::vec2(0.0f, velY));
 
     if(std::abs(player.getVelocity().y) >= MAX_VELOCITY) { // Limit vertical velocity
         if(velY > 0.0f){
-            player.setVelocity(glm::vec2(player.getVelocity().x, MAX_VELOCITY)); // Limit to MAX_VELOCITY
-            // player.sensorUpdate();
+            player.setVelocity(glm::vec2(player.getVelocity().x, MAX_VELOCITY));
         }
         else if(velY < 0.0f) {
-            player.setVelocity(glm::vec2(player.getVelocity().x, -MAX_VELOCITY)); // Limit to -MAX_VELOCITY
-            // player.sensorUpdate();
+            player.setVelocity(glm::vec2(player.getVelocity().x, -MAX_VELOCITY));
         }
     }
     player.sensorUpdate();  // KEEP THIS UPDATE HERE! ESSENTIAL FOR PREVENTING SENSORS FROM LAGGING BEHIND
@@ -63,7 +59,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
     // enough to gate the precise checks.
 
 
-    // Proximity filter: Chebyshev distance (tile units) ≤ 5 to *any* goal tile.
+    // Proximity filter: Chebyshev distance (tile units) ≤ 5 to *a* goal tile.
     glm::ivec2 playerTile = tilemap.worldToTileIndex(player.getPosition());
     glm::ivec2 goalTile = tilemap.getGoalPos();
     int goalDistance = std::max(std::abs(playerTile.x - goalTile.x), std::abs(playerTile.y - goalTile.y));
@@ -81,16 +77,16 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
                 // Reset player to initial position after 5 second delay
                 DEBUG_ONLY(std::cout<<"Player has reached the goal! Waiting for reset...\n";);
                 if(player.goal_reach_timer > 0.0f) {
-                    player.goal_reach_timer -= deltaTime; // Decrease timer
+                    player.goal_reach_timer -= deltaTime;
                     DEBUG_ONLY(std::cout<<"Goal reach timer: "<<player.goal_reach_timer<<"\n";);
                     
                 } else {
                     player.setPosition(tilemap.tileIndexToWorldPos(tilemap.getInitPlayerPos().x, tilemap.getInitPlayerPos().y));
-                    player.setVelocity(glm::vec2(0.0f, 0.0f)); // Reset velocity
-                    player.setAcceleration(glm::vec2(0.0f, 0.0f)); // Reset acceleration
-                    player.sensorUpdate(); // Update sensors after position reset
+                    player.setVelocity(glm::vec2(0.0f, 0.0f));
+                    player.setAcceleration(glm::vec2(0.0f, 0.0f));
+                    player.sensorUpdate();
                     player.goal_reach_timer = 5.0f; // Reset timer
-                    player.setGoalCount(0); // Reset goal count
+                    player.setGoalCount(0); // Reset goal counter
                 }
             }
         }

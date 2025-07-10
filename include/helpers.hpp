@@ -144,7 +144,7 @@ int playerInput(GameObject& player, float& playerspeed) {
 
     std::ostringstream oss;
     glm::vec2 velocity = player.getVelocity();
-    glm::vec2 acceleration = player.getAcceleration(); // Assuming this method exists
+    glm::vec2 acceleration = player.getAcceleration();
     bool grounded = player.isGrounded();
 
     oss << "Vel (X,Y): (" << velocity.x << ", " << velocity.y << ")  "
