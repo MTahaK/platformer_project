@@ -50,16 +50,3 @@ bool PlayerObject::tileGoalCollision(Tilemap& tilemap, const Sensor& sensor) {
     }
     return isGoal; // Check if the tile at the sensor's position is a goal tile
 }
-
-bool PlayerObject::checkIfWin(Tilemap& tilemap){
-    auto playeridx = tilemap.worldToTileIndex(getPosition());
-    
-    // goal position is already stored as ivec2
-    auto goalidx = tilemap.getGoalPos();
-
-    if(playeridx.x == goalidx.x || playeridx.y == goalidx.y){
-        std::cout<<"Player has reached the goal!\n";
-        return true; // Player has reached the goal
-    }
-    return false;
-}

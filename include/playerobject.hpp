@@ -17,6 +17,7 @@ class PlayerObject : public GameObject {
         void sensorUpdate();
 
         void setGoalCount(int count) { goal_count = count; }
+        void setInGoal(bool status) {in_goal = status;}
         void incrementGoalCount() { goal_count++; }
 
 
@@ -31,7 +32,7 @@ class PlayerObject : public GameObject {
         const Sensor& getTopSensor() const { return topSensor; }
         const Sensor& getBottomSensor() const { return bottomSensor; }
 
-        bool checkIfWin(Tilemap& tilemap);
+        bool checkIfInGoal() {return in_goal;}
 
         float goal_reach_timer = 5.0f; // Timer to track goal reach time
 
@@ -44,5 +45,6 @@ class PlayerObject : public GameObject {
         Sensor bottomSensor; // Bottom sensor for detecting floors
 
         int goal_count = 0; // Counter for the number of sensors that detect a goal tile
+        bool in_goal = false;
 
 };
