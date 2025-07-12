@@ -21,20 +21,18 @@ int main(void){
     PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
 
     // Set player scale to (0.6f, 1.0f)
-    // player.setScale(glm::vec2(0.6f, 1.0f)); // Set player scale to 0.6 tiles wide and 1 tile high
+    // player.setScale(glm::vec2(0.6f, 1.0f));
 
     player.setGrounded(true); // Set the player object to be grounded initially
 
-    // Initialize input system
     Input::initialize(window.getWindow());
 
-    // Initialize action system
     Action actionSystem;
     Physics physicsSystem;
 
     float playerspeed = 1.0f;
         
-    float lastFrameTime = glfwGetTime(); // seconds
+    float lastFrameTime = glfwGetTime();
 
     while(!window.shouldClose()){
 
@@ -49,7 +47,7 @@ int main(void){
         if(playerInput(player, playerspeed) == -2){
             break; // Exit the loop if escape is pressed
         }
-        physicsSystem.deltaTime = deltaTime; // Update physics system delta time
+        physicsSystem.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
         
         physicsSystem.playerMovementStep(player, deltaTime);
         physicsSystem.checkPlayerWorldCollisions(player, tilemap);

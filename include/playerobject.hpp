@@ -16,20 +16,12 @@ class PlayerObject : public GameObject {
         void setUpSensors();
         void sensorUpdate();
 
-        void setGoalCount(int count) { goal_count = count; } // Set the goal count
-        void incrementGoalCount() { goal_count++; } // Increment the goal count
+        void setGoalCount(int count) { goal_count = count; }
+        void incrementGoalCount() { goal_count++; }
 
 
         bool tileCollision(Tilemap& tilemap, const Sensor& sensor);
         bool tileGoalCollision(Tilemap& tilemap, const Sensor& sensor);
-        // Getters for sensors
-        // const Sensor& getASensor() const { return ASensor; }
-        // const Sensor& getBSensor() const { return BSensor; }
-        // const Sensor& getBottomSensor() const { return bottom; }
-        // const Sensor& getCSensor() const { return CSensor; }
-        // const Sensor& getDSensor() const { return DSensor; }
-        // const Sensor& getESensor() const { return ESensor; }
-        // const Sensor& getFSensor() const { return FSensor; }
 
         const glm::ivec2 getPlayerTileIdx(Tilemap& tilemap) const;
         int getGoalCount() const { return goal_count; }
@@ -44,20 +36,7 @@ class PlayerObject : public GameObject {
         float goal_reach_timer = 5.0f; // Timer to track goal reach time
 
     private:
-        // PlayerObject adds six 'sensors' to detect collisions
-        // Their positioning and naming take after the sensors used in
-        // the classic Sonic games:
-        // A-B: Ground collisions
-        // C-D: Ceiling collisions
-        // E-F: Wall collisions
-
-        // Sensor ASensor; // Left sensor for ground collision
-        // Sensor BSensor; // Right sensor for ground collision
-        // Sensor bottom;
-        // Sensor CSensor; // Left sensor for ceiling collision
-        // Sensor DSensor; // Right sensor for ceiling collision
-        // Sensor ESensor; // Left sensor for wall collision
-        // Sensor FSensor; // Right sensor for wall collision
+        // PlayerObject adds four 'sensors' to detect collisions
 
         Sensor leftSensor;   // Left sensor for detecting walls
         Sensor rightSensor;  // Right sensor for detecting walls
