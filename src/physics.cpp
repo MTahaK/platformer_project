@@ -79,15 +79,15 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
         DEBUG_ONLY(std::cout<<"Player has reached the goal! Waiting for reset...\n";);
     } else if(player.checkIfInGoal()){
 
-        if(player.goal_reach_timer > 0.0f) {
-            player.goal_reach_timer -= deltaTime;
-            DEBUG_ONLY(std::cout<<"Goal reach timer: "<<player.goal_reach_timer<<"\n";);
+        if(player.goalReachTimer_ > 0.0f) {
+            player.goalReachTimer_ -= deltaTime;
+            DEBUG_ONLY(std::cout<<"Goal reach timer: "<<player.goalReachTimer_<<"\n";);
         } else {
             player.setPosition(tilemap.tileIndexToWorldPos(tilemap.getInitPlayerPos().x, tilemap.getInitPlayerPos().y));
             player.setVelocity(glm::vec2(0.0f, 0.0f));
             player.setAcceleration(glm::vec2(0.0f, 0.0f));
             player.sensorUpdate();
-            player.goal_reach_timer = 5.0f; // Reset timer
+            player.goalReachTimer_ = 5.0f; // Reset timer
             player.setGoalCount(0); // Reset goal counter
             player.setInGoal(false);
         }
@@ -110,7 +110,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
     
             if(player.getLeftSensor().position.x < tileright) {
                 // If left sensor is to left of right tile edge, snap it to the right edge
-                player.offsetPosition(glm::vec2(tileright - player.getLeftSensor().position.x + epsilon, 0.0f));
+                player.offsetPosition(glm::vec2(tileright - player.getLeftSensor().position.x + EPSILON, 0.0f));
             }
             player.sensorUpdate();  // Immediate sensor update after any movement
         }
@@ -130,7 +130,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
     
             if(player.getRightSensor().position.x > tileleft) {
                 // If right sensor is to right of left tile edge, snap it to the left edge
-                player.offsetPosition(glm::vec2(tileleft - player.getRightSensor().position.x - epsilon, 0.0f));
+                player.offsetPosition(glm::vec2(tileleft - player.getRightSensor().position.x - EPSILON, 0.0f));
             }
             player.sensorUpdate();
         }
@@ -151,7 +151,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
     
             if(player.getLeftSensor().position.x < tileright) {
                 // If left sensor is to left of right tile edge, snap it to the right edge
-                player.offsetPosition(glm::vec2(tileright - player.getLeftSensor().position.x + epsilon, 0.0f));
+                player.offsetPosition(glm::vec2(tileright - player.getLeftSensor().position.x + EPSILON, 0.0f));
             }
             player.sensorUpdate();  // Immediate sensor update after any movement
         }
@@ -170,7 +170,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
     
             if(player.getRightSensor().position.x > tileleft) {
                 // If right sensor is to right of left tile edge, snap it to the left edge
-                player.offsetPosition(glm::vec2(tileleft - player.getRightSensor().position.x - epsilon, 0.0f));
+                player.offsetPosition(glm::vec2(tileleft - player.getRightSensor().position.x - EPSILON, 0.0f));
             }
             player.sensorUpdate();
         }
@@ -188,7 +188,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
         std::cout<<"Tile bottom position: "<<tilebot<<"\n";);
         if( player.getTopSensor().position.y > tilebot) {
             // If the bottom sensor is above the tile top, snap it to the tile top
-            player.offsetPosition(glm::vec2(0.0f, tilebot - player.getTopSensor().position.y - epsilon));
+            player.offsetPosition(glm::vec2(0.0f, tilebot - player.getTopSensor().position.y - EPSILON));
         }
 
         player.sensorUpdate();
@@ -208,7 +208,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
         std::cout<<"Tile top position: "<<tiletop<<"\n";);
         if( player.getBottomSensor().position.y < tiletop) {
             // If the bottom sensor is above the tile top, snap it to the tile top
-            player.offsetPosition(glm::vec2(0.0f, tiletop - player.getBottomSensor().position.y + epsilon));
+            player.offsetPosition(glm::vec2(0.0f, tiletop - player.getBottomSensor().position.y + EPSILON));
         }
     } 
     else {

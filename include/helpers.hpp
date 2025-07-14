@@ -150,7 +150,7 @@ int playerInput(GameObject& player, float& playerspeed) {
     oss << "Vel (X,Y): (" << velocity.x << ", " << velocity.y << ")  "
         << "Acc (X,Y): (" << acceleration.x << ", " << acceleration.y << ")  "
         << "Grounded?: " << std::boolalpha << grounded << "  "
-        << "Debug: " << g_debug_enabled;
+        << "Debug: " << g_debugEnabled;
     std::string output = oss.str();
     output.resize(90, ' '); // Pad to overwrite old output cleanly
 
@@ -318,7 +318,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
     renderer.drawQuad(shader, model, player.getColor()); // Draw the player object
 
     // Draw player sensors
-    if(g_debug_enabled){
+    if(g_debugEnabled){
         
         glm::vec2 pOrigin = player.getPosition();
         // Bottom-Left sensor starts from middle-left and goes down

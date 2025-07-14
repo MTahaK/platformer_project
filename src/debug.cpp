@@ -1,10 +1,10 @@
 #include "debug.hpp"
 
-bool g_debug_enabled = false; // Global debug flag
+bool g_debugEnabled = false; // Global debug flag
 
-void toggleDebugMode(){
-    g_debug_enabled = !g_debug_enabled;
-    if (g_debug_enabled) {
+void toggleDebugMode() {
+    g_debugEnabled = !g_debugEnabled;
+    if (g_debugEnabled) {
         std::cout<<"[Debug] Debug mode enabled.\n";
     } else {
         std::cout<<"[Debug] Debug mode disabled.\n";

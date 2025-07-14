@@ -41,7 +41,7 @@ class GameObject {
 
         void setAcceleration(const glm::vec2& acceleration) { acceleration_ = acceleration; } // Set the acceleration vector
 
-        void setGrounded(bool grounded) { isgrounded_ = grounded; } // Set whether the object is grounded
+        void setGrounded(bool grounded) { isGrounded_ = grounded; } // Set whether the object is grounded
 
         // Getters
         const glm::vec2& getPosition() const { return position_; }
@@ -59,7 +59,7 @@ class GameObject {
             offsetPosition(velocity_ * deltaTime); // Apply velocity to position based on deltaTime
         }
 
-        bool isGrounded() const { return isgrounded_; } // Returns whether the object is grounded
+        bool isGrounded() const { return isGrounded_; } // Returns whether the object is grounded
 
         // AABB-related methods
         const void computeAABB();
@@ -81,5 +81,5 @@ class GameObject {
         glm::vec2 acceleration_ = glm::vec2(0.0f); // Acceleration vector (not used yet)
         AABB aabb_;             // Axis-aligned bounding box for collision detection
         
-        bool isgrounded_ = false;
+        bool isGrounded_ = false;
 };

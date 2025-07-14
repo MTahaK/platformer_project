@@ -3,25 +3,25 @@
 #include <iostream>
 
 void PlayerObject::setUpSensors(){
-    leftSensor.position   = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
-    rightSensor.position  = getPosition() + glm::vec2( getScale().x / 2.0f + epsilon, 0.0f);
-    topSensor.position    = getPosition() + glm::vec2(0.0f,  getScale().y / 2.0f + epsilon);
-    bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
+    leftSensor_.position   = getPosition() + glm::vec2(-getScale().x / 2.0f - EPSILON, 0.0f);
+    rightSensor_.position  = getPosition() + glm::vec2( getScale().x / 2.0f + EPSILON, 0.0f);
+    topSensor_.position    = getPosition() + glm::vec2(0.0f,  getScale().y / 2.0f + EPSILON);
+    bottomSensor_.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - EPSILON);
 
     // Colours for debug
-    bottomSensor.color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-    topSensor.color = glm::vec4(0.0f, 0.8f, 1.0f, 1.0f);
-    leftSensor.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-    rightSensor.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    bottomSensor_.color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    topSensor_.color = glm::vec4(0.0f, 0.8f, 1.0f, 1.0f);
+    leftSensor_.color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    rightSensor_.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
 
 }
 
 void PlayerObject::sensorUpdate() {
-    leftSensor.position   = getPosition() + glm::vec2(-getScale().x / 2.0f - epsilon, 0.0f);
-    rightSensor.position  = getPosition() + glm::vec2( getScale().x / 2.0f + epsilon, 0.0f);
-    topSensor.position    = getPosition() + glm::vec2(0.0f,  getScale().y / 2.0f + epsilon);
-    bottomSensor.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - epsilon);
+    leftSensor_.position   = getPosition() + glm::vec2(-getScale().x / 2.0f - EPSILON, 0.0f);
+    rightSensor_.position  = getPosition() + glm::vec2( getScale().x / 2.0f + EPSILON, 0.0f);
+    topSensor_.position    = getPosition() + glm::vec2(0.0f,  getScale().y / 2.0f + EPSILON);
+    bottomSensor_.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - EPSILON);
     
 }
 
@@ -40,13 +40,13 @@ bool PlayerObject::tileGoalCollision(Tilemap& tilemap, const Sensor& sensor) {
     glm::ivec2 tileIndex = tilemap.worldToTileIndex(sensor.position);
     bool isGoal = tilemap.isGoalTile(tileIndex.x, tileIndex.y);
     if(isGoal){
-        if(goal_count < 4) goal_count++;
-    } else if(goal_count > 0) {
-        goal_count--; // Decrease goal count if the player is not on a goal tile
-    } else if (goal_count < 0) {
-        goal_count = 0; // Ensure goal count does not go negative
+        if(goalCount_ < 4) goalCount_++;
+    } else if(goalCount_ > 0) {
+        goalCount_--; // Decrease goal count if the player is not on a goal tile
+    } else if (goalCount_ < 0) {
+        goalCount_ = 0; // Ensure goal count does not go negative
     } else{
-        goal_count = 0; // Reset goal count if the player is not on a goal tile
+        goalCount_ = 0; // Reset goal count if the player is not on a goal tile
     }
     return isGoal; // Check if the tile at the sensor's position is a goal tile
 }

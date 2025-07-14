@@ -3,8 +3,8 @@
 // Define static members
 GLFWwindow* Input::s_window = nullptr;
 
-std::unordered_map<int, int> Input::s_curr;
-std::unordered_map<int, int> Input::s_prev;
+std::unordered_map<int, int> Input::s_currentKeys_;
+std::unordered_map<int, int> Input::s_previousKeys_;
 
 void Input::initialize(GLFWwindow* window){
     s_window = window;
@@ -12,29 +12,29 @@ void Input::initialize(GLFWwindow* window){
 }
 
 void Input::update(){
-    s_prev = s_curr; // Store previous state
+    s_previousKeys_ = s_currentKeys_; // Store previous state
 
     // Iterate only over tracked keys
     // Update logic for tracked keys may come if remapping added
-    for(int key : tracked_keys){
+    for(int key : s_trackedKeys_){
         int state = glfwGetKey(s_window, key);
         // 0 -> GLFW_RELEASED, 1-> GLFW_PRESS
-        s_curr[key] = state;
+        s_currentKeys_[key] = state;
     }
 }
 
 bool Input::isKeyPressed(int key){
-    auto it = s_curr.find(key);
-    return it != s_curr.end() && it->second == GLFW_PRESS;
+    auto it = s_currentKeys_.find(key);
+    return it != s_currentKeys_.end() && it->second == GLFW_PRESS;
     // Prevents insertion of unadded keys into map
 }
 
 bool Input::isKeyJustPressed(int key){
-    auto it_curr = s_curr.find(key);
-    auto it_prev = s_prev.find(key);
+    auto itCurrent = s_currentKeys_.find(key);
+    auto itPrevious = s_previousKeys_.find(key);
     // Calling find() on the key prevents insertion
-    if(it_curr != s_curr.end() && it_prev != s_prev.end()){
-        if(it_curr->second == GLFW_PRESS && it_prev->second == GLFW_RELEASE){
+    if(itCurrent != s_currentKeys_.end() && itPrevious != s_previousKeys_.end()){
+        if(itCurrent->second == GLFW_PRESS && itPrevious->second == GLFW_RELEASE){
             return true;
         }
     }
@@ -42,18 +42,18 @@ bool Input::isKeyJustPressed(int key){
 }
 
 bool Input::isKeyJustReleased(int key){
-    auto it_curr = s_curr.find(key);
-    auto it_prev = s_prev.find(key);
+    auto itCurrent = s_currentKeys_.find(key);
+    auto itPrevious = s_previousKeys_.find(key);
     // Calling find() on the key prevents insertion
-    if(it_curr != s_curr.end() && it_prev != s_prev.end()){
-        if(it_curr->second == GLFW_RELEASE && it_prev->second == GLFW_PRESS){
+    if(itCurrent != s_currentKeys_.end() && itPrevious != s_previousKeys_.end()){
+        if(itCurrent->second == GLFW_RELEASE && itPrevious->second == GLFW_PRESS){
             return true;
         }
     }
     return false;
 }
 
-std::vector<int> Input::tracked_keys = {
+std::vector<int> Input::s_trackedKeys_ = {
     GLFW_KEY_SPACE, GLFW_KEY_ENTER, GLFW_KEY_ESCAPE,
     GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP, GLFW_KEY_DOWN, GLFW_KEY_LEFT_SHIFT,
     GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_S, GLFW_KEY_D, GLFW_KEY_Q, GLFW_KEY_E,

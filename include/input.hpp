@@ -21,9 +21,9 @@ public:
 private:
     static GLFWwindow* s_window;
 
-    static std::vector<int> tracked_keys;
+    static std::vector<int> s_trackedKeys_;
     
-    static std::unordered_map<int, int> s_curr;
-    static std::unordered_map<int, int> s_prev;;
+    static std::unordered_map<int, int> s_currentKeys_;
+    static std::unordered_map<int, int> s_previousKeys_;;
 
 };

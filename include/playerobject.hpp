@@ -16,35 +16,35 @@ class PlayerObject : public GameObject {
         void setUpSensors();
         void sensorUpdate();
 
-        void setGoalCount(int count) { goal_count = count; }
-        void setInGoal(bool status) {in_goal = status;}
-        void incrementGoalCount() { goal_count++; }
+        void setGoalCount(int count) { goalCount_ = count; }
+        void setInGoal(bool status) {inGoal_ = status;}
+        void incrementGoalCount() { goalCount_++; }
 
 
         bool tileCollision(Tilemap& tilemap, const Sensor& sensor);
         bool tileGoalCollision(Tilemap& tilemap, const Sensor& sensor);
 
         const glm::ivec2 getPlayerTileIdx(Tilemap& tilemap) const;
-        int getGoalCount() const { return goal_count; }
+        int getGoalCount() const { return goalCount_; }
 
-        const Sensor& getLeftSensor() const { return leftSensor; }
-        const Sensor& getRightSensor() const { return rightSensor; }
-        const Sensor& getTopSensor() const { return topSensor; }
-        const Sensor& getBottomSensor() const { return bottomSensor; }
+        const Sensor& getLeftSensor() const { return leftSensor_; }
+        const Sensor& getRightSensor() const { return rightSensor_; }
+        const Sensor& getTopSensor() const { return topSensor_; }
+        const Sensor& getBottomSensor() const { return bottomSensor_; }
 
-        bool checkIfInGoal() {return in_goal;}
+        bool checkIfInGoal() {return inGoal_;}
 
-        float goal_reach_timer = 5.0f; // Timer to track goal reach time
+        float goalReachTimer_ = 5.0f; // Timer to track goal reach time
 
     private:
         // PlayerObject adds four 'sensors' to detect collisions
 
-        Sensor leftSensor;   // Left sensor for detecting walls
-        Sensor rightSensor;  // Right sensor for detecting walls
-        Sensor topSensor;    // Top sensor for detecting ceilings
-        Sensor bottomSensor; // Bottom sensor for detecting floors
+        Sensor leftSensor_;   // Left sensor for detecting walls
+        Sensor rightSensor_;  // Right sensor for detecting walls
+        Sensor topSensor_;    // Top sensor for detecting ceilings
+        Sensor bottomSensor_; // Bottom sensor for detecting floors
 
-        int goal_count = 0; // Counter for the number of sensors that detect a goal tile
-        bool in_goal = false;
+        int goalCount_ = 0; // Counter for the number of sensors that detect a goal tile
+        bool inGoal_ = false;
 
 };
