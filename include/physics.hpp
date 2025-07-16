@@ -14,7 +14,7 @@ const float MAX_VELOCITY = 15.0f; // Maximum velocity limit
 
 const float movementAccel = 7.0f; // Acceleration applied when moving left/right
 const float slowdownAccel = 16.0f; // Acceleration applied when slowing down
-const float turnaroundAccel = 18.0f;
+const float turnaroundAccel = 36.0f;
 const float midairDrag = 1.0f;
 
 class Physics {

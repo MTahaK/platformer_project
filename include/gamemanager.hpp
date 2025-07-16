@@ -7,6 +7,9 @@
 #include "window.hpp"
 #include "input.hpp"
 #include "playerobject.hpp"
+#include "debug.hpp"
+#include "globals.hpp"
+#include "color.hpp"
 
 enum class GameState {
     MENU,
@@ -23,14 +26,16 @@ class GameManager {
     public:
         // Default constructor leaves everything uninitialized
         GameManager() = default;
+        // Destructor
+        ~GameManager() = default;
 
         // Full initialization constructor
-        GameManager(PlayerObject player, Tilemap tilemap, Physics physics, Renderer2D renderer, Shader shader);
+        GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap, Physics& physics);
 
         void runGameLoop();
-        void setState();
+        void setState(GameState state) { gameState_ = state; };
         
-        GameState getState();
+        GameState getState() const { return gameState_; }
 
         // State-specific routines, includes input handling, physics, rendering for each state
         void handleMenuState();
@@ -40,11 +45,19 @@ class GameManager {
         void handleWinState();
         void handleExitState();
 
+        // Subsystem returns
+        PlayerObject& getPlayer() { return player_; }
+        Tilemap& getTilemap() { return tilemap_; }
+        Physics& getPhysics() { return physics_; }
+        Renderer2D& getRenderer() { return renderer_; }
+        Shader& getShader() { return shader_; }
+
     private:
         GameState gameState_ = GameState::MENU;
-        PlayerObject player_;
-        Tilemap tilemap_;
-        Physics physics_;
-        Renderer2D renderer_;
-        Shader shader_;
+        Window& window_;
+        Shader& shader_;
+        Renderer2D& renderer_;
+        PlayerObject& player_;
+        Tilemap& tilemap_;
+        Physics& physics_;
 };

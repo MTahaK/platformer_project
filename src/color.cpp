@@ -1,6 +1,6 @@
 #include "color.hpp"
 
-glm::vec4 hexToRGBA(const std::string& hex) {
+glm::vec4 hexToVec4(const std::string& hex) {
     unsigned int hexValue;
     std::stringstream ss;
     ss << std::hex << hex.substr(1); // Skip the '#' character
