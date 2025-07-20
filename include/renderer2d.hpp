@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "shader.hpp"
 #include <string>
+#include "globals.hpp"
 
 // Renderer2D class for 2D rendering operations
 class Renderer2D {

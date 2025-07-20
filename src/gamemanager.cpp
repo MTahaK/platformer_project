@@ -1,7 +1,9 @@
 #include "gamemanager.hpp"
+#include "helpers.hpp"
 
 GameManager::GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap, Physics& physics): 
                         window_(window), shader_(shader), renderer_(renderer), player_(player), tilemap_(tilemap), physics_(physics) {
+    lastFrameTime_ = glfwGetTime(); // Initialize timing
 }
 
 void GameManager::runGameLoop() {
@@ -13,13 +15,13 @@ void GameManager::runGameLoop() {
             handlePlayState();
             break;
         case GameState::PAUSE:
-            handlePauseState();
+            // handlePauseState();
             break;
         case GameState::DEAD:
-            handleDeadState();
+            // handleDeadState();
             break;
         case GameState::WIN:
-            handleWinState();
+            // handleWinState();
             break;
         case GameState::EXIT:
             handleExitState();
@@ -42,12 +44,10 @@ void GameManager::handleMenuState() {
         -1.0f, 1.0f
     );
 
-    // View matrix: identity, fixed in place
-    glm::mat4 view = glm::mat4(1.0f);
-    renderer_.beginScene(shader_, view, projection); // Begin the scene
+    renderer_.beginScene(shader_, IDENTITY_MATRIX, projection); // Begin the scene
 
     // Compute model matrix for screen-size quad
-    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 model = IDENTITY_MATRIX;
     // Center the quad in the framebuffer
     model = glm::translate(model, glm::vec3(fbWidth / 2.0f, fbHeight / 2.0f, 0.0f));
     model = glm::scale(model, glm::vec3(fbWidth, fbHeight, 1.0f)); // Scale to framebuffer size
@@ -63,11 +63,41 @@ void GameManager::handleMenuState() {
         setState(GameState::PLAY);
         std::cout<< "Switching to PLAY state." << std::endl;
     }
+    if (Input::isKeyPressed(GLFW_KEY_ESCAPE)) {
+        setState(GameState::EXIT);
+        std::cout << "Switching to EXIT state." << std::endl;
+    }
 }
 
 // All other state handlers currently empty, to be implemented later
-void GameManager::handlePlayState(){};
+void GameManager::handlePlayState(){
+    float currentFrameTime = glfwGetTime();
+    auto frameStart = std::chrono::high_resolution_clock::now();
+    float deltaTime = currentFrameTime - lastFrameTime_;
+    lastFrameTime_ = currentFrameTime;
+
+    // Poll for events
+    window_.pollEvents();
+
+    if(playerInput(player_) == -2){
+        setState(GameState::EXIT); // Transition to EXIT state instead of breaking
+        return;
+    }
+    physics_.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
+    
+    physics_.playerMovementStep(player_, deltaTime);
+    physics_.checkPlayerWorldCollisions(player_, tilemap_);
+
+    drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
+    
+    auto frameEnd = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = frameEnd - frameStart;
+};
 void GameManager::handlePauseState(){};
 void GameManager::handleDeadState(){};
 void GameManager::handleWinState(){};
-void GameManager::handleExitState(){};
+
+
+void GameManager::handleExitState(){
+    window_.setShouldClose(true);
+};

@@ -29,6 +29,10 @@ class Window {
         bool shouldClose() const {
             return glfwWindowShouldClose(window_);
         }
+
+        void setShouldClose(bool value) {
+            glfwSetWindowShouldClose(window_, value);
+        }
         
 
     private:

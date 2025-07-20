@@ -135,7 +135,7 @@ void Renderer2D::beginScene(Shader& shader, const glm::mat4& view, const glm::ma
     view_ = view;
     proj_ = proj;
     // Set the model matrix to identity for now
-    model_ = glm::mat4(1.0f);
+    model_ = IDENTITY_MATRIX;
 
     // Reactivate the VAO for drawing
     glBindVertexArray(vao_);

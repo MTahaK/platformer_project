@@ -1,5 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <chrono>
+#include <iostream>
 #include "tilemap.hpp"
 #include "physics.hpp"
 #include "renderer2d.hpp"
@@ -60,4 +62,7 @@ class GameManager {
         PlayerObject& player_;
         Tilemap& tilemap_;
         Physics& physics_;
+        
+        // Timing management for game loop
+        float lastFrameTime_ = 0.0f;
 };
