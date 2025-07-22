@@ -65,4 +65,5 @@ class GameManager {
         
         // Timing management for game loop
         float lastFrameTime_ = 0.0f;
+        float winTimer_ = 0.0f; // Timer for WIN state countdown
 };

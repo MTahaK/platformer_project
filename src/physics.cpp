@@ -66,7 +66,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 
     // TODO Will interleave this into the existing sensor checks later
     
-    if(goalDistance <= 5){
+    if(goalDistance <= 5 && !player.checkIfInGoal()){
         player.tileGoalCollision(tilemap, player.getLeftSensor());
         player.tileGoalCollision(tilemap, player.getRightSensor());
         player.tileGoalCollision(tilemap, player.getTopSensor());
@@ -76,22 +76,9 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
     // Before this block runs at least once, in_goal is still false
     if(player.getGoalCount() >= 4 && !player.checkIfInGoal()){
         player.setInGoal(true);
-        DEBUG_ONLY(std::cout<<"Player has reached the goal! Waiting for reset...\n";);
-    } else if(player.checkIfInGoal()){
-
-        if(player.goalReachTimer_ > 0.0f) {
-            player.goalReachTimer_ -= deltaTime;
-            DEBUG_ONLY(std::cout<<"Goal reach timer: "<<player.goalReachTimer_<<"\n";);
-        } else {
-            player.setPosition(tilemap.tileIndexToWorldPos(tilemap.getInitPlayerPos().x, tilemap.getInitPlayerPos().y));
-            player.setVelocity(glm::vec2(0.0f, 0.0f));
-            player.setAcceleration(glm::vec2(0.0f, 0.0f));
-            player.sensorUpdate();
-            player.goalReachTimer_ = 5.0f; // Reset timer
-            player.setGoalCount(0); // Reset goal counter
-            player.setInGoal(false);
-        }
+        DEBUG_ONLY(std::cout<<"Player has reached the goal!\n";);
     }
+    
     // Check collisions with the tilemap using sensors
     if(player.getVelocity().x < 0.0f){
         // Negative velocity, don't need to check right sensor
