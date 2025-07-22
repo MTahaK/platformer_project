@@ -60,14 +60,13 @@ std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth) {
     return objects;
 }
 
-int playerInput(GameObject& player) {
+InputResult playerInput(GameObject& player) {
     // Key polling for basic movement
     Input::update();
 
-    if(Input::isKeyJustPressed(GLFW_KEY_G)){
-        // Debug grounding key
-        player.setGrounded(!player.isGrounded());
-    }
+    // if(Input::isKeyJustPressed(GLFW_KEY_G)){
+    //     player.setGrounded(!player.isGrounded());
+    // }
     if(Input::isKeyJustPressed(GLFW_KEY_O)){
         toggleDebugMode();
     }
@@ -115,8 +114,15 @@ int playerInput(GameObject& player) {
             player.setVelocity(glm::vec2(player.getVelocity().x, -10.0f)); // Apply downward velocity
         }
     }
-    if(Input::isKeyJustPressed(GLFW_KEY_ESCAPE)){
-        return -2; // "break" signal to exit the loop
+    if(Input::isKeyJustPressed(GLFW_KEY_Q)){
+        DEBUG_ONLY(
+            std::cout << "Quitting application." << std::endl;
+        );
+        return InputResult::FORCE_QUIT; // Immediate quit, closes window
+    }
+
+    if(Input::isKeyJustPressed(GLFW_KEY_ESCAPE) || Input::isKeyJustPressed(GLFW_KEY_P)){
+        return InputResult::PAUSE;
     }
 
     std::ostringstream oss;
@@ -132,7 +138,7 @@ int playerInput(GameObject& player) {
     output.resize(90, ' '); // Pad to overwrite old output cleanly
 
     std::cout << "\r" << output << std::flush;
-    return 0;
+    return InputResult::CONTINUE; // Continue normal processing;
 }
 
 void miscMovement(std::vector<GameObject>& objects, float initialWorldWidth, int& leftdir, int& rightdir, Action& actionSystem) {

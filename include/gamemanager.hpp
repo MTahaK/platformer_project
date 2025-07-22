@@ -35,7 +35,7 @@ class GameManager {
         GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap, Physics& physics);
 
         void runGameLoop();
-        void setState(GameState state) { gameState_ = state; };
+        void setState(GameState state);
         
         GameState getState() const { return gameState_; }
 

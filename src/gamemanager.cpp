@@ -6,6 +6,20 @@ GameManager::GameManager(Window& window, Shader& shader, Renderer2D& renderer, P
     lastFrameTime_ = glfwGetTime(); // Initialize timing
 }
 
+void GameManager::setState(GameState state) {
+    // Clear input state by updating twice - this moves current to previous
+    // and ensures no "just pressed" states carry over
+    Input::update();
+    Input::update();
+    
+    // Reset timing when entering PLAY state to avoid delta time glitches
+    if (state == GameState::PLAY) {
+        lastFrameTime_ = glfwGetTime();
+    }
+    
+    gameState_ = state;
+}
+
 void GameManager::runGameLoop() {
     switch (gameState_) {
         case GameState::MENU:
@@ -15,7 +29,7 @@ void GameManager::runGameLoop() {
             handlePlayState();
             break;
         case GameState::PAUSE:
-            // handlePauseState();
+            handlePauseState();
             break;
         case GameState::DEAD:
             // handleDeadState();
@@ -61,11 +75,11 @@ void GameManager::handleMenuState() {
     // Check for input to switch to PLAY state
     if (Input::isKeyPressed(GLFW_KEY_ENTER)) {
         setState(GameState::PLAY);
-        std::cout<< "Switching to PLAY state." << std::endl;
+        DEBUG_ONLY(std::cout<< "Switching to PLAY state." << std::endl;);
     }
-    if (Input::isKeyPressed(GLFW_KEY_ESCAPE)) {
+    if (Input::isKeyPressed(GLFW_KEY_Q)) {
         setState(GameState::EXIT);
-        std::cout << "Switching to EXIT state." << std::endl;
+        DEBUG_ONLY(std::cout << "Switching to EXIT state." << std::endl;);
     }
 }
 
@@ -79,8 +93,15 @@ void GameManager::handlePlayState(){
     // Poll for events
     window_.pollEvents();
 
-    if(playerInput(player_) == -2){
-        setState(GameState::EXIT); // Transition to EXIT state instead of breaking
+    auto inputResult = playerInput(player_);
+
+    if(inputResult == InputResult::PAUSE){
+        setState(GameState::PAUSE);
+        DEBUG_ONLY(std::cout << "Pausing game." << std::endl;);
+        return;
+    } else if(inputResult == InputResult::FORCE_QUIT){
+        setState(GameState::EXIT);
+        DEBUG_ONLY(std::cout << "Quitting application." << std::endl;);
         return;
     }
     physics_.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
@@ -93,7 +114,25 @@ void GameManager::handlePlayState(){
     auto frameEnd = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = frameEnd - frameStart;
 };
-void GameManager::handlePauseState(){};
+
+void GameManager::handlePauseState(){
+    // Poll events but don't update game systems
+    window_.pollEvents();
+    
+    // Still render the current frame (game world frozen)
+    drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
+    
+    // Handle pause-specific input
+    Input::update();
+    if (Input::isKeyJustPressed(GLFW_KEY_ESCAPE) || Input::isKeyJustPressed(GLFW_KEY_P)) {
+        setState(GameState::PLAY); // Resume game
+        DEBUG_ONLY(std::cout << "Resuming game." << std::endl;);
+    }
+    if (Input::isKeyJustPressed(GLFW_KEY_Q)) {
+        setState(GameState::EXIT); // Quit to menu/exit
+        DEBUG_ONLY(std::cout << "Quitting to exit." << std::endl;);
+    }
+};
 void GameManager::handleDeadState(){};
 void GameManager::handleWinState(){};
 

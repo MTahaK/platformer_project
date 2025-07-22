@@ -22,6 +22,12 @@
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 
+enum class InputResult{
+    CONTINUE = 0,
+    PAUSE = 1,
+    FORCE_QUIT = 2  // In normal play, quitting must be performed from PAUSE
+};
+
 
 int initializeVisuals(Shader& shader, Renderer2D& renderer);
 
@@ -30,7 +36,7 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY);
 std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth);
 
 // INPUT HANDLING -  Will likely add more state-specific functions later, but may move.
-int playerInput(GameObject& player);
+InputResult playerInput(GameObject& player);
 
 // RENDERING FUNCTIONS - some not used
 void drawStep(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects);
