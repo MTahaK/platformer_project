@@ -18,6 +18,7 @@ class PlayerObject : public GameObject {
 
         void setGoalCount(int count) { goalCount_ = count; }
         void setInGoal(bool status) {inGoal_ = status;}
+        void setShouldDie(bool status) { shouldDie_ = status; }
         void incrementGoalCount() { goalCount_++; }
 
 
@@ -44,5 +45,6 @@ class PlayerObject : public GameObject {
 
         int goalCount_ = 0; // Counter for the number of sensors that detect a goal tile
         bool inGoal_ = false;
+        bool shouldDie_ = false; // Processed during player update
 
 };

@@ -1,4 +1,6 @@
 #include "gameobject.hpp"
+#include "behavior.hpp"
+#include "playerobject.hpp"
 #include <iostream>
 
 GameObject::GameObject() {
@@ -74,4 +76,21 @@ const AABB GameObject::computeOffsetAABB(const glm::vec2& offset) {
     offsetAABB.bottom = (position_.y + offset.y) - halfHeight;
 
     return offsetAABB;
+}
+
+// Behavior management implementations
+void GameObject::setBehavior(std::unique_ptr<Behavior> behavior) {
+    behavior_ = std::move(behavior);
+}
+
+void GameObject::updateBehavior(float deltaTime) {
+    if (behavior_) {
+        behavior_->update(*this, deltaTime);
+    }
+}
+
+void GameObject::handlePlayerCollision(PlayerObject& player) {
+    if (behavior_) {
+        behavior_->onPlayerCollision(*this, player);
+    }
 }

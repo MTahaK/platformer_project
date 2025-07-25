@@ -1,8 +1,10 @@
 #pragma once
 #include <glm/glm.hpp>
-#include "gameobject.hpp"
-#include "playerobject.hpp"
-#include "tilemap.hpp"
+#include <memory>
+
+class GameObject;
+class PlayerObject;
+class Tilemap;
 
 
 class Behavior {
@@ -27,9 +29,8 @@ class IdleBehavior : public Behavior {
         void update(GameObject& obj, float deltaTime) override;
 };
 
-class SpikeBehavior : public Behavior {
-    // Not necessarily a 'spike', but essentially a stationary kill object
-    // May extend/change to only kill when collided with on a certain surface?
+class KillBehavior : public Behavior {
+
     public:
         void update(GameObject& obj, float deltaTime) override;
 
@@ -41,8 +42,10 @@ class DeathWallBehavior : public Behavior {
     // to goal area - immediately kills player if they touch it
     public:
 
-        DeathWallBehavior(float acceleration, glm::ivec2 startPos, glm::ivec2 endPos)
-            : acceleration_(acceleration), startPos_(startPos), endPos_(endPos) {}
+        DeathWallBehavior(float acceleration, glm::ivec2 startPos, glm::ivec2 endPos);
+        // Optional: constructor with max speed limit
+        DeathWallBehavior(float acceleration, glm::ivec2 startPos, glm::ivec2 endPos, float maxSpeed);
+        
         void update(GameObject& obj, float deltaTime) override;
 
         void onPlayerCollision(GameObject& obj, PlayerObject& player) override;
@@ -51,9 +54,25 @@ class DeathWallBehavior : public Behavior {
 
         float acceleration_; // Acceleration of the death wall
         float velocity_ = 0.0f; // Current velocity of the death wall, increases based on acceleration
+        float maxSpeed_ = -1.0f; // Maximum speed (-1 means no limit)
         glm::ivec2 startPos_; // Starting position of the death wall
         glm::ivec2 endPos_;   // Ending position of the death wall
         glm::ivec2 currentPos_; // Current position of the death wall
 
         // Direction is determined by the start and end positions
+};
+
+class MovingPlatformBehavior : public Behavior {
+    // When the player is on the top surface of the platform, the platform's velocity
+    // is added to the player's velocity
+    public:
+        MovingPlatformBehavior(float speed, glm::vec2 direction);
+
+        void update(GameObject& obj, float deltaTime) override;
+
+        void onPlayerCollision(GameObject& obj, PlayerObject& player) override;
+    private:
+        float speed_;
+        glm::vec2 direction_;
+        glm::vec2 currentPos_;
 };

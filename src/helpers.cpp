@@ -34,31 +34,31 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
     return player;
 }
 
-std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth) {
+// std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth) {
 
-    // --- Create game objects ONCE (they persist across frames) ---
-    std::vector<GameObject> objects = {
-        { {worldWidth * 0.3f, worldHeight * 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f} }, // blue, left
-        { {worldWidth * 0.5f, worldHeight * 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} }, // green, center
-        { {worldWidth * 0.7f, worldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
-    };
+//     // --- Create game objects ONCE (they persist across frames) ---
+//     std::vector<GameObject> objects = {
+//         { {worldWidth * 0.3f, worldHeight * 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f} }, // blue, left
+//         { {worldWidth * 0.5f, worldHeight * 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} }, // green, center
+//         { {worldWidth * 0.7f, worldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
+//     };
     
-    objects[0].setName("Left Object");
-    objects[1].setName("Player Object");
-    objects[2].setName("Right Object");
+//     objects[0].setName("Left Object");
+//     objects[1].setName("Player Object");
+//     objects[2].setName("Right Object");
 
-       // Add a ground object (static platform)
-    GameObject ground(
-        { worldWidth / 2.0f, 0.45f },         // centered horizontally, near bottom
-        { worldWidth*3, 1.0f },               // full width, 1 unit tall
-        0.0f,
-        { 0.5f, 0.25f, 0.0f, 1.0f }                // brown-ish color
-    );
-    ground.setName("Ground");
-    objects.push_back(ground);
+//        // Add a ground object (static platform)
+//     GameObject ground(
+//         { worldWidth / 2.0f, 0.45f },         // centered horizontally, near bottom
+//         { worldWidth*3, 1.0f },               // full width, 1 unit tall
+//         0.0f,
+//         { 0.5f, 0.25f, 0.0f, 1.0f }                // brown-ish color
+//     );
+//     ground.setName("Ground");
+//     objects.push_back(ground);
 
-    return objects;
-}
+//     return objects;
+// }
 
 InputResult playerInput(GameObject& player) {
     // Key polling for basic movement

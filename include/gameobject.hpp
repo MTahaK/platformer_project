@@ -3,6 +3,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
 #include <vector>
+#include <memory>
+#include "behavior.hpp"
 struct AABB{
     float left, right, top, bottom;
 };
@@ -43,6 +45,11 @@ class GameObject {
 
         void setGrounded(bool grounded) { isGrounded_ = grounded; } // Set whether the object is grounded
 
+        // Behavior management
+        void setBehavior(std::unique_ptr<Behavior> behavior);
+        void updateBehavior(float deltaTime);
+        void handlePlayerCollision(class PlayerObject& player);
+
         // Getters
         const glm::vec2& getPosition() const { return position_; }
         const glm::vec2& getScale() const { return scale_; }
@@ -82,4 +89,7 @@ class GameObject {
         AABB aabb_;             // Axis-aligned bounding box for collision detection
         
         bool isGrounded_ = false;
+        
+        // Behavior system
+        std::unique_ptr<Behavior> behavior_;
 };
