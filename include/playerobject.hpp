@@ -34,8 +34,6 @@ class PlayerObject : public GameObject {
 
         bool checkIfInGoal() {return inGoal_;}
 
-        float goalReachTimer_ = 5.0f; // Timer to track goal reach time
-
     private:
         // PlayerObject adds four 'sensors' to detect collisions
 
