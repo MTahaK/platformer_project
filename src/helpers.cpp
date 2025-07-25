@@ -34,32 +34,6 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
     return player;
 }
 
-// std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth) {
-
-//     // --- Create game objects ONCE (they persist across frames) ---
-//     std::vector<GameObject> objects = {
-//         { {worldWidth * 0.3f, worldHeight * 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f} }, // blue, left
-//         { {worldWidth * 0.5f, worldHeight * 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} }, // green, center
-//         { {worldWidth * 0.7f, worldHeight * 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }  // red, right
-//     };
-    
-//     objects[0].setName("Left Object");
-//     objects[1].setName("Player Object");
-//     objects[2].setName("Right Object");
-
-//        // Add a ground object (static platform)
-//     GameObject ground(
-//         { worldWidth / 2.0f, 0.45f },         // centered horizontally, near bottom
-//         { worldWidth*3, 1.0f },               // full width, 1 unit tall
-//         0.0f,
-//         { 0.5f, 0.25f, 0.0f, 1.0f }                // brown-ish color
-//     );
-//     ground.setName("Ground");
-//     objects.push_back(ground);
-
-//     return objects;
-// }
-
 InputResult playerInput(GameObject& player) {
     // Key polling for basic movement
     Input::update();
@@ -141,71 +115,6 @@ InputResult playerInput(GameObject& player) {
     return InputResult::CONTINUE; // Continue normal processing;
 }
 
-void miscMovement(std::vector<GameObject>& objects, float initialWorldWidth, int& leftdir, int& rightdir, Action& actionSystem) {
-    // Secondary object movement
-
-    // If the left object hits the left world boundary, reverse direction
-    if(objects[0].getPosition().x <= 0.0f){
-        leftdir = 1; // Reverse direction
-    }
-    // If it hits the right world boundary, reverse direction
-    if(objects[0].getPosition().x >= initialWorldWidth){
-        leftdir = -1; // Reverse direction
-    }
-    // If the right object hits the right world boundary, reverse direction
-    if(objects[2].getPosition().x >= initialWorldWidth){
-        rightdir = -1; // Reverse direction
-    }
-    // If it hits the left world boundary, reverse direction
-    if(objects[2].getPosition().x <= 0.0f){
-        rightdir = 1; // Reverse direction
-    }
-    
-    actionSystem.addAction({
-            .offset = glm::vec2(leftdir*0.001f, 0.0f), // Move left
-            .actor = &objects[0], // The left object
-            .affectedObjects = {}
-        });
-    actionSystem.addAction({
-        .offset = glm::vec2(rightdir*0.001f, 0.0f), // Move right
-        .actor = &objects[2], // The right object
-        .affectedObjects = {}
-    });
-
-    // objects[0].setVelocity(glm::vec2(leftdir * 0.001f, objects[0].getVelocity().y)); // Move left
-    // objects[2].setVelocity(glm::vec2(rightdir * 0.001f, objects[2].getVelocity().y)); // Move right
-}
-
-void queueActions(std::vector<GameObject>& objects, Action& actionSystem, float deltaTime) {
-    for (auto& obj : objects) {
-        if(obj.getName() == "Ground" || obj.getName() == "Player Object") {
-            // Decouple player movement from action queue
-            continue; // Skip ground object for velocity application
-        }
-        if (!obj.isGrounded()) {
-            obj.addVelocity(glm::vec2(0.0f, gravity * deltaTime));
-        }
-
-        // Convert velocity into a queued action
-        glm::vec2 displacement = obj.getVelocity() * deltaTime;
-
-        // Queue x and y displacements separately
-        if (displacement.x != 0.0f) {
-            actionSystem.addAction({
-                .offset = glm::vec2(displacement.x, 0.0f),
-                .actor = &obj,
-                .affectedObjects = {}
-            });
-        }
-        if (displacement.y != 0.0f) {
-            actionSystem.addAction({
-                .offset = glm::vec2(0.0f, displacement.y),
-                .actor = &obj,
-                .affectedObjects = {}
-            });
-        }
-    }
-}
 
 void drawStep(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects) {
     
@@ -317,11 +226,4 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 
     // Swap buffers
     window.swap();
-}
-
-void applyActions( std::vector<GameObject>& objects, Action& actionSystem) {
-    // Process actions in the action system
-    actionSystem.validateActions(objects); // Validate actions (e.g., check for collisions)
-    actionSystem.processActions(); // Apply the actions to the game objects
-    actionSystem.clearActions(); // Clear the action queue for next frame
 }

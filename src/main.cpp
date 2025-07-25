@@ -28,7 +28,6 @@ int main(void){
 
     Input::initialize(window.getWindow());
 
-    Action actionSystem;
     Physics physicsSystem;
 
     GameManager gameManager(window, shader, renderer, player, tilemap, physicsSystem);

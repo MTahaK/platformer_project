@@ -14,7 +14,6 @@
 #include "gameobject.hpp"
 #include "playerobject.hpp"
 #include "input.hpp"
-#include "action.hpp"
 #include "physics.hpp"
 #include "tilemap.hpp"
 #include "debug.hpp"
@@ -42,8 +41,3 @@ InputResult playerInput(GameObject& player);
 void drawStep(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects);
 void drawStepPlayer(Window& window, Renderer2D& renderer, Shader& shader, const PlayerObject& player);
 void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, const Tilemap& tilemap, const PlayerObject& player);
-
-// ACTION SYSTEM FUNCTIONS - CURRENTLY UNUSED
-void miscMovement(std::vector<GameObject>& objects, float initialWorldWidth, int& leftdir, int& rightdir, Action& actionSystem);
-void queueActions(std::vector<GameObject>& objects, Action& actionSystem, float deltaTime);
-void applyActions(std::vector<GameObject>& objects, Action& actionSystem);

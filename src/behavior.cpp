@@ -47,24 +47,35 @@ void DeathWallBehavior::update(GameObject& obj, float deltaTime) {
         velocity_ = maxSpeed_;
     }
 
+    DEBUG_ONLY(std::cout << "Death wall - Velocity: " << velocity_ << ", Acceleration: " << acceleration_ << ", DeltaTime: " << deltaTime << std::endl;);
+
+    // Use floating point position for smooth movement, then update currentPos_
+    static glm::vec2 floatPos = glm::vec2(startPos_);
+    
     // Simple death wall only moves along one axis; progresses from startPos to endPos
     // The wall moves in the direction of endPos from startPos, so it MAY be either
     // entirely horizontally-moving or entirely vertically-moving
     if (startPos_.x != endPos_.x) {
         // Horizontal movement
-        currentPos_.x += static_cast<int>(velocity_ * deltaTime);
-        if ((startPos_.x < endPos_.x && currentPos_.x >= endPos_.x) ||
-            (startPos_.x > endPos_.x && currentPos_.x <= endPos_.x)) {
+        floatPos.x += velocity_ * deltaTime;
+        currentPos_.x = static_cast<int>(floatPos.x);
+        if ((startPos_.x < endPos_.x && floatPos.x >= endPos_.x) ||
+            (startPos_.x > endPos_.x && floatPos.x <= endPos_.x)) {
+            floatPos.x = endPos_.x;
             currentPos_.x = endPos_.x; // Stop at end position
         }
     } else {
         // Vertical movement
-        currentPos_.y += static_cast<int>(velocity_ * deltaTime);
-        if ((startPos_.y < endPos_.y && currentPos_.y >= endPos_.y) ||
-            (startPos_.y > endPos_.y && currentPos_.y <= endPos_.y)) {
+        floatPos.y += velocity_ * deltaTime;
+        currentPos_.y = static_cast<int>(floatPos.y);
+        if ((startPos_.y < endPos_.y && floatPos.y >= endPos_.y) ||
+            (startPos_.y > endPos_.y && floatPos.y <= endPos_.y)) {
+            floatPos.y = endPos_.y;
             currentPos_.y = endPos_.y; // Stop at end position
         }
     }
+
+    DEBUG_ONLY(std::cout << "Death wall position: (" << currentPos_.x << ", " << currentPos_.y << ")" << std::endl;);
 
     obj.setPosition(glm::vec2(currentPos_));
 }

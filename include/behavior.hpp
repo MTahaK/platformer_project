@@ -58,6 +58,7 @@ class DeathWallBehavior : public Behavior {
         glm::ivec2 startPos_; // Starting position of the death wall
         glm::ivec2 endPos_;   // Ending position of the death wall
         glm::ivec2 currentPos_; // Current position of the death wall
+        glm::vec2 floatPos_; // Floating-point position for smooth movement
 
         // Direction is determined by the start and end positions
 };
