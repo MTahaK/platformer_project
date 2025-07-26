@@ -21,22 +21,17 @@ void KillBehavior::onPlayerCollision(GameObject& obj, PlayerObject& player) {
     player.setShouldDie(true);
 }
 
-DeathWallBehavior::DeathWallBehavior(float acceleration, glm::ivec2 startPos, glm::ivec2 endPos)
-    : acceleration_(acceleration), startPos_(startPos), endPos_(endPos), currentPos_(startPos) {
-    // Initialize currentPos_ to starting position
-    // 
-    // Acceleration tuning guide:
-    // - Small values (0.1 - 0.5): Very gradual acceleration, gives players lots of time
-    // - Medium values (0.5 - 2.0): Noticeable pressure without being overwhelming  
-    // - Large values (2.0+): Aggressive acceleration, creates high pressure gameplay
-    //
-    // Example: acceleration = 1.0f means wall gains 1 unit/second of speed every second
-    // After 5 seconds: velocity = 5 units/second
-    // After 10 seconds: velocity = 10 units/second
+DeathWallBehavior::DeathWallBehavior(GameObject& obj, float acceleration, glm::vec2 startPos, glm::vec2 endPos)
+    : acceleration_(acceleration), startPos_(startPos), endPos_(endPos){
+    obj.setPosition(startPos);
 }
 
-DeathWallBehavior::DeathWallBehavior(float acceleration, glm::ivec2 startPos, glm::ivec2 endPos, float maxSpeed)
-    : acceleration_(acceleration), maxSpeed_(maxSpeed), startPos_(startPos), endPos_(endPos), currentPos_(startPos) {};
+
+
+DeathWallBehavior::DeathWallBehavior(GameObject& obj, float acceleration, glm::vec2 startPos, glm::vec2 endPos, float maxSpeed)
+    : acceleration_(acceleration), maxSpeed_(maxSpeed), startPos_(startPos), endPos_(endPos){
+    obj.setPosition(startPos);
+}
 
 void DeathWallBehavior::update(GameObject& obj, float deltaTime) {
     // Compute velocity from acceleration
@@ -47,37 +42,27 @@ void DeathWallBehavior::update(GameObject& obj, float deltaTime) {
         velocity_ = maxSpeed_;
     }
 
-    DEBUG_ONLY(std::cout << "Death wall - Velocity: " << velocity_ << ", Acceleration: " << acceleration_ << ", DeltaTime: " << deltaTime << std::endl;);
-
-    // Use floating point position for smooth movement, then update currentPos_
-    static glm::vec2 floatPos = glm::vec2(startPos_);
-    
+    auto currentPos = obj.getPosition();
     // Simple death wall only moves along one axis; progresses from startPos to endPos
-    // The wall moves in the direction of endPos from startPos, so it MAY be either
+    // The wall moves in the direction of endPos from startPo s, so it MAY be either
     // entirely horizontally-moving or entirely vertically-moving
     if (startPos_.x != endPos_.x) {
         // Horizontal movement
-        floatPos.x += velocity_ * deltaTime;
-        currentPos_.x = static_cast<int>(floatPos.x);
-        if ((startPos_.x < endPos_.x && floatPos.x >= endPos_.x) ||
-            (startPos_.x > endPos_.x && floatPos.x <= endPos_.x)) {
-            floatPos.x = endPos_.x;
-            currentPos_.x = endPos_.x; // Stop at end position
+        currentPos.x += (velocity_ * deltaTime);
+        if ((startPos_.x < endPos_.x && currentPos.x >= endPos_.x) ||
+            (startPos_.x > endPos_.x && currentPos.x <= endPos_.x)) {
+            currentPos.x = endPos_.x; // Stop at end position
         }
     } else {
         // Vertical movement
-        floatPos.y += velocity_ * deltaTime;
-        currentPos_.y = static_cast<int>(floatPos.y);
-        if ((startPos_.y < endPos_.y && floatPos.y >= endPos_.y) ||
-            (startPos_.y > endPos_.y && floatPos.y <= endPos_.y)) {
-            floatPos.y = endPos_.y;
-            currentPos_.y = endPos_.y; // Stop at end position
+        currentPos.y += (velocity_ * deltaTime);
+        if ((startPos_.y < endPos_.y && currentPos.y >= endPos_.y) ||
+            (startPos_.y > endPos_.y && currentPos.y <= endPos_.y)) {
+            currentPos.y = endPos_.y; // Stop at end position
         }
     }
 
-    DEBUG_ONLY(std::cout << "Death wall position: (" << currentPos_.x << ", " << currentPos_.y << ")" << std::endl;);
-
-    obj.setPosition(glm::vec2(currentPos_));
+    obj.setPosition(glm::vec2(currentPos));
 }
 
 void DeathWallBehavior::onPlayerCollision(GameObject& obj, PlayerObject& player) {
