@@ -59,6 +59,7 @@ class DeathWallBehavior : public Behavior {
         glm::vec2 endPos_;   // Ending position of the death wall
 
         // Direction is determined by the start and end positions
+        glm::vec2 direction_;
 };
 
 class MovingPlatformBehavior : public Behavior {

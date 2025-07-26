@@ -24,6 +24,13 @@ void KillBehavior::onPlayerCollision(GameObject& obj, PlayerObject& player) {
 DeathWallBehavior::DeathWallBehavior(GameObject& obj, float acceleration, glm::vec2 startPos, glm::vec2 endPos)
     : acceleration_(acceleration), startPos_(startPos), endPos_(endPos){
     obj.setPosition(startPos);
+    // Suppose startPos = (1, 2) and endPos = (4, 2), then direction_ = (3, 0).
+    // If startPos = (1, 2) and endPos = (1, 5), then direction_ = (0, 3).
+    // Normalize to get the final direction vector
+    direction_ = glm::vec2(endPos - startPos);
+    if (direction_ != glm::vec2(0)) {
+        direction_ = glm::normalize(direction_);
+    }
 }
 
 
@@ -31,6 +38,10 @@ DeathWallBehavior::DeathWallBehavior(GameObject& obj, float acceleration, glm::v
 DeathWallBehavior::DeathWallBehavior(GameObject& obj, float acceleration, glm::vec2 startPos, glm::vec2 endPos, float maxSpeed)
     : acceleration_(acceleration), maxSpeed_(maxSpeed), startPos_(startPos), endPos_(endPos){
     obj.setPosition(startPos);
+    direction_ = endPos - startPos;
+    if (direction_ != glm::vec2(0)) {
+        direction_ = glm::normalize(direction_);
+    }
 }
 
 void DeathWallBehavior::update(GameObject& obj, float deltaTime) {
@@ -44,25 +55,12 @@ void DeathWallBehavior::update(GameObject& obj, float deltaTime) {
 
     auto currentPos = obj.getPosition();
     // Simple death wall only moves along one axis; progresses from startPos to endPos
-    // The wall moves in the direction of endPos from startPo s, so it MAY be either
+    // The wall moves in the direction of endPos from startPos, so it may be either
     // entirely horizontally-moving or entirely vertically-moving
-    if (startPos_.x != endPos_.x) {
-        // Horizontal movement
-        currentPos.x += (velocity_ * deltaTime);
-        if ((startPos_.x < endPos_.x && currentPos.x >= endPos_.x) ||
-            (startPos_.x > endPos_.x && currentPos.x <= endPos_.x)) {
-            currentPos.x = endPos_.x; // Stop at end position
-        }
-    } else {
-        // Vertical movement
-        currentPos.y += (velocity_ * deltaTime);
-        if ((startPos_.y < endPos_.y && currentPos.y >= endPos_.y) ||
-            (startPos_.y > endPos_.y && currentPos.y <= endPos_.y)) {
-            currentPos.y = endPos_.y; // Stop at end position
-        }
-    }
+    
+    currentPos += (velocity_ * deltaTime) * direction_;
 
-    obj.setPosition(glm::vec2(currentPos));
+    obj.setPosition(currentPos);
 }
 
 void DeathWallBehavior::onPlayerCollision(GameObject& obj, PlayerObject& player) {
