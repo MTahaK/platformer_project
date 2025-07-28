@@ -32,7 +32,7 @@ class GameManager {
         ~GameManager() = default;
 
         // Full initialization constructor
-        GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap, Physics& physics);
+        GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap, std::vector<GameObject>& objects, Physics& physics);
 
         void runGameLoop();
         void setState(GameState state);
@@ -50,6 +50,7 @@ class GameManager {
         // Subsystem returns
         PlayerObject& getPlayer() { return player_; }
         Tilemap& getTilemap() { return tilemap_; }
+        std::vector<GameObject>& getObjects() { return objects; }
         Physics& getPhysics() { return physics_; }
         Renderer2D& getRenderer() { return renderer_; }
         Shader& getShader() { return shader_; }
@@ -61,6 +62,7 @@ class GameManager {
         Renderer2D& renderer_;
         PlayerObject& player_;
         Tilemap& tilemap_;
+        std::vector<GameObject>& objects_;
         Physics& physics_;
         
         // Timing management for game loop

@@ -32,7 +32,7 @@ int initializeVisuals(Shader& shader, Renderer2D& renderer);
 
 // SETUP FUNCTIONS  
 PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY);
-std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth);
+// std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth);
 
 // INPUT HANDLING -  Will likely add more state-specific functions later, but may move.
 InputResult playerInput(GameObject& player);
@@ -41,3 +41,5 @@ InputResult playerInput(GameObject& player);
 void drawStep(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects);
 void drawStepPlayer(Window& window, Renderer2D& renderer, Shader& shader, const PlayerObject& player);
 void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, const Tilemap& tilemap, const PlayerObject& player);
+void drawObjects(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects);
+void finishDraw(Window& window, Renderer2D& renderer, Shader& shader);
