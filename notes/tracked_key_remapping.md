@@ -8,8 +8,8 @@
 
   ```cpp
   struct TrackedKey {
-      int keyCode;
-      bool isDefault; // True if part of original control scheme
+	  int keyCode;
+	  bool isDefault; // True if part of original control scheme
   };
   ```
 

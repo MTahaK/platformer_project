@@ -25,7 +25,7 @@ Let’s break these down:
   * The stride between vertex attributes
   * The offset of each attribute
   * Which VBO is currently bound
-    It’s essentially a container for the VBO’s structure.
+	It’s essentially a container for the VBO’s structure.
 
 * **EBO (Element Buffer Object):** Also called an Index Buffer Object (IBO). Instead of duplicating vertices to form multiple triangles, you use indices that refer to vertices. This reduces redundancy in vertex data.
 
@@ -64,18 +64,18 @@ Each entity in your game world should be represented by an object that tracks it
 
 ```cpp
 struct GameObject {
-    glm::vec2 position;
-    glm::vec2 scale = {1.0f, 1.0f};
-    float rotation = 0.0f; // Radians
-    glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+	glm::vec2 position;
+	glm::vec2 scale = {1.0f, 1.0f};
+	float rotation = 0.0f; // Radians
+	glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 
-    glm::mat4 getModelMatrix() const {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(position, 0.0f));
-        model = glm::rotate(model, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
-        model = glm::scale(model, glm::vec3(scale, 1.0f));
-        return model;
-    }
+	glm::mat4 getModelMatrix() const {
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(position, 0.0f));
+	model = glm::rotate(model, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::scale(model, glm::vec3(scale, 1.0f));
+	return model;
+	}
 };
 ```
 
@@ -85,9 +85,9 @@ In your render loop:
 
 ```cpp
 for (const GameObject& obj : sceneObjects) {
-    shader.setMat4("u_Model", obj.getModelMatrix());
-    shader.setVec4("u_Color", obj.color);
-    renderer.drawQuad(); // Reuses the same VBO/VAO for every draw
+	shader.setMat4("u_Model", obj.getModelMatrix());
+	shader.setVec4("u_Color", obj.color);
+	renderer.drawQuad(); // Reuses the same VBO/VAO for every draw
 }
 ```
 
@@ -123,15 +123,15 @@ You parse this grid and generate `GameObject`s with appropriate positions:
 ```cpp
 float tileSize = 1.0f;
 for (int y = 0; y < rows; ++y) {
-    for (int x = 0; x < cols; ++x) {
-        char tile = map[y][x];
-        glm::vec2 position = glm::vec2(x * tileSize, (rows - y - 1) * tileSize);
+	for (int x = 0; x < cols; ++x) {
+	char tile = map[y][x];
+	glm::vec2 position = glm::vec2(x * tileSize, (rows - y - 1) * tileSize);
 
-        if (tile == '#')
-            sceneObjects.emplace_back(TileObject{position});
-        else if (tile == 'P')
-            player.position = position;
-    }
+	if (tile == '#')
+	sceneObjects.emplace_back(TileObject{position});
+	else if (tile == 'P')
+	player.position = position;
+	}
 }
 ```
 

@@ -19,31 +19,31 @@ The system consists of:
 ```cpp
 class PlayerObject : public GameObject {
 private:
-    struct ActionData {
-        bool isValid = false;
-        std::function<void(PlayerObject&)> execute;
-        float cooldown = 0.0f;
-        std::string validationSource; // "collision", "cooldown", "state"
-    };
-    
-    std::unordered_map<std::string, ActionData> actionMap_;
-    std::vector<std::string> validActionQueue_;
-    
+	struct ActionData {
+	bool isValid = false;
+	std::function<void(PlayerObject&)> execute;
+	float cooldown = 0.0f;
+	std::string validationSource; // "collision", "cooldown", "state"
+	};
+	
+	std::unordered_map<std::string, ActionData> actionMap_;
+	std::vector<std::string> validActionQueue_;
+	
 public:
-    void validateActions() {
-        validActionQueue_.clear();
-        for (auto& [actionName, actionData] : actionMap_) {
-            if (actionData.isValid) {
-                validActionQueue_.push_back(actionName);
-            }
-        }
-    }
-    
-    void executeValidActions() {
-        for (const auto& actionName : validActionQueue_) {
-            actionMap_[actionName].execute(*this);
-        }
-    }
+	void validateActions() {
+	validActionQueue_.clear();
+	for (auto& [actionName, actionData] : actionMap_) {
+	if (actionData.isValid) {
+	validActionQueue_.push_back(actionName);
+	}
+	}
+	}
+	
+	void executeValidActions() {
+	for (const auto& actionName : validActionQueue_) {
+	actionMap_[actionName].execute(*this);
+	}
+	}
 };
 ```
 
@@ -62,56 +62,56 @@ public:
 
 ```cpp
 enum class PlayerAction : uint32_t {
-    LEFT_WALL_JUMP = 1 << 0,
-    RIGHT_WALL_JUMP = 1 << 1,
-    BOUNCE = 1 << 2,
-    DASH = 1 << 3,
-    DOUBLE_JUMP = 1 << 4,
-    ATTACK = 1 << 5,
-    GLIDE = 1 << 6,
-    WALL_SLIDE = 1 << 7,
-    // ... up to 32 actions
+	LEFT_WALL_JUMP = 1 << 0,
+	RIGHT_WALL_JUMP = 1 << 1,
+	BOUNCE = 1 << 2,
+	DASH = 1 << 3,
+	DOUBLE_JUMP = 1 << 4,
+	ATTACK = 1 << 5,
+	GLIDE = 1 << 6,
+	WALL_SLIDE = 1 << 7,
+	// ... up to 32 actions
 };
 
 class PlayerObject : public GameObject {
 private:
-    uint32_t validActions_ = 0;
-    std::array<std::function<void(PlayerObject&)>, 32> actionFunctions_;
-    std::vector<PlayerAction> validActionQueue_;
-    
+	uint32_t validActions_ = 0;
+	std::array<std::function<void(PlayerObject&)>, 32> actionFunctions_;
+	std::vector<PlayerAction> validActionQueue_;
+	
 public:
-    void setActionValid(PlayerAction action, bool valid) {
-        if (valid) {
-            validActions_ |= static_cast<uint32_t>(action);
-        } else {
-            validActions_ &= ~static_cast<uint32_t>(action);
-        }
-    }
-    
-    bool isActionValid(PlayerAction action) const {
-        return validActions_ & static_cast<uint32_t>(action);
-    }
-    
-    void buildValidActionQueue() {
-        validActionQueue_.clear();
-        for (int i = 0; i < 32; ++i) {
-            if (validActions_ & (1 << i)) {
-                validActionQueue_.push_back(static_cast<PlayerAction>(1 << i));
-            }
-        }
-    }
-    
-    void executeValidActions() {
-        for (PlayerAction action : validActionQueue_) {
-            int index = __builtin_ctz(static_cast<uint32_t>(action)); // Count trailing zeros
-            actionFunctions_[index](*this);
-        }
-    }
-    
-    void clearAllActions() {
-        validActions_ = 0;
-        validActionQueue_.clear();
-    }
+	void setActionValid(PlayerAction action, bool valid) {
+	if (valid) {
+	validActions_ |= static_cast<uint32_t>(action);
+	} else {
+	validActions_ &= ~static_cast<uint32_t>(action);
+	}
+	}
+	
+	bool isActionValid(PlayerAction action) const {
+	return validActions_ & static_cast<uint32_t>(action);
+	}
+	
+	void buildValidActionQueue() {
+	validActionQueue_.clear();
+	for (int i = 0; i < 32; ++i) {
+	if (validActions_ & (1 << i)) {
+	validActionQueue_.push_back(static_cast<PlayerAction>(1 << i));
+	}
+	}
+	}
+	
+	void executeValidActions() {
+	for (PlayerAction action : validActionQueue_) {
+	int index = __builtin_ctz(static_cast<uint32_t>(action)); // Count trailing zeros
+	actionFunctions_[index](*this);
+	}
+	}
+	
+	void clearAllActions() {
+	validActions_ = 0;
+	validActionQueue_.clear();
+	}
 };
 ```
 
@@ -131,15 +131,15 @@ public:
 ```cpp
 class PlayerObject : public GameObject {
 private:
-    // Fast access for common actions
-    enum CoreAction { LEFT_WALL_JUMP, RIGHT_WALL_JUMP, DASH, DOUBLE_JUMP, CORE_ACTION_COUNT };
-    std::array<bool, CORE_ACTION_COUNT> coreActionValid_;
-    std::array<std::function<void(PlayerObject&)>, CORE_ACTION_COUNT> coreActionFunctions_;
-    
-    // Flexible storage for special/dynamic actions
-    std::unordered_map<std::string, ActionData> specialActions_;
-    
-    std::vector<std::function<void(PlayerObject&)>> validActionQueue_;
+	// Fast access for common actions
+	enum CoreAction { LEFT_WALL_JUMP, RIGHT_WALL_JUMP, DASH, DOUBLE_JUMP, CORE_ACTION_COUNT };
+	std::array<bool, CORE_ACTION_COUNT> coreActionValid_;
+	std::array<std::function<void(PlayerObject&)>, CORE_ACTION_COUNT> coreActionFunctions_;
+	
+	// Flexible storage for special/dynamic actions
+	std::unordered_map<std::string, ActionData> specialActions_;
+	
+	std::vector<std::function<void(PlayerObject&)>> validActionQueue_;
 };
 ```
 
@@ -148,57 +148,57 @@ private:
 ### Collision-Based Validation
 ```cpp
 void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {
-    // ... existing collision detection ...
-    
-    // Clear collision-based actions
-    player.clearActionsBySource("collision");
-    
-    // Set action validity based on collision state
-    if (!player.isGrounded() && player.tileCollision(tilemap, player.getRightSensor())) {
-        player.setActionValid(PlayerAction::LEFT_WALL_JUMP, true);
-    }
-    
-    if (!player.isGrounded() && player.tileCollision(tilemap, player.getLeftSensor())) {
-        player.setActionValid(PlayerAction::RIGHT_WALL_JUMP, true);
-    }
+	// ... existing collision detection ...
+	
+	// Clear collision-based actions
+	player.clearActionsBySource("collision");
+	
+	// Set action validity based on collision state
+	if (!player.isGrounded() && player.tileCollision(tilemap, player.getRightSensor())) {
+	player.setActionValid(PlayerAction::LEFT_WALL_JUMP, true);
+	}
+	
+	if (!player.isGrounded() && player.tileCollision(tilemap, player.getLeftSensor())) {
+	player.setActionValid(PlayerAction::RIGHT_WALL_JUMP, true);
+	}
 }
 ```
 
 ### State-Based Validation
 ```cpp
 void PlayerObject::updateStateBasedActions() {
-    // Double jump availability
-    if (!hasDoubleJumped_ && !isGrounded()) {
-        setActionValid(PlayerAction::DOUBLE_JUMP, true);
-    }
-    
-    // Dash cooldown
-    if (dashCooldown_ <= 0) {
-        setActionValid(PlayerAction::DASH, true);
-    }
-    
-    // Animation-based actions
-    if (currentAnimation_ != "attacking") {
-        setActionValid(PlayerAction::ATTACK, true);
-    }
+	// Double jump availability
+	if (!hasDoubleJumped_ && !isGrounded()) {
+	setActionValid(PlayerAction::DOUBLE_JUMP, true);
+	}
+	
+	// Dash cooldown
+	if (dashCooldown_ <= 0) {
+	setActionValid(PlayerAction::DASH, true);
+	}
+	
+	// Animation-based actions
+	if (currentAnimation_ != "attacking") {
+	setActionValid(PlayerAction::ATTACK, true);
+	}
 }
 ```
 
 ### Input Handling
 ```cpp
 void PlayerObject::handleInput(const InputState& input) {
-    buildValidActionQueue();
-    
-    // Check input against valid actions
-    if (input.isPressed(Input::JUMP)) {
-        if (isActionValid(PlayerAction::LEFT_WALL_JUMP) && input.isHeld(Input::LEFT)) {
-            executeAction(PlayerAction::LEFT_WALL_JUMP);
-        } else if (isActionValid(PlayerAction::RIGHT_WALL_JUMP) && input.isHeld(Input::RIGHT)) {
-            executeAction(PlayerAction::RIGHT_WALL_JUMP);
-        } else if (isActionValid(PlayerAction::DOUBLE_JUMP)) {
-            executeAction(PlayerAction::DOUBLE_JUMP);
-        }
-    }
+	buildValidActionQueue();
+	
+	// Check input against valid actions
+	if (input.isPressed(Input::JUMP)) {
+	if (isActionValid(PlayerAction::LEFT_WALL_JUMP) && input.isHeld(Input::LEFT)) {
+	executeAction(PlayerAction::LEFT_WALL_JUMP);
+	} else if (isActionValid(PlayerAction::RIGHT_WALL_JUMP) && input.isHeld(Input::RIGHT)) {
+	executeAction(PlayerAction::RIGHT_WALL_JUMP);
+	} else if (isActionValid(PlayerAction::DOUBLE_JUMP)) {
+	executeAction(PlayerAction::DOUBLE_JUMP);
+	}
+	}
 }
 ```
 
@@ -208,16 +208,16 @@ void PlayerObject::handleInput(const InputState& input) {
 ```cpp
 class PlayerObject : public GameObject {
 private:
-    bool canLeftWallJump_;
-    bool canRightWallJump_;
-    bool canDoubleJump_;
-    bool canDash_;
-    // ... 20+ more flags
-    
+	bool canLeftWallJump_;
+	bool canRightWallJump_;
+	bool canDoubleJump_;
+	bool canDash_;
+	// ... 20+ more flags
+	
 public:
-    bool getCanLeftWallJump() const { return canLeftWallJump_; }
-    void setCanLeftWallJump(bool value) { canLeftWallJump_ = value; }
-    // ... 40+ more getters/setters
+	bool getCanLeftWallJump() const { return canLeftWallJump_; }
+	void setCanLeftWallJump(bool value) { canLeftWallJump_ = value; }
+	// ... 40+ more getters/setters
 };
 ```
 

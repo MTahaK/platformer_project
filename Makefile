@@ -1,11 +1,11 @@
 UNAME_S := $(shell uname -s)
 
 ifeq ($(UNAME_S), Darwin)
-    GLFW_CFLAGS := -I/opt/homebrew/include
-    GLFW_LDFLAGS := -L/opt/homebrew/lib -framework OpenGL
+	GLFW_CFLAGS := -I/opt/homebrew/include
+	GLFW_LDFLAGS := -L/opt/homebrew/lib -framework OpenGL
 else
-    GLFW_CFLAGS :=
-    GLFW_LDFLAGS := -lGL
+	GLFW_CFLAGS :=
+	GLFW_LDFLAGS := -lGL
 endif
 
 CXX      := g++

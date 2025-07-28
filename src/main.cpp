@@ -2,43 +2,62 @@
 #include "gamemanager.hpp"
 
 int main(void){
-    Window window(1920, 1080, "OpenGL Window");
-    
-    Shader shader;
-    Renderer2D renderer;
+	Window window(1920, 1080, "OpenGL Window");
+	
+	Shader shader;
+	Renderer2D renderer;
 
-    if(initializeVisuals(shader, renderer) != 0){
-        return -1; // Exit if initialization fails
-    }
+	if(initializeVisuals(shader, renderer) != 0){
+	return -1; // Exit if initialization fails
+	}
 
-    renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
+	renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
 
-    // --- TILEMAP SETUP ---
-    std::string tilemapFile = "./assets/test.tmap";
+	// --- TILEMAP SETUP ---
+	std::string tilemapFile = "./assets/test.tmap";
 
-    Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
+	Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
 
-    // Set player position in tilemap
-    PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
+	// Set player position in tilemap
+	PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
 
-    // Set player scale to (0.6f, 1.0f)
-    // player.setScale(glm::vec2(0.6f, 1.0f));
+	// Set player scale to (0.6f, 1.0f)
+	// player.setScale(glm::vec2(0.6f, 1.0f));
 
-    player.setGrounded(true); // Set the player object to be grounded initially
+	player.setGrounded(true); // Set the player object to be grounded initially
 
-    Input::initialize(window.getWindow());
+	Input::initialize(window.getWindow());
 
-    Physics physicsSystem;
+	Physics physicsSystem;
 
-    GameManager gameManager(window, shader, renderer, player, tilemap, physicsSystem);
-        
-    while(!window.shouldClose()){
-        gameManager.runGameLoop();
-    }
-    // Cleanup and exit
-    renderer.shutdown();
-    shader.shutdown();
-    window.destroy();
-    std::cout << "Exiting application." << std::endl;
-    return 0;
+	// Initialize empty object array
+	std::vector<GameObject> objects;
+
+	// Create and insert DeathWall object
+	// For test, DeathWall scale stretches entire height of level, and is 1 tile wide.
+	// DeathWall starts at left edge of tilemap
+	GameObject deathWall;
+	deathWall.setPosition(glm::vec2(0.0f, 0.0f));
+	deathWall.setScale(glm::vec2(1.0f, tilemap.getHeight()));
+	// DeathWall color is red
+	deathWall.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	deathWall.setName("Death Wall");
+	
+	// Create instance of DeathWallBehavior
+	DeathWallBehavior deathWallBehavior(deathWall, 0.5f, glm::vec2(0.0f, 0.0f), glm::vec2(tilemap.getWidth(), 0.0f));
+	// Set the behavior for the death wall
+	deathWall.setBehavior(std::make_unique<DeathWallBehavior>(deathWallBehavior));
+	objects.push_back(deathWall);
+
+	GameManager gameManager(window, shader, renderer, player, tilemap, objects, physicsSystem);
+	
+	while(!window.shouldClose()){
+	gameManager.runGameLoop();
+	}
+	// Cleanup and exit
+	renderer.shutdown();
+	shader.shutdown();
+	window.destroy();
+	std::cout << "Exiting application." << std::endl;
+	return 0;
 }
