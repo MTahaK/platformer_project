@@ -19,12 +19,12 @@ const float midairDrag = 1.0f;
 
 class Physics {
 
-    public:
+	public:
 
-        void playerMovementStep(PlayerObject& player, float deltaTime);
-        void checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap);
-        void checkPlayerEntityCollisions(GameObject& obj, const std::vector<GameObject>& entities); // May end up unused
+	void playerMovementStep(PlayerObject& player, float deltaTime);
+	void checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap);
+	void checkPlayerEntityCollisions(GameObject& obj, const std::vector<GameObject>& entities); // May end up unused
 
-        float deltaTime = 0.0f;
+	float deltaTime = 0.0f;
 
 };

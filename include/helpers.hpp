@@ -22,9 +22,9 @@ constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 
 enum class InputResult{
-    CONTINUE = 0,
-    PAUSE = 1,
-    FORCE_QUIT = 2  // In normal play, quitting must be performed from PAUSE
+	CONTINUE = 0,
+	PAUSE = 1,
+	FORCE_QUIT = 2  // In normal play, quitting must be performed from PAUSE
 };
 
 
