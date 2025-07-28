@@ -43,3 +43,6 @@ void drawStepPlayer(Window& window, Renderer2D& renderer, Shader& shader, const 
 void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, const Tilemap& tilemap, const PlayerObject& player);
 void drawObjects(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects);
 void finishDraw(Window& window, Renderer2D& renderer, Shader& shader);
+
+// UPDATE FUNCTIONS
+void updateDeathWall(GameObject& deathWall, float deltaTime);

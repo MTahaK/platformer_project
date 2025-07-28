@@ -240,3 +240,10 @@ void finishDraw(Window& window, Renderer2D& renderer, Shader& shader) {
 	// Swap buffers
 	window.swap();
 }
+
+
+void updateDeathWall(GameObject& deathWall, float deltaTime) {
+	// Call the behavior's update method
+	deathWall.updateBehavior(deltaTime);
+
+}

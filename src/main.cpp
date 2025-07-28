@@ -36,18 +36,20 @@ int main(void){
 	// Create and insert DeathWall object
 	// For test, DeathWall scale stretches entire height of level, and is 1 tile wide.
 	// DeathWall starts at left edge of tilemap
+	// ...existing code...
 	GameObject deathWall;
-	deathWall.setPosition(glm::vec2(0.0f, 0.0f));
+	deathWall.setPosition(glm::vec2(0.0f, tilemap.getHeight() / 2.0f)); // Centre vertically in level
 	deathWall.setScale(glm::vec2(1.0f, tilemap.getHeight()));
+// ...existing code...
 	// DeathWall color is red
 	deathWall.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	deathWall.setName("Death Wall");
-	
+	auto deathWallPos = deathWall.getPosition();
 	// Create instance of DeathWallBehavior
-	DeathWallBehavior deathWallBehavior(deathWall, 0.5f, glm::vec2(0.0f, 0.0f), glm::vec2(tilemap.getWidth(), 0.0f));
+	DeathWallBehavior deathWallBehavior(deathWall, 0.5f, glm::vec2(0.0f, deathWallPos.y), glm::vec2(tilemap.getWidth(), deathWallPos.y));
 	// Set the behavior for the death wall
 	deathWall.setBehavior(std::make_unique<DeathWallBehavior>(deathWallBehavior));
-	objects.push_back(deathWall);
+	objects.push_back(std::move(deathWall));
 
 	GameManager gameManager(window, shader, renderer, player, tilemap, objects, physicsSystem);
 	

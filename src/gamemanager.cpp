@@ -132,9 +132,11 @@ void GameManager::handlePlayState(){
 		DEBUG_ONLY(std::cout << "Player reached goal, transitioning to WIN state." << std::endl;);
 		return;
 	}
+	updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
 
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
-	drawObjects(window_, renderer_, shader_, objects);
+	drawObjects(window_, renderer_, shader_, objects_);
+	finishDraw(window_, renderer_, shader_);
 	
 	auto frameEnd = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> elapsed = frameEnd - frameStart;
