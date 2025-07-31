@@ -273,3 +273,22 @@ void updateDeathWall(GameObject &deathWall, float deltaTime)
 	// Call the behavior's update method
 	deathWall.updateBehavior(deltaTime);
 }
+
+void updatePlayer(PlayerObject &player, Physics &physics, Tilemap &tilemap, std::vector<GameObject> &objects, float deltaTime){
+	physics.playerMovementStep(player, deltaTime);
+	physics.checkPlayerWorldCollisions(player, tilemap);
+
+	GameObject* deathWall = nullptr;
+	if (!objects.empty()) {
+		for(auto& obj : objects) {
+			if(obj.getName() == "DeathWall") {
+				deathWall = &obj;
+				break;
+			}
+		}
+	}
+	
+	if (deathWall) {
+		physics.checkPlayerDeathWallCollision(player, *deathWall);
+	}
+}

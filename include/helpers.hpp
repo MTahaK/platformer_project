@@ -45,4 +45,5 @@ void drawObjects(Window& window, Renderer2D& renderer, Shader& shader, const std
 void finishDraw(Window& window, Renderer2D& renderer, Shader& shader);
 
 // UPDATE FUNCTIONS
+void updatePlayer(PlayerObject &player, Physics& physics, Tilemap& tilemap, std::vector<GameObject>& objects, float deltaTime);
 void updateDeathWall(GameObject& deathWall, float deltaTime);

@@ -122,10 +122,8 @@ void GameManager::handlePlayState(){
 		return;
 	}
 	physics_.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
-	
-	physics_.playerMovementStep(player_, deltaTime);
-	physics_.checkPlayerWorldCollisions(player_, tilemap_);
 
+	updatePlayer(player_, physics_, tilemap_, objects_, deltaTime);
 	if(player_.checkIfInGoal()) {
 		// Transition to WIN state
 		setState(GameState::WIN);
@@ -135,7 +133,6 @@ void GameManager::handlePlayState(){
 	updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
 	
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
-	physics_.checkPlayerDeathWallCollision(player_, objects_[0]);
 	drawObjects(window_, renderer_, shader_, objects_);
 	finishDraw(window_, renderer_, shader_);
 	

@@ -45,7 +45,7 @@ int main(void){
 // ...existing code...
 	// DeathWall color is red
 	deathWall.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	deathWall.setName("Death Wall");
+	deathWall.setName("DeathWall");
 	auto deathWallPos = deathWall.getPosition();
 	// Create instance of DeathWallBehavior
 	DeathWallBehavior deathWallBehavior(deathWall, 0.5f, glm::vec2(0.0f, deathWallPos.y), glm::vec2(tilemap.getWidth(), deathWallPos.y));
