@@ -48,7 +48,7 @@ void GameManager::runGameLoop() {
 			handlePauseState();
 			break;
 		case GameState::DEAD:
-			// handleDeadState();
+			handleDeadState();
 			break;
 		case GameState::WIN:
 			handleWinState();
@@ -158,7 +158,60 @@ void GameManager::handlePauseState(){
 		DEBUG_ONLY(std::cout << "Quitting to exit." << std::endl;);
 	}
 };
-void GameManager::handleDeadState(){};
+void GameManager::handleDeadState(){
+	window_.pollEvents();
+	
+	// Currently, render a red quad that matches the framebuffer size
+	int fbWidth, fbHeight;
+	window_.getFramebufferSize(fbWidth, fbHeight);
+
+	// Define projection matrix to match the framebuffer size
+	glm::mat4 projection = glm::ortho(
+		0.0f, static_cast<float>(fbWidth),
+		0.0f, static_cast<float>(fbHeight),
+		-1.0f, 1.0f
+	);
+
+	renderer_.beginScene(shader_, IDENTITY_MATRIX, projection); // Begin the scene
+
+	// Compute model matrix for screen-size quad
+	glm::mat4 model = IDENTITY_MATRIX;
+	// Center the quad in the framebuffer
+	model = glm::translate(model, glm::vec3(fbWidth / 2.0f, fbHeight / 2.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(fbWidth, fbHeight, 1.0f)); // Scale to framebuffer size
+	auto color = hexToVec4("#ff0000"); // Red color for death state
+
+	renderer_.drawQuad(shader_, model, color);
+
+	finishDraw(window_, renderer_, shader_);
+
+	Input::update();
+	// Check for input to reset level or exit
+	if (Input::isKeyPressed(GLFW_KEY_ENTER)) {
+		// Reset level and return to PLAY state
+		player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
+		player_.setVelocity(glm::vec2(0.0f, 0.0f));
+		player_.setAcceleration(glm::vec2(0.0f, 0.0f));
+		player_.sensorUpdate();
+		
+		// Reset goal-related states
+		player_.setGoalCount(0);
+		player_.setInGoal(false);
+
+		// Reset death wall
+		auto* deathWallBehavior = dynamic_cast<DeathWallBehavior*>(objects_[0].getBehavior());
+		if (deathWallBehavior) {
+			deathWallBehavior->reset(objects_[0]);
+		}
+
+		setState(GameState::PLAY);
+		DEBUG_ONLY(std::cout << "Level reset, returning to PLAY state." << std::endl;);
+	}
+	if (Input::isKeyPressed(GLFW_KEY_Q)) {
+		setState(GameState::EXIT);
+		DEBUG_ONLY(std::cout << "Switching to EXIT state." << std::endl;);
+	}
+};
 void GameManager::handleWinState(){
 	float currentFrameTime = glfwGetTime();
 	float deltaTime = currentFrameTime - lastFrameTime_;
