@@ -39,6 +39,8 @@ int main(void){
 	// ...existing code...
 	GameObject deathWall;
 	deathWall.setPosition(glm::vec2(0.0f, tilemap.getHeight() / 2.0f)); // Centre vertically in level
+	deathWall.setInitPosition(deathWall.getPosition()); // Set initial position
+
 	deathWall.setScale(glm::vec2(1.0f, tilemap.getHeight()));
 // ...existing code...
 	// DeathWall color is red
@@ -54,7 +56,7 @@ int main(void){
 	GameManager gameManager(window, shader, renderer, player, tilemap, objects, physicsSystem);
 	
 	while(!window.shouldClose()){
-	gameManager.runGameLoop();
+		gameManager.runGameLoop();
 	}
 	// Cleanup and exit
 	renderer.shutdown();

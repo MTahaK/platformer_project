@@ -50,6 +50,8 @@ class DeathWallBehavior : public Behavior {
 
 	void onPlayerCollision(GameObject& obj, PlayerObject& player) override;
 
+	void reset(GameObject& obj);
+
 	private:
 
 	float acceleration_; // Acceleration of the death wall

@@ -198,6 +198,9 @@ void GameManager::handleWinState(){
 	
 	// Continue rendering the game world during countdown
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
+	drawObjects(window_, renderer_, shader_, objects_);
+	finishDraw(window_, renderer_, shader_);
+
 	
 	// When timer expires, reset player and return to PLAY state
 	if (winTimer_ <= 0.0f) {
@@ -213,7 +216,11 @@ void GameManager::handleWinState(){
 		
 		// Reset win timer for next time
 		winTimer_ = 0.0f;
-		
+
+		// Reset death wall
+		auto* deathWallBehavior = dynamic_cast<DeathWallBehavior*>(objects_[0].getBehavior());
+		deathWallBehavior->reset(objects_[0]);
+
 		// Transition back to PLAY state
 		setState(GameState::PLAY);
 		DEBUG_ONLY(std::cout << "Player reset, returning to PLAY state." << std::endl;);

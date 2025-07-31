@@ -27,6 +27,8 @@ class GameObject {
 	void offsetPosition(const glm::vec2& offset) { position_ += offset; computeAABB();}
 	void multPosition(const glm::vec2& multiplier) { position_ *= multiplier; computeAABB();}
 
+	void setInitPosition(const glm::vec2& initPos) { initPos_ = initPos; }
+
 	void setScale(const glm::vec2& scale) { scale_ = scale; computeAABB();}
 	void offsetScale(const glm::vec2& offset) { scale_ += offset; computeAABB();}
 	void multScale(const glm::vec2& multiplier) { scale_ *= multiplier; computeAABB();}
@@ -45,15 +47,13 @@ class GameObject {
 
 	void setGrounded(bool grounded) { isGrounded_ = grounded; } // Set whether the object is grounded
 
-	// Behavior management
-	void setBehavior(std::unique_ptr<Behavior> behavior);
-	void updateBehavior(float deltaTime);
-	void handlePlayerCollision(class PlayerObject& player);
 
 	// Getters
 	const glm::vec2& getPosition() const { return position_; }
 	const glm::vec2& getScale() const { return scale_; }
 	float getRotation() const { return rotation_; }
+
+	const glm::vec2& getInitPosition() const { return initPos_; }
 
 	const glm::vec4& getColor() const { return color_; }
 	const std::string& getName() const { return name_; }
@@ -76,10 +76,18 @@ class GameObject {
 	
 	glm::mat4 getModelMatrix() const; // Computes and returns model matrix
 
+	// Behavior management
+	void setBehavior(std::unique_ptr<Behavior> behavior);
+	void updateBehavior(float deltaTime);
+	void handlePlayerCollision(class PlayerObject& player);
+	Behavior* getBehavior() const { return behavior_.get(); }
+
 	private:
 	glm::vec2 position_;    // X, Y position
 	glm::vec2 scale_;       // Scaling coefficient (in each direction)
 	float rotation_;        // Angle in radians
+
+	glm::vec2 initPos_;
 
 	glm::vec4 color_;
 	std::string name_;

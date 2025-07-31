@@ -61,9 +61,19 @@ void DeathWallBehavior::update(GameObject& obj, float deltaTime) {
 	currentPos += (velocity_ * deltaTime) * direction_;
 
 	obj.setPosition(currentPos);
+
+	// Recompute AABB
+	obj.computeAABB();
 }
 
 void DeathWallBehavior::onPlayerCollision(GameObject& obj, PlayerObject& player) {
 	DEBUG_ONLY(std::cout << "Player hit death wall!" << std::endl;);
 	player.setShouldDie(true);
+}
+
+void DeathWallBehavior::reset(GameObject& obj) {
+	velocity_ = 0.0f;
+	obj.setPosition(startPos_);
+	obj.setVelocity(glm::vec2(0.0f, 0.0f)); // Reset velocity to zero
+	obj.computeAABB(); // Recompute AABB after resetting position
 }
