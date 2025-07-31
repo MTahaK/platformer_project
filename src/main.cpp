@@ -14,7 +14,7 @@ int main(void){
 	renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
 
 	// --- TILEMAP SETUP ---
-	std::string tilemapFile = "./assets/test.tmap";
+	std::string tilemapFile = "./assets/test2.tmap";
 
 	Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
 
