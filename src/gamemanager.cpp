@@ -130,6 +130,12 @@ void GameManager::handlePlayState(){
 		DEBUG_ONLY(std::cout << "Player reached goal, transitioning to WIN state." << std::endl;);
 		return;
 	}
+	if(player_.getShouldDie()) {
+		// Transition to DEAD state
+		setState(GameState::DEAD);
+		DEBUG_ONLY(std::cout << "Player died, transitioning to DEAD state." << std::endl;);
+		return;
+	}
 	updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
 	
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
@@ -193,6 +199,7 @@ void GameManager::handleDeadState(){
 		player_.setVelocity(glm::vec2(0.0f, 0.0f));
 		player_.setAcceleration(glm::vec2(0.0f, 0.0f));
 		player_.sensorUpdate();
+		player_.setShouldDie(false);
 		
 		// Reset goal-related states
 		player_.setGoalCount(0);
@@ -200,9 +207,7 @@ void GameManager::handleDeadState(){
 
 		// Reset death wall
 		auto* deathWallBehavior = dynamic_cast<DeathWallBehavior*>(objects_[0].getBehavior());
-		if (deathWallBehavior) {
-			deathWallBehavior->reset(objects_[0]);
-		}
+		deathWallBehavior->reset(objects_[0]);
 
 		setState(GameState::PLAY);
 		DEBUG_ONLY(std::cout << "Level reset, returning to PLAY state." << std::endl;);
