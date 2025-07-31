@@ -274,7 +274,7 @@ void updateDeathWall(GameObject &deathWall, float deltaTime)
 	deathWall.updateBehavior(deltaTime);
 }
 
-void updatePlayer(PlayerObject &player, Physics &physics, Tilemap &tilemap, std::vector<GameObject> &objects, float deltaTime){
+void updatePStatePlayer(PlayerObject &player, Physics &physics, Tilemap &tilemap, std::vector<GameObject> &objects, float deltaTime){
 	physics.playerMovementStep(player, deltaTime);
 	physics.checkPlayerWorldCollisions(player, tilemap);
 

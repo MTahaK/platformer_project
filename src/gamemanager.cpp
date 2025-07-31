@@ -123,7 +123,7 @@ void GameManager::handlePlayState(){
 	}
 	physics_.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
 
-	updatePlayer(player_, physics_, tilemap_, objects_, deltaTime);
+	updatePStatePlayer(player_, physics_, tilemap_, objects_, deltaTime);
 	if(player_.checkIfInGoal()) {
 		// Transition to WIN state
 		setState(GameState::WIN);
