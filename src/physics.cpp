@@ -213,3 +213,12 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 	player.sensorUpdate();
 	}
 }
+
+void Physics::checkPlayerDeathWallCollision(PlayerObject& player, GameObject& deathWall) {
+	// DeathWall is just a GameObject, so collisions can be checked using AABB
+	if(checkCollision(player.getAABB(), deathWall.getAABB())) {
+		// Call behaviour player collision function
+		auto* behavior = deathWall.getBehavior();
+		behavior->onPlayerCollision(deathWall, player);
+	}
+}

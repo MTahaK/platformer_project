@@ -6,6 +6,7 @@
 #include "globals.hpp"
 #include "gameobject.hpp"
 #include "playerobject.hpp"
+#include "behavior.hpp"
 #include "tilemap.hpp"
 #include "debug.hpp"
 
@@ -23,7 +24,8 @@ class Physics {
 
 	void playerMovementStep(PlayerObject& player, float deltaTime);
 	void checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap);
-	void checkPlayerEntityCollisions(GameObject& obj, const std::vector<GameObject>& entities); // May end up unused
+	void checkPlayerDeathWallCollision(PlayerObject& player, GameObject& deathWall);
+	void checkPlayerEntityCollisions(GameObject& obj, const std::vector<GameObject>& entities);
 
 	float deltaTime = 0.0f;
 
