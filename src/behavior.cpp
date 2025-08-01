@@ -6,56 +6,47 @@
 #include "debug.hpp"
 #include "globals.hpp"
 
-void IdleBehavior::update(GameObject &obj, float deltaTime)
-{
+void IdleBehavior::update(GameObject &obj, float deltaTime){
 	// Nothing
 }
 
-void KillBehavior::update(GameObject &obj, float deltaTime)
-{
+void KillBehavior::update(GameObject &obj, float deltaTime){
 	// Nothing
 }
 
-void KillBehavior::onPlayerCollision(GameObject &obj, PlayerObject &player)
-{
+void KillBehavior::onPlayerCollision(GameObject &obj, PlayerObject &player){
 	DEBUG_ONLY(std::cout << "Player hit kill object!" << std::endl;);
 	// Handle player death
 	player.setShouldDie(true);
 }
 
 DeathWallBehavior::DeathWallBehavior(GameObject &obj, float acceleration, glm::vec2 startPos, glm::vec2 endPos)
-	: acceleration_(acceleration), startPos_(startPos), endPos_(endPos)
-{
+	: acceleration_(acceleration), startPos_(startPos), endPos_(endPos){
 	obj.setPosition(startPos);
 	// Suppose startPos = (1, 2) and endPos = (4, 2), then direction_ = (3, 0).
 	// If startPos = (1, 2) and endPos = (1, 5), then direction_ = (0, 3).
 	// Normalize to get the final direction vector
 	direction_ = glm::vec2(endPos - startPos);
-	if (direction_ != glm::vec2(0))
-	{
+	if (direction_ != glm::vec2(0)){
 		direction_ = glm::normalize(direction_);
 	}
 }
 
 DeathWallBehavior::DeathWallBehavior(GameObject &obj, float acceleration, glm::vec2 startPos, glm::vec2 endPos, float maxSpeed)
-	: acceleration_(acceleration), maxSpeed_(maxSpeed), startPos_(startPos), endPos_(endPos)
-{
+	: acceleration_(acceleration), maxSpeed_(maxSpeed), startPos_(startPos), endPos_(endPos){
 	obj.setPosition(startPos);
 	direction_ = endPos - startPos;
-	if (direction_ != glm::vec2(0))
-	{
+	if (direction_ != glm::vec2(0)){
 		direction_ = glm::normalize(direction_);
 	}
 }
 
-void DeathWallBehavior::update(GameObject &obj, float deltaTime)
-{
+void DeathWallBehavior::update(GameObject &obj, float deltaTime){
 	// Compute velocity from acceleration
 	velocity_ += acceleration_ * deltaTime;
 
 	// Apply speed limit if one is set
-	if (maxSpeed_ > 0.0f && velocity_ > maxSpeed_)
-	{
+	if (maxSpeed_ > 0.0f && velocity_ > maxSpeed_){
 		velocity_ = maxSpeed_;
 	}
 
@@ -72,14 +63,12 @@ void DeathWallBehavior::update(GameObject &obj, float deltaTime)
 	obj.computeAABB();
 }
 
-void DeathWallBehavior::onPlayerCollision(GameObject &obj, PlayerObject &player)
-{
+void DeathWallBehavior::onPlayerCollision(GameObject &obj, PlayerObject &player){
 	DEBUG_ONLY(std::cout << "Player hit death wall!" << std::endl;);
 	player.setShouldDie(true);
 }
 
-void DeathWallBehavior::reset(GameObject &obj)
-{
+void DeathWallBehavior::reset(GameObject &obj){
 	velocity_ = 0.0f;
 	obj.setPosition(startPos_);
 	obj.setVelocity(glm::vec2(0.0f, 0.0f)); // Reset velocity to zero

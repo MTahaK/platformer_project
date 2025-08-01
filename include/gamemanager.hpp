@@ -26,46 +26,46 @@ enum class GameState {
 class GameManager {
 	
 	public:
-	// Default constructor leaves everything uninitialized
-	GameManager() = default;
-	// Destructor
-	~GameManager() = default;
+		// Default constructor leaves everything uninitialized
+		GameManager() = default;
+		// Destructor
+		~GameManager() = default;
 
-	// Full initialization constructor
-	GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap, std::vector<GameObject>& objects, Physics& physics);
+		// Full initialization constructor
+		GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap, std::vector<GameObject>& objects, Physics& physics);
 
-	void runGameLoop();
-	void setState(GameState state);
-	
-	GameState getState() const { return gameState_; }
+		void runGameLoop();
+		void setState(GameState state);
+		
+		GameState getState() const { return gameState_; }
 
-	// State-specific routines, includes input handling, physics, rendering for each state
-	void handleMenuState();
-	void handlePlayState();
-	void handlePauseState();
-	void handleDeadState();
-	void handleWinState();
-	void handleExitState();
+		// State-specific routines, includes input handling, physics, rendering for each state
+		void handleMenuState();
+		void handlePlayState();
+		void handlePauseState();
+		void handleDeadState();
+		void handleWinState();
+		void handleExitState();
 
-	// Subsystem returns
-	PlayerObject& getPlayer() { return player_; }
-	Tilemap& getTilemap() { return tilemap_; }
-	std::vector<GameObject>& getObjects() { return objects_; }
-	Physics& getPhysics() { return physics_; }
-	Renderer2D& getRenderer() { return renderer_; }
-	Shader& getShader() { return shader_; }
+		// Subsystem returns
+		PlayerObject& getPlayer() { return player_; }
+		Tilemap& getTilemap() { return tilemap_; }
+		std::vector<GameObject>& getObjects() { return objects_; }
+		Physics& getPhysics() { return physics_; }
+		Renderer2D& getRenderer() { return renderer_; }
+		Shader& getShader() { return shader_; }
 
 	private:
-	GameState gameState_ = GameState::MENU;
-	Window& window_;
-	Shader& shader_;
-	Renderer2D& renderer_;
-	PlayerObject& player_;
-	Tilemap& tilemap_;
-	std::vector<GameObject>& objects_;
-	Physics& physics_;
-	
-	// Timing management for game loop
-	float lastFrameTime_ = 0.0f;
-	float winTimer_ = 0.0f; // Timer for WIN state countdown
+		GameState gameState_ = GameState::MENU;
+		Window& window_;
+		Shader& shader_;
+		Renderer2D& renderer_;
+		PlayerObject& player_;
+		Tilemap& tilemap_;
+		std::vector<GameObject>& objects_;
+		Physics& physics_;
+		
+		// Timing management for game loop
+		float lastFrameTime_ = 0.0f;
+		float winTimer_ = 0.0f; // Timer for WIN state countdown
 };

@@ -22,11 +22,11 @@ class Physics {
 
 	public:
 
-	void playerMovementStep(PlayerObject& player, float deltaTime);
-	void checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap);
-	void checkPlayerDeathWallCollision(PlayerObject& player, GameObject& deathWall);
-	void checkPlayerEntityCollisions(GameObject& obj, const std::vector<GameObject>& entities);
+		void playerMovementStep(PlayerObject& player, float deltaTime);
+		void checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap);
+		void checkPlayerDeathWallCollision(PlayerObject& player, GameObject& deathWall);
+		void checkPlayerEntityCollisions(GameObject& obj, const std::vector<GameObject>& entities);
 
-	float deltaTime = 0.0f;
+		float deltaTime = 0.0f;
 
 };

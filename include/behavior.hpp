@@ -8,7 +8,6 @@ class Tilemap;
 
 
 class Behavior {
-
 	// Abstract base class for behaviours
 	public:
 	virtual ~Behavior() = default;
@@ -19,7 +18,6 @@ class Behavior {
 	virtual void onPlayerCollision(GameObject& obj, PlayerObject& player) {}
 	virtual void onTileCollision(GameObject& obj, Tilemap& tilemap) {}
 	virtual void onObjectCollision(GameObject& obj, GameObject& other) {}
-
 };
 
 // CONCRETE BEHAVIOURS
@@ -30,7 +28,6 @@ class IdleBehavior : public Behavior {
 };
 
 class KillBehavior : public Behavior {
-
 	public:
 	void update(GameObject& obj, float deltaTime) override;
 
