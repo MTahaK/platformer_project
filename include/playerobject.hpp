@@ -11,7 +11,7 @@ struct Sensor
 };
 
 // PlayerObject class inherits from GameObject
-class PlayerObject : public GameObject{
+class PlayerObject : public GameObject {
 
 	public:
 		void setUpSensors();
