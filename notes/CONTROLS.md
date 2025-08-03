@@ -19,17 +19,9 @@ This document describes the control scheme for the platformer game across all ga
 - `DOWN ARROW` or `S` - Fast fall (when in air)
 
 ### Game Controls
-- `O` - Toggle debug mode (shows player sensors as lines)
+- `O` - Toggle debug mode
 - `P` or `ESCAPE` - Pause the game
 - `Q` - Force quit to exit
-
-### Movement Mechanics
-- **Horizontal Movement**: Uses acceleration-based system with different values for:
-  - Normal acceleration when moving in same direction
-  - Higher acceleration when turning around (changing direction)
-  - Deceleration when no input (different values for grounded vs airborne)
-- **Jumping**: Only available when player is grounded
-- **Fast Fall**: Increases downward velocity when airborne
 
 ---
 
@@ -52,7 +44,6 @@ This document describes the control scheme for the platformer game across all ga
 - `Q` - Force quit to exit
 
 **Behavior:**
-- Player can still move around during the 5-second countdown
 - After 5 seconds, automatically resets level and returns to PLAY state
 - Resets player position, velocity, goal status, and death wall
 
@@ -80,11 +71,3 @@ This document describes the control scheme for the platformer game across all ga
 **Visual Changes:**
 - Shows player collision sensors as colored lines extending from player center
 - Sensors include: bottom (ground detection), top (ceiling), left/right (wall collision)
-
----
-
-## Notes
-
-- **Input Buffering**: State transitions clear input buffers to prevent accidental key presses from carrying over
-- **Delta Time**: Timing is properly managed during state transitions to prevent glitches
-- **Consistent Quit**: `Q` key provides quick exit from any state except PAUSE (where it exits to menu)
