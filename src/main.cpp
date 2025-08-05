@@ -1,14 +1,14 @@
 #include "helpers.hpp"
 #include "gamemanager.hpp"
 
-int main(void){
+int main(void) {
 	Window window(1920, 1080, "OpenGL Window");
-	
+
 	Shader shader;
 	Renderer2D renderer;
 
-	if(initializeVisuals(shader, renderer) != 0){
-	return -1; // Exit if initialization fails
+	if (initializeVisuals(shader, renderer) != 0) {
+		return -1; // Exit if initialization fails
 	}
 
 	renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
@@ -39,10 +39,10 @@ int main(void){
 	// ...existing code...
 	GameObject deathWall;
 	deathWall.setPosition(glm::vec2(0.0f, tilemap.getHeight() / 2.0f)); // Centre vertically in level
-	deathWall.setInitPosition(deathWall.getPosition()); // Set initial position
+	deathWall.setInitPosition(deathWall.getPosition());					// Set initial position
 
 	deathWall.setScale(glm::vec2(1.0f, tilemap.getHeight()));
-// ...existing code...
+	// ...existing code...
 	// DeathWall color is red
 	deathWall.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	deathWall.setName("DeathWall");
@@ -54,8 +54,8 @@ int main(void){
 	objects.push_back(std::move(deathWall));
 
 	GameManager gameManager(window, shader, renderer, player, tilemap, objects, physicsSystem);
-	
-	while(!window.shouldClose()){
+
+	while (!window.shouldClose()) {
 		gameManager.runGameLoop();
 	}
 	// Cleanup and exit

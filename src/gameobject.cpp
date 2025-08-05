@@ -13,15 +13,15 @@ GameObject::GameObject() {
 	computeAABB(); // Compute AABB based on default position and scale
 }
 
-GameObject::GameObject(const glm::vec2& position, const glm::vec4& color){
+GameObject::GameObject(const glm::vec2& position, const glm::vec4& color) {
 	// Initialize with just position and color - convenient for simple objects
 	position_ = position;
 	scale_ = glm::vec2(1.0f, 1.0f); // Default scale
-	rotation_ = 0.0f; // Default rotation
+	rotation_ = 0.0f;				// Default rotation
 	color_ = color;
 	name_ = "Unnamed";
 	computeAABB(); // Compute AABB based on position and scale
-	// Note: AABB will be computed with default scale (1,1) and rotation
+				   // Note: AABB will be computed with default scale (1,1) and rotation
 }
 
 GameObject::GameObject(const glm::vec2& position, const glm::vec2& scale, float rotation, const glm::vec4& color) {
@@ -36,10 +36,10 @@ GameObject::GameObject(const glm::vec2& position, const glm::vec2& scale, float 
 
 glm::mat4 GameObject::getModelMatrix() const {
 	// Compute the model matrix based on position, scale, and rotation
-	glm::mat4 model = glm::mat4(1.0f); // Start with identity matrix
-	model = glm::translate(model, glm::vec3(position_, 0.0f)); // Translate to position
+	glm::mat4 model = glm::mat4(1.0f);									// Start with identity matrix
+	model = glm::translate(model, glm::vec3(position_, 0.0f));			// Translate to position
 	model = glm::rotate(model, rotation_, glm::vec3(0.0f, 0.0f, 1.0f)); // Rotate around Z-axis
-	model = glm::scale(model, glm::vec3(scale_, 1.0f)); // Scale in X and Y directions
+	model = glm::scale(model, glm::vec3(scale_, 1.0f));					// Scale in X and Y directions
 	return model;
 }
 
@@ -56,10 +56,10 @@ const void GameObject::computeAABB() {
 
 bool checkCollision(const AABB& a, const AABB& b) {
 	bool collision;
-	if(a.left < b.right && a.right > b.left && a.top > b.bottom && a.bottom < b.top){
-	collision = true;
-	}else{
-	collision = false;
+	if (a.left < b.right && a.right > b.left && a.top > b.bottom && a.bottom < b.top) {
+		collision = true;
+	} else {
+		collision = false;
 	}
 	return (collision);
 }
@@ -79,18 +79,16 @@ const AABB GameObject::computeOffsetAABB(const glm::vec2& offset) {
 }
 
 // Behavior management implementations
-void GameObject::setBehavior(std::unique_ptr<Behavior> behavior) {
-	behavior_ = std::move(behavior);
-}
+void GameObject::setBehavior(std::unique_ptr<Behavior> behavior) { behavior_ = std::move(behavior); }
 
 void GameObject::updateBehavior(float deltaTime) {
 	if (behavior_) {
-	behavior_->update(*this, deltaTime);
+		behavior_->update(*this, deltaTime);
 	}
 }
 
 void GameObject::handlePlayerCollision(PlayerObject& player) {
 	if (behavior_) {
-	behavior_->onPlayerCollision(*this, player);
+		behavior_->onPlayerCollision(*this, player);
 	}
 }

@@ -1,21 +1,21 @@
 #pragma once
-#include <glm/glm.hpp>
-#include <chrono>
-#include <iostream>
-#include "tilemap.hpp"
-#include "physics.hpp"
-#include "renderer2d.hpp"
-#include "shader.hpp"
-#include "window.hpp"
-#include "input.hpp"
-#include "playerobject.hpp"
+#include "color.hpp"
 #include "debug.hpp"
 #include "globals.hpp"
-#include "color.hpp"
+#include "input.hpp"
+#include "physics.hpp"
+#include "playerobject.hpp"
+#include "renderer2d.hpp"
+#include "shader.hpp"
+#include "tilemap.hpp"
+#include "window.hpp"
+#include <chrono>
+#include <glm/glm.hpp>
+#include <iostream>
 
 enum class GameState {
 	MENU,
-	// LOAD, may not use
+	// LOAD, may not used
 	PLAY,
 	PAUSE,
 	DEAD,
@@ -24,7 +24,7 @@ enum class GameState {
 };
 
 class GameManager {
-	
+
 	public:
 		// Default constructor leaves everything uninitialized
 		GameManager() = default;
@@ -32,14 +32,16 @@ class GameManager {
 		~GameManager() = default;
 
 		// Full initialization constructor
-		GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap, std::vector<GameObject>& objects, Physics& physics);
+		GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap,
+					std::vector<GameObject>& objects, Physics& physics);
 
 		void runGameLoop();
 		void setState(GameState state);
-		
+
 		GameState getState() const { return gameState_; }
 
-		// State-specific routines, includes input handling, physics, rendering for each state
+		// State-specific routines, includes input handling, physics, rendering
+		// for each state
 		void handleMenuState();
 		void handlePlayState();
 		void handlePauseState();
@@ -64,7 +66,7 @@ class GameManager {
 		Tilemap& tilemap_;
 		std::vector<GameObject>& objects_;
 		Physics& physics_;
-		
+
 		// Timing management for game loop
 		float lastFrameTime_ = 0.0f;
 		float winTimer_ = 0.0f; // Timer for WIN state countdown
