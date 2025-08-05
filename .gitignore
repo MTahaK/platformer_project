@@ -5,4 +5,5 @@
 build/
 project_dump.txt
 # Ignore workflows for now
-.github/workflows/ 
+.github/workflows/
+chat.json
