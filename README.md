@@ -31,7 +31,7 @@ Vertex Data → VAO/VBO → Vertex Shader → Fragment Shader → Framebuffer
 The engine uses a modern OpenGL approach with:
 - **Shader Management**: Runtime shader compilation and uniform handling
 - **Matrix Transformations**: MVP (Model-View-Projection) matrix pipeline
-- **Immediate Rendering**: Direct draw calls optimized for 2D geometry
+- **Immediate Rendering**: Direct draw calls optimized for 2D geometry (batched rendering planned)
 
 ### Physics System
 - **Frame-rate Independent**: Uses delta-time calculations for consistent movement
@@ -52,10 +52,8 @@ GameManager
 ## 🚀 Getting Started
 
 ### Prerequisites
-- C++17 compatible compiler (GCC/Clang)
+- C++17 compatible compiler
 - OpenGL 3.3+ support
-- GLFW library
-- GLM (OpenGL Mathematics)
 
 ### Building
 
@@ -73,58 +71,12 @@ make
 
 ### Controls
 
-**Menu State:**
-- `ENTER` - Start game
-- `Q` - Quit
-
-**Gameplay:**
-- `A/D` or `←/→` - Move left/right
-- `W` or `↑` - Jump (when grounded)
-- `S` or `↓` - Fast fall
-- `P/ESC` - Pause
-- `O` - Toggle debug mode (show collision sensors)
+A document describing controls in every game state is available in `notes`.
 
 ## 🎯 Key Technical Highlights
 
 A key focus in this project is creating highly optimized systems that make conservative use of resources. I have a vendetta against modern video game 'optimization' and I want that to be realized through this project!
 
-### Custom Shader System
-Simple but effective shader pipeline for solid-colored geometry:
-```glsl
-// Vertex shader with MVP transformation
-#version 330 core
-layout(location = 0) in vec2 aPos;
-uniform mat4 MVP;
-void main() {
-    gl_Position = MVP * vec4(aPos, 0.0, 1.0);
-}
-```
-
-### Physics Integration
-```cpp
-// Frame-rate independent movement
-void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
-    float velX = player.getAcceleration().x * deltaTime;
-    player.addVelocity(glm::vec2(velX, 0.0f));
-    // Velocity limiting and collision detection...
-}
-```
-
-### Modular Rendering
-```cpp
-// Clean separation of concerns
-renderer.beginScene(shader, view, projection);
-for (const auto& object : objects) {
-    glm::mat4 model = object.getModelMatrix();
-    renderer.drawQuad(shader, model, object.getColor());
-}
-```
-
-## 📊 Performance
-
-- **Target Performance**: 60+ FPS, ideally 120+ FPS
-- **Memory Management**: RAII-based resource handling
-- **Optimization**: Efficient matrix calculations and minimal state changes
 
 ## 🔮 Future Enhancements
 
