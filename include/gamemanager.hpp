@@ -1,17 +1,17 @@
 #pragma once
-#include "color.hpp"
-#include "debug.hpp"
-#include "globals.hpp"
-#include "input.hpp"
+#include <glm/glm.hpp>
+#include <chrono>
+#include <iostream>
+#include "tilemap.hpp"
 #include "physics.hpp"
-#include "playerobject.hpp"
 #include "renderer2d.hpp"
 #include "shader.hpp"
-#include "tilemap.hpp"
 #include "window.hpp"
-#include <chrono>
-#include <glm/glm.hpp>
-#include <iostream>
+#include "input.hpp"
+#include "playerobject.hpp"
+#include "debug.hpp"
+#include "globals.hpp"
+#include "color.hpp"
 
 enum class GameState {
 	MENU,

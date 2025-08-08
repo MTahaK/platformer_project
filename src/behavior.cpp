@@ -1,10 +1,10 @@
+#include <iostream>
 #include "behavior.hpp"
-#include "debug.hpp"
 #include "gameobject.hpp"
-#include "globals.hpp"
 #include "playerobject.hpp"
 #include "tilemap.hpp"
-#include <iostream>
+#include "debug.hpp"
+#include "globals.hpp"
 
 void IdleBehavior::update(GameObject& obj, float deltaTime) {
 	// Nothing
