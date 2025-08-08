@@ -1,5 +1,8 @@
 #include "helpers.hpp"
 #include "gamemanager.hpp"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 int main(void) {
 	Window window(1920, 1080, "OpenGL Window");
@@ -10,6 +13,16 @@ int main(void) {
 	if (initializeVisuals(shader, renderer) != 0) {
 		return -1; // Exit if initialization fails
 	}
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window.getWindow(), true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+	ImGui_ImplOpenGL3_Init();
 
 	renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
 
@@ -54,7 +67,7 @@ int main(void) {
 	objects.push_back(std::move(deathWall));
 
 	GameManager gameManager(window, shader, renderer, player, tilemap, objects, physicsSystem);
-
+	
 	while (!window.shouldClose()) {
 		gameManager.runGameLoop();
 	}

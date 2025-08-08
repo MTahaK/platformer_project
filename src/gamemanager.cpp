@@ -87,6 +87,16 @@ void GameManager::handleMenuState()
 
 	renderer_.drawQuad(shader_, model, color);
 
+	// (Your code calls glfwPollEvents())
+	// ...
+	// Start the Dear ImGui frame
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	ImGui::ShowDemoWindow(); // Show demo window! :)
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	finishDraw(window_, renderer_, shader_);
 	// window_.swap();
 
