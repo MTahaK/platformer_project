@@ -17,9 +17,9 @@
 #include "physics.hpp"
 #include "tilemap.hpp"
 #include "debug.hpp"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
+#include "gamemanager.hpp"
+#include "globals.hpp"
+#include "userinterface.hpp"
 
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds

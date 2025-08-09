@@ -1,5 +1,4 @@
 #include "helpers.hpp"
-#include "gamemanager.hpp"
 
 int main(void) {
 	Window window(1920, 1080, "OpenGL Window");
@@ -12,14 +11,7 @@ int main(void) {
 	}
 
 	// Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-
-	// Setup Platform/Renderer backends
-	ImGui_ImplGlfw_InitForOpenGL(window.getWindow(), true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-	ImGui_ImplOpenGL3_Init();
+	UserInterface ui(&window);
 
 	renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
 

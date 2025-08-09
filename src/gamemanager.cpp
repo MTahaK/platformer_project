@@ -72,23 +72,81 @@ void GameManager::handleMenuState() {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::ShowDemoWindow(); // Show demo window! :)
+	// ImGui::ShowDemoWindow(); // Show demo window! :)
+	auto menuFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImVec2 windowSize(800, 600);
+	ImVec2 windowPos(
+		viewport->WorkPos.x + (viewport->WorkSize.x - windowSize.x) * 0.5f,
+		viewport->WorkPos.y + (viewport->WorkSize.y - windowSize.y) * 0.5f
+	);
+	ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);
+
+	if (ImGui::Begin("Main Menu", nullptr, menuFlags)) {
+
+		// Push larger font size for title
+		// ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]); // Use default font but we'll scale it
+		
+		// Center the title text
+		float windowHeight = ImGui::GetWindowSize().y;
+		float spacingAmount = windowHeight * 0.10f; // 15% of window height
+		ImGui::Dummy(ImVec2(0.0f, spacingAmount));
+
+		const char* title = "Welcome to the Game!";
+		ImGui::SetWindowFontScale(3.0f); // Make text 2x larger
+		float windowWidth = ImGui::GetWindowSize().x;
+		float textWidth = ImGui::CalcTextSize(title).x;
+		ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+		
+		ImGui::Text("%s", title);
+
+		ImGui::SetWindowFontScale(2.0f); // Reset font scale
+		
+		// ImGui::PopFont();
+		
+		// Add scalable spacing - more space between title and instructions
+		spacingAmount = windowHeight * 0.3f; // 30% of window height
+		ImGui::Dummy(ImVec2(0.0f, spacingAmount));
+		
+		// Center the button
+		ImVec2 buttonSize(400, 50);
+		float buttonWidth = buttonSize.x;
+		ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+		if(ImGui::Button("Start Game (ENTER)", buttonSize)) {
+			setState(GameState::PLAY);
+			DEBUG_ONLY(std::cout << "Switching to PLAY state." << std::endl;);
+		}
+
+		// Add spacing between buttons
+		ImGui::Dummy(ImVec2(0.0f, 20.0f)); // 20 pixels of vertical space
+
+		// Center the second button
+		ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+		if(ImGui::Button("Quit (Q)", buttonSize)) {
+			setState(GameState::EXIT);
+			DEBUG_ONLY(std::cout << "Switching to EXIT state." << std::endl;);
+		}
+	}
+	ImGui::End();
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	finishDraw(window_, renderer_, shader_);
 	// window_.swap();
 
-	Input::update();
-	// Check for input to switch to PLAY state
-	if (Input::isKeyPressed(GLFW_KEY_ENTER)) {
-		setState(GameState::PLAY);
-		DEBUG_ONLY(std::cout << "Switching to PLAY state." << std::endl;);
-	}
-	if (Input::isKeyPressed(GLFW_KEY_Q)) {
-		setState(GameState::EXIT);
-		DEBUG_ONLY(std::cout << "Switching to EXIT state." << std::endl;);
-	}
+	// Input::update();
+	// // Check for input to switch to PLAY state
+	// if (Input::isKeyPressed(GLFW_KEY_ENTER)) {
+	// 	setState(GameState::PLAY);
+	// 	DEBUG_ONLY(std::cout << "Switching to PLAY state." << std::endl;);
+	// }
+	// if (Input::isKeyPressed(GLFW_KEY_Q)) {
+	// 	setState(GameState::EXIT);
+	// 	DEBUG_ONLY(std::cout << "Switching to EXIT state." << std::endl;);
+	// }
 }
 
 // All other state handlers currently empty, to be implemented later
@@ -131,6 +189,24 @@ void GameManager::handlePlayState() {
 
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
 	drawObjects(window_, renderer_, shader_, objects_);
+
+	if(g_debugEnabled) {
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		
+		if (ImGui::Begin("Debug Info")) {
+			ImGui::Text("Player Position: %.2f, %.2f", 
+					player_.getPosition().x, player_.getPosition().y);
+			ImGui::Text("Player Grounded: %s", 
+					player_.isGrounded() ? "Yes" : "No");
+			ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+		}
+		ImGui::End();
+		
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
 	finishDraw(window_, renderer_, shader_);
 
 	auto frameEnd = std::chrono::high_resolution_clock::now();
