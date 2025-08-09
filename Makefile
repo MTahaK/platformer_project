@@ -9,7 +9,7 @@ else
 endif
 
 CXX      := g++
-CXXFLAGS := -std=c++17 -Wall -Iinclude -DIMGUI_IMPL_OPENGL_LOADER_GLAD $(GLFW_CFLAGS)
+CXXFLAGS := -std=c++17 -Wall -Iinclude $(GLFW_CFLAGS)
 LDFLAGS  := -lglfw -ldl $(GLFW_LDFLAGS)
 
 SRC_DIR   := src

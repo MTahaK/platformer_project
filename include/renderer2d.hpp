@@ -10,9 +10,9 @@
 #include "globals.hpp"
 
 struct BatchVertex {
-	glm::vec2 position;
-	glm::vec4 color;
-	// Once textures are implemented, will include UV coords
+		glm::vec2 position;
+		glm::vec4 color;
+		// Once textures are implemented, will include UV coords
 };
 
 class Renderer2D {
@@ -26,14 +26,13 @@ class Renderer2D {
 		void beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj); // Runs at start of frame before drawing
 		void drawQuad(Shader& shader, const glm::mat4& transform, const glm::vec4& color);
 		void drawLine(Shader& shader, const glm::vec2& start, const glm::vec2& end, const glm::vec4& color);
-		void endScene();  // Runs at end of frame after drawing
+		void endScene(); // Runs at end of frame after drawing
 		// Doesn't really do anything now, as I'm using immediate rendering
 
 		void flushBatch();
 		void addQuadtoBatch(const glm::mat4 transform, const glm::vec4& color);
-		
-	private:
 
+	private:
 		static const uint32_t MAX_QUADS = 10000;
 		static const uint32_t MAX_VERTICES = MAX_QUADS * 4;
 		static const uint32_t MAX_INDICES = MAX_QUADS * 6;
@@ -41,7 +40,7 @@ class Renderer2D {
 		std::vector<BatchVertex> batchVertices_;
 		std::vector<uint32_t> batchIndices_;
 		uint32_t vertexCount_ = 0; // Number of vertices currently in use
-		uint32_t indexCount_ = 0; // Number of indices currently in use
+		uint32_t indexCount_ = 0;  // Number of indices currently in use
 
 		GLuint shader_ = 0;
 		GLuint vao_;
@@ -57,4 +56,3 @@ class Renderer2D {
 
 		bool shaderLoaded_ = false;
 };
-

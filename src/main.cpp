@@ -1,8 +1,5 @@
 #include "helpers.hpp"
 #include "gamemanager.hpp"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
 
 int main(void) {
 	Window window(1920, 1080, "OpenGL Window");
@@ -67,7 +64,7 @@ int main(void) {
 	objects.push_back(std::move(deathWall));
 
 	GameManager gameManager(window, shader, renderer, player, tilemap, objects, physicsSystem);
-	
+
 	while (!window.shouldClose()) {
 		gameManager.runGameLoop();
 	}

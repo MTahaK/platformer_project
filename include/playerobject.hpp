@@ -4,10 +4,9 @@
 #include "tilemap.hpp"
 #include "globals.hpp"
 
-struct Sensor
-{
-	glm::vec2 position; // Position of the sensor relative to the player
-	glm::vec4 color;	// Only used for debug view
+struct Sensor {
+		glm::vec2 position; // Position of the sensor relative to the player
+		glm::vec4 color;	// Only used for debug view
 };
 
 // PlayerObject class inherits from GameObject
@@ -22,16 +21,16 @@ class PlayerObject : public GameObject {
 		void setShouldDie(bool status) { shouldDie_ = status; }
 		void incrementGoalCount() { goalCount_++; }
 
-		bool tileCollision(Tilemap &tilemap, const Sensor &sensor);
-		bool tileGoalCollision(Tilemap &tilemap, const Sensor &sensor);
+		bool tileCollision(Tilemap& tilemap, const Sensor& sensor);
+		bool tileGoalCollision(Tilemap& tilemap, const Sensor& sensor);
 
-		const glm::ivec2 getPlayerTileIdx(Tilemap &tilemap) const;
+		const glm::ivec2 getPlayerTileIdx(Tilemap& tilemap) const;
 		int getGoalCount() const { return goalCount_; }
 
-		const Sensor &getLeftSensor() const { return leftSensor_; }
-		const Sensor &getRightSensor() const { return rightSensor_; }
-		const Sensor &getTopSensor() const { return topSensor_; }
-		const Sensor &getBottomSensor() const { return bottomSensor_; }
+		const Sensor& getLeftSensor() const { return leftSensor_; }
+		const Sensor& getRightSensor() const { return rightSensor_; }
+		const Sensor& getTopSensor() const { return topSensor_; }
+		const Sensor& getBottomSensor() const { return bottomSensor_; }
 
 		bool checkIfInGoal() { return inGoal_; }
 		bool getShouldDie() const { return shouldDie_; }

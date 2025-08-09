@@ -24,16 +24,15 @@
 constexpr double targetFPS = 120.0;
 constexpr double targetFrameTime = 1.0 / targetFPS; // ~0.016666... seconds
 
-enum class InputResult{
+enum class InputResult {
 	CONTINUE = 0,
 	PAUSE = 1,
-	FORCE_QUIT = 2  // In normal play, quitting must be performed from PAUSE
+	FORCE_QUIT = 2 // In normal play, quitting must be performed from PAUSE
 };
-
 
 int initializeVisuals(Shader& shader, Renderer2D& renderer);
 
-// SETUP FUNCTIONS  
+// SETUP FUNCTIONS
 PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY);
 // std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth);
 
@@ -48,5 +47,5 @@ void drawObjects(Window& window, Renderer2D& renderer, Shader& shader, const std
 void finishDraw(Window& window, Renderer2D& renderer, Shader& shader);
 
 // UPDATE FUNCTIONS
-void updatePStatePlayer(PlayerObject &player, Physics& physics, Tilemap& tilemap, std::vector<GameObject>& objects, float deltaTime);
+void updatePStatePlayer(PlayerObject& player, Physics& physics, Tilemap& tilemap, std::vector<GameObject>& objects, float deltaTime);
 void updateDeathWall(GameObject& deathWall, float deltaTime);
