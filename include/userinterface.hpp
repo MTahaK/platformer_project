@@ -10,9 +10,6 @@ class UserInterface {
 	public:
 		UserInterface(Window* window);
 
-		void menuUI();
-		void debugUI();
-
 	private:
 		Window* window_;
 };
