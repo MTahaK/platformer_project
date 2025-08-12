@@ -35,8 +35,6 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
 }
 
 InputResult playerInput(GameObject& player) {
-	// Key polling for basic movement
-	Input::update();
 	
 	if (Input::isKeyJustPressed(GLFW_KEY_O)) {
 		toggleDebugMode();
@@ -81,11 +79,6 @@ InputResult playerInput(GameObject& player) {
 			player.setVelocity(glm::vec2(player.getVelocity().x, -10.0f)); // Apply downward velocity
 		}
 	}
-	if (Input::isKeyJustPressed(GLFW_KEY_Q)) {
-		DEBUG_ONLY(std::cout << "Quitting application." << std::endl;);
-		return InputResult::FORCE_QUIT; // Immediate quit, closes window
-	}
-
 	if (Input::isKeyJustPressed(GLFW_KEY_ESCAPE) || Input::isKeyJustPressed(GLFW_KEY_P)) {
 		return InputResult::PAUSE;
 	}

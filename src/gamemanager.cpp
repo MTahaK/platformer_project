@@ -140,7 +140,6 @@ void GameManager::handleMenuState() {
 	finishDraw(window_, renderer_, shader_);
 }
 
-// All other state handlers currently empty, to be implemented later
 void GameManager::handlePlayState() {
 	float currentFrameTime = glfwGetTime();
 	auto frameStart = std::chrono::high_resolution_clock::now();
@@ -155,10 +154,6 @@ void GameManager::handlePlayState() {
 	if (inputResult == InputResult::PAUSE) {
 		setState(GameState::PAUSE);
 		DEBUG_ONLY(std::cout << "Pausing game." << std::endl;);
-		return;
-	} else if (inputResult == InputResult::FORCE_QUIT) {
-		setState(GameState::EXIT);
-		DEBUG_ONLY(std::cout << "Quitting application." << std::endl;);
 		return;
 	}
 	physics_.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
@@ -213,6 +208,7 @@ void GameManager::handlePauseState() {
 
 	// Still render the current frame (game world frozen)
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
+	drawObjects(window_, renderer_, shader_, objects_);
 
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -289,7 +285,6 @@ void GameManager::handlePauseState() {
 	finishDraw(window_, renderer_, shader_);
 
 	// Handle pause-specific input
-	Input::update();
 	if (Input::isKeyJustPressed(GLFW_KEY_ESCAPE) || Input::isKeyJustPressed(GLFW_KEY_P)) {
 		setState(GameState::PLAY); // Resume game
 		DEBUG_ONLY(std::cout << "Resuming game." << std::endl;);
@@ -319,7 +314,6 @@ void GameManager::handleDeadState() {
 
 	finishDraw(window_, renderer_, shader_);
 
-	Input::update();
 	// Check for input to reset level or exit
 	if (Input::isKeyPressed(GLFW_KEY_ENTER)) {
 		// Reset level and return to PLAY state

@@ -35,7 +35,11 @@ class LevelManager {
 		std::vector<LevelMetaData>& getAvailableLevels(); // Returned vector is then given to UI engine to display levels
 
 		// Phase 3: Player makes selection
-		void selectLevel(int index); // Sets current level index
+		bool hasSelection() const { return currLevelIndex_ >= 0; }
+		void selectLevel(int index) { currLevelIndex_ = index; } // Sets current level index
+		int getSelectedLevelIndex() const { return currLevelIndex_; }
+		const LevelMetaData& getSelectedLevelMetaData() const;
+		void clearSelection() { currLevelIndex_ = -1; }
 
 		// Phase 4: Load after confirmation, to be run after confirmation button is pressed
 		Tilemap loadSelectedLevel();
