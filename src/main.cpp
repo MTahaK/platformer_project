@@ -16,7 +16,7 @@ int main(void) {
 	renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
 
 	// --- TILEMAP SETUP ---
-	std::string tilemapFile = "./assets/test2.tmap";
+	std::string tilemapFile = "./assets/levels/test2.tmap";
 
 	Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
 
@@ -38,17 +38,15 @@ int main(void) {
 	// Create and insert DeathWall object
 	// For test, DeathWall scale stretches entire height of level, and is 1 tile wide.
 	// DeathWall starts at left edge of tilemap
-	// ...existing code...
 	GameObject deathWall;
 	deathWall.setPosition(glm::vec2(0.0f, tilemap.getHeight() / 2.0f)); // Centre vertically in level
 	deathWall.setInitPosition(deathWall.getPosition());					// Set initial position
 
 	deathWall.setScale(glm::vec2(1.0f, tilemap.getHeight()));
-	// ...existing code...
-	// DeathWall color is red
 	deathWall.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	deathWall.setName("DeathWall");
 	auto deathWallPos = deathWall.getPosition();
+	
 	// Create instance of DeathWallBehavior
 	DeathWallBehavior deathWallBehavior(deathWall, 0.5f, glm::vec2(0.0f, deathWallPos.y), glm::vec2(tilemap.getWidth(), deathWallPos.y));
 	// Set the behavior for the death wall

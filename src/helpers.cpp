@@ -174,7 +174,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 	// Projection matrix (orthographic): dynamic, based on aspect
 	glm::mat4 projection = glm::ortho(0.0f, worldWidth, 0.0f, worldHeight, -1.0f, 1.0f);
 
-	// View matrix: identity for now (no camera)
+	// View matrix: camera follows player
 	glm::vec2 cameraCenter = player.getPosition();
 	glm::mat4 view =
 		glm::translate(glm::mat4(1.0f), glm::vec3(-cameraCenter.x + worldWidth / 2.0f - 0.3f,  // Camera slightly to the right of player

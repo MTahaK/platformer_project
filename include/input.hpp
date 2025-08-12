@@ -13,6 +13,8 @@ class Input {
 		// Update key/mouse state (called once per frame)
 		static void update();
 
+		static void clear();
+
 		// --- Key State Queries ---
 		static bool isKeyPressed(int key);		// Currently held down
 		static bool isKeyJustPressed(int key);	// Transitioned from up to down this frame

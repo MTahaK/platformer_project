@@ -23,6 +23,13 @@ void Input::update() {
 	}
 }
 
+void Input::clear() {
+	// Clear input state by updating twice - this moves current to previous
+	// and ensures no "just pressed" states carry over
+	update();
+	update();
+}
+
 bool Input::isKeyPressed(int key) {
 	auto it = s_currentKeys_.find(key);
 	return it != s_currentKeys_.end() && it->second == GLFW_PRESS;

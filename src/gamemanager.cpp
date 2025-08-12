@@ -8,10 +8,7 @@ GameManager::GameManager(Window& window, Shader& shader, Renderer2D& renderer, P
 }
 
 void GameManager::setState(GameState state) {
-	// Clear input state by updating twice - this moves current to previous
-	// and ensures no "just pressed" states carry over
-	Input::update();
-	Input::update();
+	Input::clear();
 
 	// Reset timing when entering PLAY state to avoid delta time glitches
 	if (state == GameState::PLAY) {
