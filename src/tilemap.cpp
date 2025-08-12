@@ -69,7 +69,7 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 	std::getline(file, line); // Consume the newline after height
 
 	Tilemap tilemap(width, height, tileSize);
-
+	bool startSet = false, dwallStartSet = false, dwallEndSet = false;
 	for (int y = height - 1; y >= 0; --y) {
 		std::getline(file, line);
 		for (int x = 0; x < width && x < static_cast<int>(line.size()); ++x) {
@@ -84,17 +84,34 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 			default:
 				type = {TileEnum::EMPTY, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f)};
 				break;
-			case 'P':																 // Player start position
-				type = {TileEnum::PLAYER, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f)}; // Green for player
-				tilemap.setPlayerPos(x, y);											 // Set player position
-				break;
+			case 'P': // Player start position
+				if(!startSet) {
+					type = {TileEnum::PLAYER, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f)};
+					tilemap.setPlayerPos(x, y);
+					startSet = true;
+					break;
+				} else {
+					// Only one player start position can be set
+					std::cerr << "Multiple player start positions found in tilemap file." << std::endl;
+				}
 			case '[':
-				type = {TileEnum::DWALLSTART, false, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)};
-				tilemap.setDeathWallStartPos(x, y);
-				break;
+				if (!dwallStartSet) {
+					type = {TileEnum::DWALLSTART, false, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)};
+					tilemap.setDeathWallStartPos(x, y);
+					dwallStartSet = true;
+					break;
+				} else {
+					std::cerr << "Multiple death wall start positions found in tilemap file." << std::endl;
+				}
+				
 			case ']':
-				type = {TileEnum::DWALLEND, false, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)};
-				tilemap.setDeathWallEndPos(x, y);
+				if (!dwallEndSet) {
+					type = {TileEnum::DWALLEND, false, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)};
+					tilemap.setDeathWallEndPos(x, y);
+					dwallEndSet = true;
+				} else {
+					std::cerr << "Multiple death wall end positions found in tilemap file." << std::endl;
+				}
 				break;
 			case 'G': // Goal tile
 				type = {TileEnum::GOAL, true, rgbaToVec4("0, 74, 20, 255")};
@@ -104,6 +121,10 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 
 			tilemap.setTile(x, y, type);
 		}
+	}
+	if (!startSet || !dwallStartSet || !dwallEndSet) {
+		std::cerr << "Tilemap is missing required positions." << std::endl;
+		throw std::runtime_error("Tilemap is missing required positions.");
 	}
 
 	return tilemap;
