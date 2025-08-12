@@ -39,16 +39,15 @@ int main(void) {
 	// For test, DeathWall scale stretches entire height of level, and is 1 tile wide.
 	// DeathWall starts at left edge of tilemap
 	GameObject deathWall;
-	deathWall.setPosition(glm::vec2(0.0f, tilemap.getHeight() / 2.0f)); // Centre vertically in level
+	deathWall.setPosition(tilemap.getDeathWallStartPosition()); // Centre vertically in level
 	deathWall.setInitPosition(deathWall.getPosition());					// Set initial position
 
 	deathWall.setScale(glm::vec2(1.0f, tilemap.getHeight()));
 	deathWall.setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	deathWall.setName("DeathWall");
-	auto deathWallPos = deathWall.getPosition();
 	
 	// Create instance of DeathWallBehavior
-	DeathWallBehavior deathWallBehavior(deathWall, 0.5f, glm::vec2(0.0f, deathWallPos.y), glm::vec2(tilemap.getWidth(), deathWallPos.y));
+	DeathWallBehavior deathWallBehavior(deathWall, 0.5f, glm::vec2(tilemap.getDeathWallStartPosition()), glm::vec2(tilemap.getDeathWallEndPosition()));
 	// Set the behavior for the death wall
 	deathWall.setBehavior(std::make_unique<DeathWallBehavior>(deathWallBehavior));
 	objects.push_back(std::move(deathWall));

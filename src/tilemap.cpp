@@ -88,6 +88,14 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 				type = {TileEnum::PLAYER, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f)}; // Green for player
 				tilemap.setPlayerPos(x, y);											 // Set player position
 				break;
+			case '[':
+				type = {TileEnum::DWALLSTART, false, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)};
+				tilemap.setDeathWallStartPos(x, y);
+				break;
+			case ']':
+				type = {TileEnum::DWALLEND, false, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)};
+				tilemap.setDeathWallEndPos(x, y);
+				break;
 			case 'G': // Goal tile
 				type = {TileEnum::GOAL, true, rgbaToVec4("0, 74, 20, 255")};
 				tilemap.setGoalPos(x, y); // Set goal position

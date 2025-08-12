@@ -9,7 +9,7 @@
 #include <sstream>
 
 // Define Tile type enum
-enum class TileEnum { EMPTY, SOLID, PLAYER, GOAL };
+enum class TileEnum { EMPTY, SOLID, PLAYER, DWALLSTART, DWALLEND, GOAL };
 
 struct TileType {
 		TileEnum type; // Type of the tile (e.g., EMPTY, SOLID)
@@ -37,6 +37,8 @@ class Tilemap {
 		void setTile(int x, int y, const TileType& tileType);			   // Set tile at position (x, y) with a specific type
 		void setPlayerPos(int x, int y) { playerPos_ = glm::ivec2(x, y); } // Set initial player position in tile indices
 		void setGoalPos(int x, int y) { goalPos_ = glm::ivec2(x, y); }	   // Set goal position in tile indices
+		void setDeathWallStartPos(int x, int y) { deathWallStartPos_ = glm::ivec2(x, y); } // Set death wall start position in tile indices
+		void setDeathWallEndPos(int x, int y) { deathWallEndPos_ = glm::ivec2(x, y); } // Set death wall end position in tile indices
 
 		void renderTileMap(Shader& shader, Renderer2D& renderer) const; // Render the tilemap using the provided shader and renderer
 
@@ -48,6 +50,8 @@ class Tilemap {
 		int getWidth() const { return width_; }
 		int getHeight() const { return height_; }
 		glm::ivec2 getPlayerPosition() const { return playerPos_; }
+		glm::ivec2 getDeathWallStartPosition() const { return deathWallStartPos_; }
+		glm::ivec2 getDeathWallEndPosition() const { return deathWallEndPos_; }
 		float getTileSize() const { return tileSize_; }
 
 	private:
@@ -56,6 +60,8 @@ class Tilemap {
 		int width_;			   // Width of the tilemap in tiles
 		int height_;		   // Height of the tilemap in tiles
 		glm::ivec2 playerPos_; // Initial player position in tile indices
+		glm::ivec2 deathWallStartPos_; // Position of the death wall start tile in tile indices
+		glm::ivec2 deathWallEndPos_; // Position of the death wall end tile in tile indices - must be aligned on one axis with start
 		glm::ivec2 goalPos_;   // Goal position in tile indices
 
 		float tileSize_; // Size of one tile in world units
