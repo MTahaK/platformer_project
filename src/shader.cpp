@@ -134,18 +134,31 @@ void Shader::use() const {
 	}
 }
 
-void Shader::setBool(const std::string& name, bool value) const { glUniform1i(glGetUniformLocation(shaderID, name.c_str()), (int)value); }
-void Shader::setInt(const std::string& name, int value) const { glUniform1i(glGetUniformLocation(shaderID, name.c_str()), value); }
-void Shader::setFloat(const std::string& name, float value) const { glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value); }
+GLint Shader::getUniformLocation(const std::string& name) const {
+	auto it = uniformLocCache_.find(name);
+	if (it != uniformLocCache_.end()) {
+		return it->second;
+	}
+
+	GLint location = glGetUniformLocation(shaderID, name.c_str());
+	if (location != -1) {
+		uniformLocCache_[name] = location;
+	}
+	return location;
+}
+
+void Shader::setBool(const std::string& name, bool value) const { glUniform1i(getUniformLocation(name), (int)value); }
+void Shader::setInt(const std::string& name, int value) const { glUniform1i(getUniformLocation(name), value); }
+void Shader::setFloat(const std::string& name, float value) const { glUniform1f(getUniformLocation(name), value); }
 void Shader::setVec2(const std::string& name, const glm::vec2& value) const {
-	glUniform2fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(value));
+	glUniform2fv(getUniformLocation(name), 1, glm::value_ptr(value));
 }
 void Shader::setVec3(const std::string& name, const glm::vec3& value) const {
-	glUniform3fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(value));
+	glUniform3fv(getUniformLocation(name), 1, glm::value_ptr(value));
 }
 void Shader::setVec4(const std::string& name, const glm::vec4& value) const {
-	glUniform4fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(value));
+	glUniform4fv(getUniformLocation(name), 1, glm::value_ptr(value));
 }
 void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
-	glUniformMatrix4fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
+	glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(mat));
 }

@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
+#include <unordered_map>
 
 class Shader {
 
@@ -34,6 +35,9 @@ class Shader {
 		std::string vertexPath_;
 		std::string fragmentPath_;
 
+		mutable std::unordered_map<std::string, GLint> uniformLocCache_;
+
 		std::string loadShaderSource(const std::string& path);
 		GLuint compileShader(const std::string& source, GLenum type);
+		GLint getUniformLocation(const std::string& name) const;
 };

@@ -163,7 +163,7 @@ void Renderer2D::drawLine(Shader& shader, const glm::vec2& start, const glm::vec
 	glBindVertexArray(lineVAO_);
 
 	glBindBuffer(GL_ARRAY_BUFFER, lineVBO_);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 
 	shader.use();
 
