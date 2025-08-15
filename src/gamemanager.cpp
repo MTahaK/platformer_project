@@ -28,6 +28,9 @@ void GameManager::runGameLoop() {
 		setState(GameState::EXIT);
 		DEBUG_ONLY(std::cout << "Force quit, switching to EXIT state." << std::endl;);
 	}
+	if (Input::isKeyJustPressed(GLFW_KEY_O)) {
+		toggleDebugMode();
+	}
 	switch (gameState_) {
 		case GameState::MENU:
 			handleMenuState();
@@ -43,6 +46,9 @@ void GameManager::runGameLoop() {
 			break;
 		case GameState::WIN:
 			handleWinState();
+			break;
+		case GameState::UIDEMO:
+			handleUIDemo();
 			break;
 		case GameState::EXIT:
 			handleExitState();
@@ -138,6 +144,14 @@ void GameManager::handleMenuState() {
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	finishDraw(window_, renderer_, shader_);
+
+	DEBUG_ONLY(
+		if(Input::isKeyJustPressed(GLFW_KEY_F1)){
+			setState(GameState::UIDEMO);
+			std::cout << "Switching to UIDemo" << std::endl;
+		}
+	); 
+
 }
 
 void GameManager::handlePlayState() {
@@ -289,6 +303,40 @@ void GameManager::handlePauseState() {
 		setState(GameState::PLAY); // Resume game
 		DEBUG_ONLY(std::cout << "Resuming game." << std::endl;);
 	}
+}
+
+void GameManager::handleUIDemo() {
+	// Open ImGui Demo
+	window_.pollEvents();
+	// Currently, render a single quad that matches the framebuffer size
+	int fbWidth, fbHeight;
+	window_.getFramebufferSize(fbWidth, fbHeight);
+
+	// Define projection matrix to match the framebuffer size
+
+	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(fbWidth), 0.0f, static_cast<float>(fbHeight), -1.0f, 1.0f);
+
+	renderer_.beginScene(shader_, IDENTITY_MATRIX, projection); // Begin the scene
+
+	// Compute model matrix for screen-size quad
+	glm::mat4 model = IDENTITY_MATRIX;
+	// Center the quad in the framebuffer
+	model = glm::translate(model, glm::vec3(fbWidth / 2.0f, fbHeight / 2.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(fbWidth, fbHeight, 1.0f)); // Scale to framebuffer size
+	auto color = hexToVec4("#2d0664");
+
+	renderer_.drawQuad(shader_, model, color);
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::ShowDemoWindow();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	finishDraw(window_, renderer_, shader_);
+
 }
 
 void GameManager::handleDeadState() {

@@ -95,8 +95,9 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 					std::cerr << "Multiple player start positions found in tilemap file." << std::endl;
 				}
 			case '[':
+				// Death wall starts and ends will always be within a solid 'wall' tile
 				if (!dwallStartSet) {
-					type = {TileEnum::DWALLSTART, false, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)};
+					type = {TileEnum::DWALLSTART, true, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f)};
 					tilemap.setDeathWallStartPos(x, y);
 					dwallStartSet = true;
 					break;
@@ -106,7 +107,7 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 				
 			case ']':
 				if (!dwallEndSet) {
-					type = {TileEnum::DWALLEND, false, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)};
+					type = {TileEnum::DWALLEND, true, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f)};
 					tilemap.setDeathWallEndPos(x, y);
 					dwallEndSet = true;
 				} else {

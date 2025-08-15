@@ -36,9 +36,6 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
 
 InputResult playerInput(GameObject& player) {
 	
-	if (Input::isKeyJustPressed(GLFW_KEY_O)) {
-		toggleDebugMode();
-	}
 	if (Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)) {
 		if (player.getVelocity().x > 0) {
 			// Player is currently moving right, increase acceleration in opposite direction
