@@ -180,15 +180,10 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 
 	// Draw player sensors
 	if (g_debugEnabled) {
-
 		glm::vec2 pOrigin = player.getPosition();
-		// Draw bottom sensor
 		renderer.drawLine(shader, pOrigin, player.getBottomSensor().position, player.getBottomSensor().color);
-		// Draw top sensor
 		renderer.drawLine(shader, pOrigin, player.getTopSensor().position, player.getTopSensor().color);
-		// Draw left sensor
 		renderer.drawLine(shader, pOrigin, player.getLeftSensor().position, player.getLeftSensor().color);
-		// Draw right sensor
 		renderer.drawLine(shader, pOrigin, player.getRightSensor().position, player.getRightSensor().color);
 	}
 
