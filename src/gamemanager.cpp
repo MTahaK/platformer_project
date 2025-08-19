@@ -471,7 +471,9 @@ void GameManager::handleDemo3D(){
 	// Create perspective projection matrix, static view matrix, and rotating model matrix for a single triangle in 3D
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+	// Rotate around Y-axis (clockwise) and X-axis (counter-clockwise) simultaneously
 	glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, -(float)glfwGetTime()*1.5f, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	renderer3D_->beginScene(*shader3D_, view, projection);
 	
@@ -483,15 +485,22 @@ void GameManager::handleDemo3D(){
     } else if(Input::isKeyJustPressed(GLFW_KEY_2)){
         currentShape = CurrentShape::PLANE;
 		std::cout<<"Setting current shape to PLANE"<<std::endl;
-    }
-    
+    } else if(Input::isKeyJustPressed(GLFW_KEY_3)){
+        currentShape = CurrentShape::CUBE;
+		std::cout<<"Setting current shape to CUBE"<<std::endl;
+	} else if(Input::isKeyJustPressed(GLFW_KEY_4)){
+		currentShape = CurrentShape::PYRAMID;
+		std::cout<<"Setting current shape to PYRAMID"<<std::endl;
+	}
     // Draw current shape
     if(currentShape == CurrentShape::TRIANGLE){
-		std::cout<<"Drawing TRIANGLE"<<std::endl;
         renderer3D_->drawTriangle(*shader3D_, model);
     } else if(currentShape == CurrentShape::PLANE){
-        std::cout<<"Drawing PLANE"<<std::endl;
         renderer3D_->drawPlane(*shader3D_, model);
+    } else if(currentShape == CurrentShape::CUBE){
+        renderer3D_->drawCube(*shader3D_, model);
+    } else if(currentShape == CurrentShape::PYRAMID){
+        renderer3D_->drawPyramid(*shader3D_, model);
     }
 	finishDraw3D(window_, *renderer3D_, *shader3D_);
 

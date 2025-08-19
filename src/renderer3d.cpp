@@ -48,6 +48,58 @@ bool Renderer3D::init(Shader& shader) {
 		0, 1, 2,
 		2, 3, 0
 	};
+
+	// Cube vertices (8 vertices, each vertex has varied colors with green components)
+	cubeVertices_ = {
+		// Front face (red-green mix)
+		{{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 0: Bottom-left-front (red)
+		{{ 0.5f, -0.5f,  0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 1: Bottom-right-front (green)
+		{{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 2: Top-right-front (yellow)
+		{{-0.5f,  0.5f,  0.5f}, {0.5f, 1.0f, 0.5f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 3: Top-left-front (light green)
+		
+		// Back face (blue-green mix)
+		{{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 4: Bottom-left-back (blue)
+		{{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 5: Bottom-right-back (cyan)
+		{{ 0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 6: Top-right-back (magenta)
+		{{-0.5f,  0.5f, -0.5f}, {0.5f, 0.5f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}  // 7: Top-left-back (light blue)
+	};
+
+	cubeIndices_ = {
+		// Front face
+		0, 1, 2,  2, 3, 0,
+		// Back face
+		4, 6, 5,  6, 4, 7,
+		// Left face
+		4, 0, 3,  3, 7, 4,
+		// Right face
+		1, 5, 6,  6, 2, 1,
+		// Top face
+		3, 2, 6,  6, 7, 3,
+		// Bottom face
+		4, 5, 1,  1, 0, 4
+	};
+
+	// Pyramid vertices (5 vertices: 4 base + 1 apex)
+	pyramidVertices_ = {
+		// Base vertices (square base in XZ plane)
+		{{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 0: Bottom-left
+		{{ 0.5f, -0.5f,  0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 1: Bottom-right
+		{{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 2: Top-right
+		{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 3: Top-left
+		
+		// Apex vertex
+		{{ 0.0f,  0.5f,  0.0f}, {1.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}}   // 4: Apex (magenta)
+	};
+
+	pyramidIndices_ = {
+		// Base (two triangles)
+		0, 2, 1,  0, 3, 2,
+		// Side faces (4 triangles pointing to apex)
+		0, 1, 4,  // Front face
+		1, 2, 4,  // Right face
+		2, 3, 4,  // Back face
+		3, 0, 4   // Left face
+	};
 	// Set vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
 	glEnableVertexAttribArray(0);
@@ -62,7 +114,7 @@ bool Renderer3D::init(Shader& shader) {
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark grey
 	currentShape_ = CurrentShape::NONE;
-	
+
 	std::cout << "[Renderer3D] Renderer initialized successfully." << std::endl;
 
 	return true;
@@ -98,9 +150,9 @@ CurrentShape Renderer3D::getCurrentShape() const {
 void Renderer3D::beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj) {
 	glEnable(GL_DEPTH_TEST);
 	// Culling
-	// glEnable(GL_CULL_FACE);
-	// glCullFace(GL_BACK);
-	// glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear buffers
 
@@ -163,4 +215,52 @@ void Renderer3D::drawPlane(Shader& shader, const glm::mat4& transform) {
 
 	// Draw the plane
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void Renderer3D::drawCube(Shader& shader, const glm::mat4& transform) {
+	// Set the model matrix
+	model_ = transform;
+
+	// Only upload geometry if we switched shapes
+	if (currentShape_ != CurrentShape::CUBE) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+		glBufferData(GL_ARRAY_BUFFER, cubeVertices_.size() * sizeof(Vertex3D), cubeVertices_.data(), GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices_.size() * sizeof(unsigned int), cubeIndices_.data(), GL_DYNAMIC_DRAW);
+
+		currentShape_ = CurrentShape::CUBE;
+	}
+
+	// Pass the matrices to the shader
+	shader.setMat4("model", model_);
+	shader.setMat4("view", view_);
+	shader.setMat4("proj", proj_);
+
+	// Draw the cube (36 indices for 12 triangles)
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+}
+
+void Renderer3D::drawPyramid(Shader& shader, const glm::mat4& transform) {
+	// Set the model matrix
+	model_ = transform;
+
+	// Only upload geometry if we switched shapes
+	if (currentShape_ != CurrentShape::PYRAMID) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+		glBufferData(GL_ARRAY_BUFFER, pyramidVertices_.size() * sizeof(Vertex3D), pyramidVertices_.data(), GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, pyramidIndices_.size() * sizeof(unsigned int), pyramidIndices_.data(), GL_DYNAMIC_DRAW);
+
+		currentShape_ = CurrentShape::PYRAMID;
+	}
+
+	// Pass the matrices to the shader
+	shader.setMat4("model", model_);
+	shader.setMat4("view", view_);
+	shader.setMat4("proj", proj_);
+
+	// Draw the pyramid (18 indices for 6 triangles)
+	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
 }
