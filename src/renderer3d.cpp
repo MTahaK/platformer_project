@@ -37,6 +37,17 @@ bool Renderer3D::init(Shader& shader) {
 		0, 1, 2 // CCW winding for front-facing triangle
 	};
 
+	planeVertices_ = {
+		{{0.5f, 0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},   // Top right, red
+		{{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},  // Top left, green
+		{{-0.5f, -0.5f, 0.0f}, {0.5f, 0.0f, 0.5f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // Bottom left, purple
+		{{0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},  // Bottom right, blue
+	};
+
+	planeIndices_ = {
+		0, 1, 2,
+		2, 3, 0
+	};
 	// Set vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
 	glEnableVertexAttribArray(0);
@@ -50,8 +61,10 @@ bool Renderer3D::init(Shader& shader) {
 	glBindVertexArray(0);
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark grey
-
+	currentShape_ = CurrentShape::NONE;
+	
 	std::cout << "[Renderer3D] Renderer initialized successfully." << std::endl;
+
 	return true;
 }
 
@@ -75,12 +88,19 @@ void Renderer3D::shutdown() {
 	std::cout << "[Renderer3D] Renderer shutdown successfully." << std::endl;
 }
 
+void Renderer3D::setCurrentShape(CurrentShape shape) {
+	currentShape_ = shape;
+}
+CurrentShape Renderer3D::getCurrentShape() const {
+	return currentShape_;
+}
+
 void Renderer3D::beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj) {
 	glEnable(GL_DEPTH_TEST);
 	// Culling
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
+	// glEnable(GL_CULL_FACE);
+	// glCullFace(GL_BACK);
+	// glFrontFace(GL_CCW);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear buffers
 
@@ -119,4 +139,28 @@ void Renderer3D::drawTriangle(Shader& shader, const glm::mat4& transform) {
 	// No need to set colour as a uniform. Colour info (per vertex) is already packed into the VBO.
 	// Draw the triangle
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+}
+
+void Renderer3D::drawPlane(Shader& shader, const glm::mat4& transform) {
+	// Set the model matrix
+	model_ = transform;
+
+	// Only upload geometry if we switched shapes
+	if (currentShape_ != CurrentShape::PLANE) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+		glBufferData(GL_ARRAY_BUFFER, planeVertices_.size() * sizeof(Vertex3D), planeVertices_.data(), GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, planeIndices_.size() * sizeof(unsigned int), planeIndices_.data(), GL_DYNAMIC_DRAW);
+
+		currentShape_ = CurrentShape::PLANE;
+	}
+
+	// Pass the matrices to the shader
+	shader.setMat4("model", model_);
+	shader.setMat4("view", view_);
+	shader.setMat4("proj", proj_);
+
+	// Draw the plane
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

@@ -474,11 +474,26 @@ void GameManager::handleDemo3D(){
 	glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	renderer3D_->beginScene(*shader3D_, view, projection);
-	// if(Input::isKeyJustPressed(GLFW_KEY_1)){
-	// 	//
-	// }
-	renderer3D_->drawTriangle(*shader3D_, model);
-
+	
+	static CurrentShape currentShape = CurrentShape::NONE;
+	// Handle input to switch shapes
+    if(Input::isKeyJustPressed(GLFW_KEY_1)){
+        currentShape = CurrentShape::TRIANGLE;
+		std::cout<<"Setting current shape to TRIANGLE"<<std::endl;
+    } else if(Input::isKeyJustPressed(GLFW_KEY_2)){
+        currentShape = CurrentShape::PLANE;
+		std::cout<<"Setting current shape to PLANE"<<std::endl;
+    }
+    
+    // Draw current shape
+    if(currentShape == CurrentShape::TRIANGLE){
+		std::cout<<"Drawing TRIANGLE"<<std::endl;
+        renderer3D_->drawTriangle(*shader3D_, model);
+    } else if(currentShape == CurrentShape::PLANE){
+        std::cout<<"Drawing PLANE"<<std::endl;
+        renderer3D_->drawPlane(*shader3D_, model);
+    }
 	finishDraw3D(window_, *renderer3D_, *shader3D_);
+
 }
 void GameManager::handleExitState() { window_.setShouldClose(true); }
