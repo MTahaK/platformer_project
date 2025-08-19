@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 #include "shader.hpp"
+#include "globals.hpp"
 
 struct Vertex3D {
 	glm::vec3 position;
@@ -13,6 +14,13 @@ struct Vertex3D {
 	glm::vec3 normal;
 };
 
+enum class CurrentShape {
+	NONE,
+	TRIANGLE,
+	PLANE,
+	CUBE,
+	PYRAMID
+};
 class Renderer3D {
 
 	public:
@@ -23,11 +31,15 @@ class Renderer3D {
 		void shutdown();
 
 		void beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj);
+		void drawTriangle(Shader& shader, const glm::mat4& transform);
 		void drawPlane(Shader& shader, const glm::mat4& transform, const glm::vec4& color);
 		void drawCube(Shader& shader, const glm::mat4& transform, const glm::vec4& color);
 		void drawPyramid(Shader& shader, const glm::mat4& transform, const glm::vec4& color);
 
 	private:
+		std::vector<Vertex3D> triangleVertices_;
+
+		std::vector<unsigned int> triangleIndices_;
 		GLuint shader_ = 0;
 		GLuint vao_;
 		GLuint vbo_;
@@ -37,4 +49,6 @@ class Renderer3D {
 		glm::mat4 view_;
 		glm::mat4 proj_;
 
+		CurrentShape currentShape_ = CurrentShape::NONE;
+		bool shaderLoaded_ = false;
 };
