@@ -50,6 +50,9 @@ void GameManager::runGameLoop() {
 		case GameState::UIDEMO:
 			handleUIDemo();
 			break;
+		case GameState::DEMO3D:
+			handleDemo3D();
+			break;
 		case GameState::EXIT:
 			handleExitState();
 			break;
@@ -113,29 +116,28 @@ void GameManager::handleMenuState() {
 		// ImGui::PopFont();
 
 		// Add scalable spacing - more space between title and instructions
-		spacingAmount = windowHeight * 0.3f; // 30% of window height
+		spacingAmount = windowHeight * 0.25f; // 30% of window height
 		ImGui::Dummy(ImVec2(0.0f, spacingAmount));
 
-		// Center the button
-		ImVec2 buttonSize(400, 50);
-		float buttonWidth = buttonSize.x;
-		ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-
-		if (ImGui::Button("Start Game", buttonSize)) {
-			setState(GameState::PLAY);
-			DEBUG_ONLY(std::cout << "Switching to PLAY state." << std::endl;);
-		}
-
-		// Add spacing between buttons
-		ImGui::Dummy(ImVec2(0.0f, 20.0f)); // 20 pixels of vertical space
-
-		// Center the second button
-		ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-
-		if (ImGui::Button("Quit", buttonSize)) {
-			setState(GameState::EXIT);
-			DEBUG_ONLY(std::cout << "Switching to EXIT state." << std::endl;);
-		}
+		// Helper for consistent button rendering
+		auto renderMenuButton = [&](const char* text, GameState targetState) {
+			ImVec2 buttonSize(400, 50);
+			ImGui::SetCursorPosX((windowWidth - buttonSize.x) * 0.5f);
+			
+			if (ImGui::Button(text, buttonSize)) {
+				setState(targetState);
+				DEBUG_ONLY(std::cout << "Switching to " << text << " state." << std::endl;);
+			}
+			ImGui::Dummy(ImVec2(0.0f, 20.0f)); // Spacing after each button
+		};
+		
+		// Clean, readable button list
+		renderMenuButton("Start Game", GameState::PLAY);
+		DEBUG_ONLY(
+			renderMenuButton("3D Demo", GameState::DEMO3D);
+			renderMenuButton("UI Demo", GameState::UIDEMO);
+		);
+		renderMenuButton("Quit", GameState::EXIT);
 	}
 	ImGui::End();
 
@@ -149,7 +151,6 @@ void GameManager::handleMenuState() {
 			std::cout << "Switching to UIDemo" << std::endl;
 		}
 	); 
-
 }
 
 void GameManager::handlePlayState() {
@@ -449,5 +450,7 @@ void GameManager::handleWinState() {
 		DEBUG_ONLY(std::cout << "Player reset, returning to PLAY state." << std::endl;);
 	}
 }
+void GameManager::handleDemo3D(){
 
+}
 void GameManager::handleExitState() { window_.setShouldClose(true); }

@@ -8,6 +8,7 @@
 #include <string>
 #include <chrono>
 #include <vector>
+#include <functional>
 #include "window.hpp"
 #include "shader.hpp"
 #include "renderer2d.hpp"

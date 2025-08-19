@@ -21,6 +21,7 @@ enum class GameState {
 	DEAD,
 	WIN,
 	UIDEMO,
+	DEMO3D,
 	EXIT
 };
 
@@ -49,6 +50,7 @@ class GameManager {
 		void handleDeadState();
 		void handleWinState();
 		void handleUIDemo();
+		void handleDemo3D();
 		void handleExitState();
 
 		// Subsystem returns
