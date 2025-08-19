@@ -103,7 +103,7 @@ void GameManager::handleMenuState() {
 		float spacingAmount = windowHeight * 0.10f; // 15% of window height
 		ImGui::Dummy(ImVec2(0.0f, spacingAmount));
 
-		const char* title = "Welcome to the Game!";
+		const char* title = "Zippy3k";
 		ImGui::SetWindowFontScale(3.0f); // Make text 2x larger
 		float windowWidth = ImGui::GetWindowSize().x;
 		float textWidth = ImGui::CalcTextSize(title).x;
@@ -474,6 +474,9 @@ void GameManager::handleDemo3D(){
 	glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	renderer3D_->beginScene(*shader3D_, view, projection);
+	// if(Input::isKeyJustPressed(GLFW_KEY_1)){
+	// 	//
+	// }
 	renderer3D_->drawTriangle(*shader3D_, model);
 
 	finishDraw3D(window_, *renderer3D_, *shader3D_);
