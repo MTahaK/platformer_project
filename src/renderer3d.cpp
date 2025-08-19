@@ -13,6 +13,7 @@ bool Renderer3D::init(Shader& shader) {
 	}
 	shaderLoaded_ = true;
 	shader_ = shader.getID();
+	setShader(shader);
 
 	// Set up vertex array object (VAO), vertex buffer object (VBO), and element buffer object (EBO)
 	glGenVertexArrays(1, &vao_);
@@ -147,33 +148,43 @@ CurrentShape Renderer3D::getCurrentShape() const {
 	return currentShape_;
 }
 
-void Renderer3D::beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj) {
+void Renderer3D::beginScene(const glm::mat4& view, const glm::mat4& proj) {
 	glEnable(GL_DEPTH_TEST);
-	// Culling
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear buffers
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Use the shader program
-	shader.use();
+	// Use the current shader
+	if (currentShader_) {
+		currentShader_->use();
+	}
 
-	// Save view and proj matrices
+	// Save matrices
 	view_ = view;
 	proj_ = proj;
-	// Set the model matrix to identity for now
 	model_ = IDENTITY_MATRIX;
 
-	// Reactivate the VAO for drawing
 	glBindVertexArray(vao_);
 }
 
-void Renderer3D::drawTriangle(Shader& shader, const glm::mat4& transform) {
-	// Set the model matrix
+void Renderer3D::setShader(Shader& shader) {
+	currentShader_ = &shader;
+	shader_ = shader.getID();
+}
+
+void Renderer3D::setLightingUniforms(const glm::vec3& lightPos, const glm::vec3& viewPos, const glm::vec3& lightColor) {
+	if (currentShader_) {
+		currentShader_->setVec3("lightPos", lightPos);
+		currentShader_->setVec3("viewPos", viewPos);
+		currentShader_->setVec3("lightColor", lightColor);
+	}
+}
+
+void Renderer3D::drawTriangle(const glm::mat4& transform) {
 	model_ = transform;
 
-	// Only upload geometry if we switched shapes
 	if (currentShape_ != CurrentShape::TRIANGLE) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 		glBufferData(GL_ARRAY_BUFFER, triangleVertices_.size() * sizeof(Vertex3D), triangleVertices_.data(), GL_DYNAMIC_DRAW);
@@ -183,21 +194,19 @@ void Renderer3D::drawTriangle(Shader& shader, const glm::mat4& transform) {
 
 		currentShape_ = CurrentShape::TRIANGLE;
 	}
-	// Pass the matrices to the shader
-	shader.setMat4("model", model_);
-	shader.setMat4("view", view_);
-	shader.setMat4("proj", proj_);
+	
+	if (currentShader_) {
+		currentShader_->setMat4("model", model_);
+		currentShader_->setMat4("view", view_);
+		currentShader_->setMat4("proj", proj_);
+	}
 
-	// No need to set colour as a uniform. Colour info (per vertex) is already packed into the VBO.
-	// Draw the triangle
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 }
 
-void Renderer3D::drawPlane(Shader& shader, const glm::mat4& transform) {
-	// Set the model matrix
+void Renderer3D::drawPlane(const glm::mat4& transform) {
 	model_ = transform;
 
-	// Only upload geometry if we switched shapes
 	if (currentShape_ != CurrentShape::PLANE) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 		glBufferData(GL_ARRAY_BUFFER, planeVertices_.size() * sizeof(Vertex3D), planeVertices_.data(), GL_DYNAMIC_DRAW);
@@ -208,20 +217,18 @@ void Renderer3D::drawPlane(Shader& shader, const glm::mat4& transform) {
 		currentShape_ = CurrentShape::PLANE;
 	}
 
-	// Pass the matrices to the shader
-	shader.setMat4("model", model_);
-	shader.setMat4("view", view_);
-	shader.setMat4("proj", proj_);
+	if (currentShader_) {
+		currentShader_->setMat4("model", model_);
+		currentShader_->setMat4("view", view_);
+		currentShader_->setMat4("proj", proj_);
+	}
 
-	// Draw the plane
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Renderer3D::drawCube(Shader& shader, const glm::mat4& transform) {
-	// Set the model matrix
+void Renderer3D::drawCube(const glm::mat4& transform) {
 	model_ = transform;
 
-	// Only upload geometry if we switched shapes
 	if (currentShape_ != CurrentShape::CUBE) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 		glBufferData(GL_ARRAY_BUFFER, cubeVertices_.size() * sizeof(Vertex3D), cubeVertices_.data(), GL_DYNAMIC_DRAW);
@@ -232,20 +239,18 @@ void Renderer3D::drawCube(Shader& shader, const glm::mat4& transform) {
 		currentShape_ = CurrentShape::CUBE;
 	}
 
-	// Pass the matrices to the shader
-	shader.setMat4("model", model_);
-	shader.setMat4("view", view_);
-	shader.setMat4("proj", proj_);
+	if (currentShader_) {
+		currentShader_->setMat4("model", model_);
+		currentShader_->setMat4("view", view_);
+		currentShader_->setMat4("proj", proj_);
+	}
 
-	// Draw the cube (36 indices for 12 triangles)
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
-void Renderer3D::drawPyramid(Shader& shader, const glm::mat4& transform) {
-	// Set the model matrix
+void Renderer3D::drawPyramid(const glm::mat4& transform) {
 	model_ = transform;
 
-	// Only upload geometry if we switched shapes
 	if (currentShape_ != CurrentShape::PYRAMID) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 		glBufferData(GL_ARRAY_BUFFER, pyramidVertices_.size() * sizeof(Vertex3D), pyramidVertices_.data(), GL_DYNAMIC_DRAW);
@@ -256,11 +261,11 @@ void Renderer3D::drawPyramid(Shader& shader, const glm::mat4& transform) {
 		currentShape_ = CurrentShape::PYRAMID;
 	}
 
-	// Pass the matrices to the shader
-	shader.setMat4("model", model_);
-	shader.setMat4("view", view_);
-	shader.setMat4("proj", proj_);
+	if (currentShader_) {
+		currentShader_->setMat4("model", model_);
+		currentShader_->setMat4("view", view_);
+		currentShader_->setMat4("proj", proj_);
+	}
 
-	// Draw the pyramid (18 indices for 6 triangles)
 	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
 }

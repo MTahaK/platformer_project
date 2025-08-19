@@ -475,7 +475,7 @@ void GameManager::handleDemo3D(){
 	glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, -(float)glfwGetTime()*1.5f, glm::vec3(1.0f, 0.0f, 0.0f));
 
-	renderer3D_->beginScene(*shader3D_, view, projection);
+	renderer3D_->beginScene(view, projection);
 	
 	static CurrentShape currentShape = CurrentShape::NONE;
 	// Handle input to switch shapes
@@ -494,13 +494,13 @@ void GameManager::handleDemo3D(){
 	}
     // Draw current shape
     if(currentShape == CurrentShape::TRIANGLE){
-        renderer3D_->drawTriangle(*shader3D_, model);
+        renderer3D_->drawTriangle(model);
     } else if(currentShape == CurrentShape::PLANE){
-        renderer3D_->drawPlane(*shader3D_, model);
+        renderer3D_->drawPlane(model);
     } else if(currentShape == CurrentShape::CUBE){
-        renderer3D_->drawCube(*shader3D_, model);
+        renderer3D_->drawCube(model);
     } else if(currentShape == CurrentShape::PYRAMID){
-        renderer3D_->drawPyramid(*shader3D_, model);
+        renderer3D_->drawPyramid(model);
     }
 	finishDraw3D(window_, *renderer3D_, *shader3D_);
 

@@ -30,11 +30,13 @@ class Renderer3D {
 		bool init(Shader& shader);
 		void shutdown();
 
-		void beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj);
-		void drawTriangle(Shader& shader, const glm::mat4& transform);
-		void drawPlane(Shader& shader, const glm::mat4& transform);
-		void drawCube(Shader& shader, const glm::mat4& transform);
-		void drawPyramid(Shader& shader, const glm::mat4& transform);
+		void beginScene(const glm::mat4& view, const glm::mat4& proj);
+		void setShader(Shader& shader);
+		void setLightingUniforms(const glm::vec3& lightPos, const glm::vec3& viewPos, const glm::vec3& lightColor);
+		void drawTriangle(const glm::mat4& transform);
+		void drawPlane(const glm::mat4& transform);
+		void drawCube(const glm::mat4& transform);
+		void drawPyramid(const glm::mat4& transform);
 
 		void setCurrentShape(CurrentShape shape);
 
@@ -54,6 +56,7 @@ class Renderer3D {
 		std::vector<unsigned int> pyramidIndices_;
 
 		GLuint shader_ = 0;
+		Shader* currentShader_ = nullptr;  // Keep reference to current shader
 		GLuint vao_;
 		GLuint vbo_;
 		GLuint ebo_;
