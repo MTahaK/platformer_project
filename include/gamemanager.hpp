@@ -5,6 +5,7 @@
 #include "tilemap.hpp"
 #include "physics.hpp"
 #include "renderer2d.hpp"
+#include "renderer3d.hpp"
 #include "shader.hpp"
 #include "window.hpp"
 #include "input.hpp"
@@ -63,13 +64,23 @@ class GameManager {
 
 	private:
 		GameState gameState_ = GameState::MENU;
+		
+		// 2D Visuals
 		Window& window_;
 		Shader& shader_;
 		Renderer2D& renderer_;
+
+		// 3D Demo Visuals
+		std::unique_ptr<Shader> shader3D_;
+		std::unique_ptr<Renderer3D> renderer3D_;
+		bool is3DInit_ = false;
+
+		// Gameplay
 		PlayerObject& player_;
 		Tilemap& tilemap_;
 		std::vector<GameObject>& objects_;
 		Physics& physics_;
+
 
 		// Timing management for game loop
 		float lastFrameTime_ = 0.0f;

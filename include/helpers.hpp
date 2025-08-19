@@ -8,6 +8,7 @@
 #include <string>
 #include <chrono>
 #include <vector>
+#include <memory>
 #include <functional>
 #include "window.hpp"
 #include "shader.hpp"
@@ -46,6 +47,7 @@ void drawStepPlayer(Window& window, Renderer2D& renderer, Shader& shader, const 
 void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, const Tilemap& tilemap, const PlayerObject& player);
 void drawObjects(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects);
 void finishDraw(Window& window, Renderer2D& renderer, Shader& shader);
+void finishDraw3D(Window& window, Renderer3D& renderer, Shader& shader);
 
 // UPDATE FUNCTIONS
 void updatePStatePlayer(PlayerObject& player, Physics& physics, Tilemap& tilemap, std::vector<GameObject>& objects, float deltaTime);

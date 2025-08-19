@@ -203,6 +203,11 @@ void finishDraw(Window& window, Renderer2D& renderer, Shader& shader) {
 	window.swap();
 }
 
+void finishDraw3D(Window& window, Renderer3D& renderer, Shader& shader) {
+	// Swap buffers
+	window.swap();
+}
+
 void updateDeathWall(GameObject& deathWall, float deltaTime) {
 	// Call the behavior's update method
 	deathWall.updateBehavior(deltaTime);

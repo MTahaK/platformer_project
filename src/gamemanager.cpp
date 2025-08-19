@@ -452,5 +452,30 @@ void GameManager::handleWinState() {
 }
 void GameManager::handleDemo3D(){
 
+	if(!is3DInit_){
+		// Create 3D shader
+		shader3D_ = std::make_unique<Shader>();
+		if(!shader3D_->load("shaders/3dvertex.glsl", "shaders/3dfragment.glsl")) {
+			std::cerr << "Failed to load 3D shaders. Exiting application." << std::endl;
+			return;
+		}
+		renderer3D_ = std::make_unique<Renderer3D>();
+		if(!renderer3D_->init(*shader3D_)) {
+			std::cerr << "Failed to create 3D renderer. Exiting application." << std::endl;
+			return;
+		}
+		is3DInit_ = true;
+	}
+	window_.pollEvents();
+
+	// Create perspective projection matrix, static view matrix, and rotating model matrix for a single triangle in 3D
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+	glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	renderer3D_->beginScene(*shader3D_, view, projection);
+	renderer3D_->drawTriangle(*shader3D_, model);
+
+	finishDraw3D(window_, *renderer3D_, *shader3D_);
 }
 void GameManager::handleExitState() { window_.setShouldClose(true); }

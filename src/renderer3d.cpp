@@ -21,6 +21,9 @@ bool Renderer3D::init(Shader& shader) {
 	glGenBuffers(1, &vbo_);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 
+	glGenBuffers(1, &ebo_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+
 	// Set up triangle geometry
 	// The layout for this will be the same for any shape.
 	triangleVertices_ = {
@@ -74,6 +77,11 @@ void Renderer3D::shutdown() {
 
 void Renderer3D::beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj) {
 	glEnable(GL_DEPTH_TEST);
+	// Culling
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear buffers
 
 	// Use the shader program
