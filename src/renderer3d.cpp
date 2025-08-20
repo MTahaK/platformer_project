@@ -3,6 +3,11 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 Renderer3D::~Renderer3D() { shutdown(); }
 
@@ -23,7 +28,7 @@ bool Renderer3D::init(Shader& shader) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 
 	glGenBuffers(1, &ebo_);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 
 	// Set up triangle geometry
 	// The layout for this will be the same for any shape.
@@ -39,67 +44,120 @@ bool Renderer3D::init(Shader& shader) {
 	};
 
 	planeVertices_ = {
-		{{0.5f, 0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},   // Top right, red
+		{{0.5f, 0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},	  // Top right, red
 		{{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},  // Top left, green
 		{{-0.5f, -0.5f, 0.0f}, {0.5f, 0.0f, 0.5f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // Bottom left, purple
 		{{0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},  // Bottom right, blue
 	};
 
-	planeIndices_ = {
-		0, 1, 2,
-		2, 3, 0
-	};
+	planeIndices_ = {0, 1, 2, 2, 3, 0};
 
-	// Cube vertices (8 vertices, each vertex has varied colors with green components)
+	// // Cube vertices (8 vertices, each vertex has varied colors with green components)
+	// cubeVertices_ = {
+	// 	// Front face (red-green mix)
+	// 	{{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 0: Bottom-left-front (red)
+	// 	{{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 1: Bottom-right-front (green)
+	// 	{{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 2: Top-right-front (yellow)
+	// 	{{-0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 3: Top-left-front (light green)
+
+	// 	// Back face (blue-green mix)
+	// 	{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 4: Bottom-left-back (blue)
+	// 	{{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 5: Bottom-right-back (cyan)
+	// 	{{ 0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 6: Top-right-back (magenta)
+	// 	{{-0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}  // 7: Top-left-back (light blue)
+	// };
+
+	// cubeIndices_ = {
+	// 	// Front face
+	// 	0, 1, 2,  2, 3, 0,
+	// 	// Back face
+	// 	4, 6, 5,  6, 4, 7,
+	// 	// Left face
+	// 	4, 0, 3,  3, 7, 4,
+	// 	// Right face
+	// 	1, 5, 6,  6, 2, 1,
+	// 	// Top face
+	// 	3, 2, 6,  6, 7, 3,
+	// 	// Bottom face
+	// 	4, 5, 1,  1, 0, 4
+	// };
+
+	// All-white so lighting is clear
+	static const glm::vec4 C = {1.0f, 1.0f, 1.0f, 1.0f};
+
 	cubeVertices_ = {
-		// Front face (red-green mix)
-		{{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 0: Bottom-left-front (red)
-		{{ 0.5f, -0.5f,  0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 1: Bottom-right-front (green)
-		{{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 2: Top-right-front (yellow)
-		{{-0.5f,  0.5f,  0.5f}, {0.5f, 1.0f, 0.5f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 3: Top-left-front (light green)
-		
-		// Back face (blue-green mix)
-		{{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 4: Bottom-left-back (blue)
-		{{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 5: Bottom-right-back (cyan)
-		{{ 0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 6: Top-right-back (magenta)
-		{{-0.5f,  0.5f, -0.5f}, {0.5f, 0.5f, 1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}  // 7: Top-left-back (light blue)
+		// +Z (front)
+		{{-0.5f, -0.5f, 0.5f}, C, {0.0f, 0.0f, 1.0f}},
+		{{0.5f, -0.5f, 0.5f}, C, {0.0f, 0.0f, 1.0f}},
+		{{0.5f, 0.5f, 0.5f}, C, {0.0f, 0.0f, 1.0f}},
+		{{-0.5f, 0.5f, 0.5f}, C, {0.0f, 0.0f, 1.0f}},
+
+		// -Z (back)
+		{{0.5f, -0.5f, -0.5f}, C, {0.0f, 0.0f, -1.0f}},
+		{{-0.5f, -0.5f, -0.5f}, C, {0.0f, 0.0f, -1.0f}},
+		{{-0.5f, 0.5f, -0.5f}, C, {0.0f, 0.0f, -1.0f}},
+		{{0.5f, 0.5f, -0.5f}, C, {0.0f, 0.0f, -1.0f}},
+
+		// -X (left)
+		{{-0.5f, -0.5f, -0.5f}, C, {-1.0f, 0.0f, 0.0f}},
+		{{-0.5f, -0.5f, 0.5f}, C, {-1.0f, 0.0f, 0.0f}},
+		{{-0.5f, 0.5f, 0.5f}, C, {-1.0f, 0.0f, 0.0f}},
+		{{-0.5f, 0.5f, -0.5f}, C, {-1.0f, 0.0f, 0.0f}},
+
+		// +X (right)
+		{{0.5f, -0.5f, 0.5f}, C, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, -0.5f, -0.5f}, C, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, 0.5f, -0.5f}, C, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, 0.5f, 0.5f}, C, {1.0f, 0.0f, 0.0f}},
+
+		// +Y (top)
+		{{-0.5f, 0.5f, 0.5f}, C, {0.0f, 1.0f, 0.0f}},
+		{{0.5f, 0.5f, 0.5f}, C, {0.0f, 1.0f, 0.0f}},
+		{{0.5f, 0.5f, -0.5f}, C, {0.0f, 1.0f, 0.0f}},
+		{{-0.5f, 0.5f, -0.5f}, C, {0.0f, 1.0f, 0.0f}},
+
+		// -Y (bottom)
+		{{-0.5f, -0.5f, -0.5f}, C, {0.0f, -1.0f, 0.0f}},
+		{{0.5f, -0.5f, -0.5f}, C, {0.0f, -1.0f, 0.0f}},
+		{{0.5f, -0.5f, 0.5f}, C, {0.0f, -1.0f, 0.0f}},
+		{{-0.5f, -0.5f, 0.5f}, C, {0.0f, -1.0f, 0.0f}},
 	};
 
 	cubeIndices_ = {
-		// Front face
-		0, 1, 2,  2, 3, 0,
-		// Back face
-		4, 6, 5,  6, 4, 7,
-		// Left face
-		4, 0, 3,  3, 7, 4,
-		// Right face
-		1, 5, 6,  6, 2, 1,
-		// Top face
-		3, 2, 6,  6, 7, 3,
-		// Bottom face
-		4, 5, 1,  1, 0, 4
+		// +Z
+		0, 1, 2, 0, 2, 3,
+		// -Z
+		4, 5, 6, 4, 6, 7,
+		// -X
+		8, 9, 10, 8, 10, 11,
+		// +X
+		12, 13, 14, 12, 14, 15,
+		// +Y
+		16, 17, 18, 16, 18, 19,
+		// -Y
+		20, 21, 22, 20, 22, 23
 	};
 
 	// Pyramid vertices (5 vertices: 4 base + 1 apex)
 	pyramidVertices_ = {
 		// Base vertices (square base in XZ plane)
-		{{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 0: Bottom-left
-		{{ 0.5f, -0.5f,  0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 1: Bottom-right
-		{{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 2: Top-right
+		{{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},	// 0: Bottom-left
+		{{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},	// 1: Bottom-right
+		{{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},	// 2: Top-right
 		{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 3: Top-left
-		
+
 		// Apex vertex
-		{{ 0.0f,  0.5f,  0.0f}, {1.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}}   // 4: Apex (magenta)
+		{{0.0f, 0.5f, 0.0f}, {1.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}} // 4: Apex (magenta)
 	};
 
 	pyramidIndices_ = {
 		// Base (two triangles)
-		0, 2, 1,  0, 3, 2,
+		0, 2, 1, 0, 3, 2,
 		// Side faces (4 triangles pointing to apex)
-		0, 1, 4,  // Front face
-		1, 2, 4,  // Right face
-		2, 3, 4,  // Back face
-		3, 0, 4   // Left face
+		0, 1, 4, // Front face
+		1, 2, 4, // Right face
+		2, 3, 4, // Back face
+		3, 0, 4	 // Left face
 	};
 	// Set vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
@@ -141,12 +199,8 @@ void Renderer3D::shutdown() {
 	std::cout << "[Renderer3D] Renderer shutdown successfully." << std::endl;
 }
 
-void Renderer3D::setCurrentShape(CurrentShape shape) {
-	currentShape_ = shape;
-}
-CurrentShape Renderer3D::getCurrentShape() const {
-	return currentShape_;
-}
+void Renderer3D::setCurrentShape(CurrentShape shape) { currentShape_ = shape; }
+CurrentShape Renderer3D::getCurrentShape() const { return currentShape_; }
 
 void Renderer3D::beginScene(const glm::mat4& view, const glm::mat4& proj) {
 	glEnable(GL_DEPTH_TEST);
@@ -194,7 +248,7 @@ void Renderer3D::drawTriangle(const glm::mat4& transform) {
 
 		currentShape_ = CurrentShape::TRIANGLE;
 	}
-	
+
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);
 		currentShader_->setMat4("view", view_);
@@ -268,4 +322,78 @@ void Renderer3D::drawPyramid(const glm::mat4& transform) {
 	}
 
 	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
+}
+
+void Renderer3D::drawSphere(const glm::mat4& transform) {
+	model_ = transform;
+
+	if (currentShape_ != CurrentShape::SPHERE) {
+		// Generate sphere geometry if not already generated
+		if (sphereVertices_.empty()) {
+			const int segments = 32; // Horizontal segments
+			const int rings = 16;	 // Vertical rings
+			const float radius = 1.0f;
+
+			sphereVertices_.clear();
+			sphereIndices_.clear();
+
+			// Generate vertices
+			for (int ring = 0; ring <= rings; ++ring) {
+				float phi = M_PI * float(ring) / float(rings); // Vertical angle
+				float y = cos(phi) * radius;
+				float ringRadius = sin(phi) * radius;
+
+				for (int seg = 0; seg <= segments; ++seg) {
+					float theta = 2.0f * M_PI * float(seg) / float(segments); // Horizontal angle
+					float x = ringRadius * cos(theta);
+					float z = ringRadius * sin(theta);
+
+					// Position
+					glm::vec3 pos(x, y, z);
+
+					// Normal (for a unit sphere, normal equals position)
+					glm::vec3 normal = normalize(pos);
+
+					// Color (white for now, lighting will handle shading)
+					glm::vec4 color(1.0f, 1.0f, 1.0f, 1.0f);
+
+					sphereVertices_.push_back({pos, color, normal});
+				}
+			}
+
+			// Generate indices for triangles
+			for (int ring = 0; ring < rings; ++ring) {
+				for (int seg = 0; seg < segments; ++seg) {
+					int current = ring * (segments + 1) + seg;
+					int next = current + segments + 1;
+
+					// Two triangles per quad
+					sphereIndices_.push_back(current);
+					sphereIndices_.push_back(next);
+					sphereIndices_.push_back(current + 1);
+
+					sphereIndices_.push_back(current + 1);
+					sphereIndices_.push_back(next);
+					sphereIndices_.push_back(next + 1);
+				}
+			}
+		}
+
+		// Upload to GPU
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+		glBufferData(GL_ARRAY_BUFFER, sphereVertices_.size() * sizeof(Vertex3D), sphereVertices_.data(), GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices_.size() * sizeof(unsigned int), sphereIndices_.data(), GL_DYNAMIC_DRAW);
+
+		currentShape_ = CurrentShape::SPHERE;
+	}
+
+	if (currentShader_) {
+		currentShader_->setMat4("model", model_);
+		currentShader_->setMat4("view", view_);
+		currentShader_->setMat4("proj", proj_);
+	}
+
+	glDrawElements(GL_TRIANGLES, sphereIndices_.size(), GL_UNSIGNED_INT, 0);
 }

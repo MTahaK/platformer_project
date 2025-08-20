@@ -10,12 +10,12 @@ uniform mat4 proj;
 
 out vec4 vertexColor; // Output color to fragment shader
 out vec3 fragPos;
-out vec3 nNormal;
+out vec3 normal;
 
 void main() {
 	// Transform the vertex position using the MVP matrix
 	gl_Position = proj * view * model * vec4(aPos, 1.0);
 	vertexColor = aColor; // Pass the vertex color to the fragment shader
 	fragPos = vec3(model * vec4(aPos, 1.0));
-	nNormal = normalize(mat3(transpose(inverse(model))) * aNormal);
+	normal = mat3(transpose(inverse(model))) * aNormal;
 }

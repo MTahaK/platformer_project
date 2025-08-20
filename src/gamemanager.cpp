@@ -481,7 +481,7 @@ void GameManager::handleDemo3D(){
 
 	static float rotationAngleY = 0.0f;
 	static float rotationAngleX = 0.0f;
-	
+
 	if(!freeRotate){
 
 		if(Input::isKeyPressed(GLFW_KEY_LEFT)) {
@@ -545,6 +545,9 @@ void GameManager::handleDemo3D(){
 	} else if(Input::isKeyJustPressed(GLFW_KEY_4)){
 		currentShape = CurrentShape::PYRAMID;
 		std::cout<<"Setting current shape to PYRAMID"<<std::endl;
+	} else if(Input::isKeyJustPressed(GLFW_KEY_5)){
+		currentShape = CurrentShape::SPHERE;
+		std::cout<<"Setting current shape to SPHERE"<<std::endl;
 	}
     // Draw current shape
     if(currentShape == CurrentShape::TRIANGLE){
@@ -555,6 +558,8 @@ void GameManager::handleDemo3D(){
         renderer3D_->drawCube(model);
     } else if(currentShape == CurrentShape::PYRAMID){
         renderer3D_->drawPyramid(model);
+    } else if(currentShape == CurrentShape::SPHERE){
+        renderer3D_->drawSphere(model);
     }
 	finishDraw3D(window_, *renderer3D_, *shader3D_);
 

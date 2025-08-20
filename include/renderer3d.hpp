@@ -19,7 +19,8 @@ enum class CurrentShape {
 	TRIANGLE,
 	PLANE,
 	CUBE,
-	PYRAMID
+	PYRAMID,
+	SPHERE
 };
 class Renderer3D {
 
@@ -37,6 +38,7 @@ class Renderer3D {
 		void drawPlane(const glm::mat4& transform);
 		void drawCube(const glm::mat4& transform);
 		void drawPyramid(const glm::mat4& transform);
+		void drawSphere(const glm::mat4& transform);
 
 		void setCurrentShape(CurrentShape shape);
 
@@ -54,6 +56,9 @@ class Renderer3D {
 
 		std::vector<Vertex3D> pyramidVertices_;
 		std::vector<unsigned int> pyramidIndices_;
+
+		std::vector<Vertex3D> sphereVertices_;
+		std::vector<unsigned int> sphereIndices_;
 
 		GLuint shader_ = 0;
 		Shader* currentShader_ = nullptr;  // Keep reference to current shader
