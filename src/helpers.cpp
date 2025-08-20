@@ -231,3 +231,21 @@ void updatePStatePlayer(PlayerObject& player, Physics& physics, Tilemap& tilemap
 		physics.checkPlayerDeathWallCollision(player, *deathWall);
 	}
 }
+
+std::string currentShapeToString(CurrentShape shape) {
+	switch (shape) {
+		case CurrentShape::NONE:
+			return "None";
+		case CurrentShape::TRIANGLE:
+			return "Triangle";
+		case CurrentShape::PLANE:
+			return "Plane";
+		case CurrentShape::CUBE:
+			return "Cube";
+		case CurrentShape::PYRAMID:
+			return "Pyramid";
+		case CurrentShape::SPHERE:
+			return "Sphere";	
+	}
+	return "N/A";
+}

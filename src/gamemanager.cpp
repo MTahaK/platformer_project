@@ -517,6 +517,7 @@ void GameManager::handleDemo3D(){
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);  // Match your view matrix
 	glm::mat4 view = glm::translate(glm::mat4(1.0f), -cameraPos);  // Note the minus
 	glm::mat4 model = IDENTITY_MATRIX;
+
 	if(freeRotate){
 		model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model, -(float)glfwGetTime()*1.5f, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -529,6 +530,18 @@ void GameManager::handleDemo3D(){
 
 	// Pass to shader
 	shader3D_->setVec3("viewPos", cameraPos);
+
+	// Lighting parameters
+	static float ka = 0.1;      // Ambient coefficient
+    static float kd = 0.8;      // Diffuse coefficient
+    static float ks = 1.0;      // Specular coefficient
+    static float p = 32.0;      // Shininess exponent
+
+	shader3D_->setFloat("ka", ka);
+	shader3D_->setFloat("kd", kd);
+	shader3D_->setFloat("ks", ks);
+	shader3D_->setFloat("p", p);
+
 	renderer3D_->beginScene(view, projection);
 	
 	static CurrentShape currentShape = CurrentShape::NONE;
@@ -548,6 +561,9 @@ void GameManager::handleDemo3D(){
 	} else if(Input::isKeyJustPressed(GLFW_KEY_5)){
 		currentShape = CurrentShape::SPHERE;
 		std::cout<<"Setting current shape to SPHERE"<<std::endl;
+	} else if(Input::isKeyJustPressed(GLFW_KEY_0)){
+		currentShape = CurrentShape::NONE;
+		std::cout<<"Setting current shape to NONE"<<std::endl;
 	}
     // Draw current shape
     if(currentShape == CurrentShape::TRIANGLE){
@@ -561,6 +577,49 @@ void GameManager::handleDemo3D(){
     } else if(currentShape == CurrentShape::SPHERE){
         renderer3D_->drawSphere(model);
     }
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
+	ImGui::SetNextWindowPos(ImVec2(15, 15), ImGuiCond_Always);
+	ImGui::SetNextWindowBgAlpha(0.5f); // Transparent background
+
+	if (ImGui::Begin("Info")) {
+		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+		ImGui::Text("Press 1-5 to change shape, 0 to reset");
+		ImGui::Text("Current Shape: %s", currentShapeToString(currentShape).c_str());
+		
+		ImGui::Columns(2, "SliderColumns", false);
+		ImGui::SetColumnWidth(0, 120); // Set first column width
+		
+		ImGui::Text("Ambient (ka)");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##ka", &ka, 0.0f, 1.0f);
+		ImGui::NextColumn();
+		
+		ImGui::Text("Diffuse (kd)");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##kd", &kd, 0.0f, 1.0f);
+		ImGui::NextColumn();
+		
+		ImGui::Text("Specular (ks)");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##ks", &ks, 0.0f, 1.0f);
+		ImGui::NextColumn();
+		
+		ImGui::Text("Shininess (p)");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##p", &p, 1.0f, 128.0f);
+		
+		ImGui::Columns(1); // Reset to single column
+	}
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	finishDraw3D(window_, *renderer3D_, *shader3D_);
 
 }

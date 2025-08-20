@@ -13,6 +13,7 @@
 #include "window.hpp"
 #include "shader.hpp"
 #include "renderer2d.hpp"
+#include "renderer3d.hpp"
 #include "gameobject.hpp"
 #include "playerobject.hpp"
 #include "input.hpp"
@@ -52,3 +53,6 @@ void finishDraw3D(Window& window, Renderer3D& renderer, Shader& shader);
 // UPDATE FUNCTIONS
 void updatePStatePlayer(PlayerObject& player, Physics& physics, Tilemap& tilemap, std::vector<GameObject>& objects, float deltaTime);
 void updateDeathWall(GameObject& deathWall, float deltaTime);
+
+// UTILITY FUNCTIONS
+std::string currentShapeToString(CurrentShape shape);
