@@ -71,7 +71,12 @@ class GameManager {
 		Renderer2D& renderer_;
 
 		// 3D Demo Visuals
-		std::unique_ptr<Shader> shader3D_;
+		Shader* shader3D_;                           // Current active shader (points to one of the variants)
+		std::unique_ptr<Shader> shaderAll_;          // All lighting components
+		std::unique_ptr<Shader> shaderAmbient_;      // Ambient only
+		std::unique_ptr<Shader> shaderDiffuse_;      // Diffuse only  
+		std::unique_ptr<Shader> shaderSpecular_;     // Specular only
+		std::unique_ptr<Shader> shaderAmbientDiffuse_; // Ambient + Diffuse
 		std::unique_ptr<Renderer3D> renderer3D_;
 		bool is3DInit_ = false;
 

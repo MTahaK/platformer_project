@@ -11,12 +11,16 @@ uniform float kd;   // Diffuse coefficient
 uniform float ks;   // Specular coefficient
 uniform float p;    // Shininess exponent
 
-uniform float showAmbient;
-uniform float showDiffuse;
-uniform float showSpecular;
+// uniform float showAmbient;
+// uniform float showDiffuse;
+// uniform float showSpecular;
+
+uniform bool showAmbient;
+uniform bool showDiffuse;
+uniform bool showSpecular;
 
 // Hard-coded light properties
-const vec3 lightPos = vec3(100.0, 100.0, 100.0);      
+const vec3 lightPos = vec3(100.0, 100.0, -10.0);      
 const vec3 lightColor = vec3(1.0, 1.0, 1.0);    // White light
 
 out vec4 FragColor;   // Final pixel color
@@ -29,11 +33,20 @@ void main() {
 
     vec3 h = normalize(lightDir + viewDir);
 
-    vec3 ambient = ka * lightColor;
-    vec3 diffuse = kd * max(0, dot(nNormal, lightDir)) * lightColor;
-    vec3 specular = ks * pow( max(0, dot(nNormal, h)), p) * lightColor;
+    vec3 ambient = vec3(0.0);
+    if(showAmbient){
+        ambient = ka * lightColor;
+    }
+    vec3 diffuse = vec3(0.0);
+    if(showDiffuse){
+        diffuse = kd * max(0, dot(nNormal, lightDir)) * lightColor;
+    }
+    vec3 specular = vec3(0.0);
+    if(showSpecular){
+        specular = ks * pow( max(0, dot(nNormal, h)), p) * lightColor;
+    }
 
-    vec3 l = (ambient * showAmbient) + (diffuse * showDiffuse) + (specular * showSpecular);
+    vec3 l = ambient + diffuse + specular;
 
     FragColor = vec4(l * vertexColor.rgb, 1.0);  // Use the computed lighting color
 }

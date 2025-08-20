@@ -453,12 +453,24 @@ void GameManager::handleWinState() {
 void GameManager::handleDemo3D(){
 
 	if(!is3DInit_){
-		// Create 3D shader
-		shader3D_ = std::make_unique<Shader>();
-		if(!shader3D_->load("shaders/bpvertex.glsl", "shaders/bpfragment.glsl")) {
-			std::cerr << "Failed to load 3D shaders. Exiting application." << std::endl;
+		// Create all shader variants
+		shaderAll_ = std::make_unique<Shader>();
+		shaderAmbient_ = std::make_unique<Shader>();
+		shaderDiffuse_ = std::make_unique<Shader>();
+		shaderSpecular_ = std::make_unique<Shader>();
+		shaderAmbientDiffuse_ = std::make_unique<Shader>();
+		
+		if(!shaderAll_->load("shaders/bpvertex.glsl", "shaders/bp_all.glsl") ||
+		   !shaderAmbient_->load("shaders/bpvertex.glsl", "shaders/bp_ambient.glsl") ||
+		   !shaderDiffuse_->load("shaders/bpvertex.glsl", "shaders/bp_diffuse.glsl") ||
+		   !shaderSpecular_->load("shaders/bpvertex.glsl", "shaders/bp_specular.glsl") ||
+		   !shaderAmbientDiffuse_->load("shaders/bpvertex.glsl", "shaders/bp_ambient_diffuse.glsl")) {
+			std::cerr << "Failed to load 3D shader variants. Exiting application." << std::endl;
 			return;
 		}
+		
+		shader3D_ = shaderAll_.get(); // Start with full lighting
+		
 		renderer3D_ = std::make_unique<Renderer3D>();
 		if(!renderer3D_->init(*shader3D_)) {
 			std::cerr << "Failed to create 3D renderer. Exiting application." << std::endl;
@@ -469,9 +481,31 @@ void GameManager::handleDemo3D(){
 	window_.pollEvents();
 
 	// Load different shaders, or reload shader (for quick testing)
-
 	if(Input::isKeyJustPressed(GLFW_KEY_R)) {
-		shader3D_->reload();
+		shaderAll_->reload();
+		shaderAmbient_->reload();
+		shaderDiffuse_->reload();
+		shaderSpecular_->reload();
+		shaderAmbientDiffuse_->reload();
+	}
+
+	// Shader variant switching with 'L' key
+	static int currentShaderMode = 0; // 0=all, 1=ambient, 2=diffuse, 3=specular, 4=ambient+diffuse
+	const char* shaderNames[] = {"All Components", "Ambient Only", "Diffuse Only", "Specular Only", "Ambient + Diffuse"};
+	
+	if(Input::isKeyJustPressed(GLFW_KEY_L)) {
+		currentShaderMode = (currentShaderMode + 1) % 5;
+		
+		switch(currentShaderMode) {
+			case 0: shader3D_ = shaderAll_.get(); break;
+			case 1: shader3D_ = shaderAmbient_.get(); break;
+			case 2: shader3D_ = shaderDiffuse_.get(); break;
+			case 3: shader3D_ = shaderSpecular_.get(); break;
+			case 4: shader3D_ = shaderAmbientDiffuse_.get(); break;
+		}
+		
+		renderer3D_->setShader(*shader3D_);
+		std::cout << "Switched to shader: " << shaderNames[currentShaderMode] << std::endl;
 	}
 
 	static bool freeRotate = true;
@@ -512,29 +546,11 @@ void GameManager::handleDemo3D(){
 			}
 		}
 	}
-	// Create perspective projection matrix, static view matrix, and rotating model matrix for a single triangle in 3D
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);  // Match your view matrix
-	glm::mat4 view = glm::translate(glm::mat4(1.0f), -cameraPos);  // Note the minus
-	glm::mat4 model = IDENTITY_MATRIX;
-
-	if(freeRotate){
-		model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, -(float)glfwGetTime()*1.5f, glm::vec3(1.0f, 0.0f, 0.0f));
-	} else{
-		model = glm::rotate(glm::mat4(1.0f), rotationAngleY, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::rotate(model, rotationAngleX, glm::vec3(1.0f, 0.0f, 0.0f));
-	}
-	// Rotate around Y-axis (clockwise) and X-axis (counter-clockwise) simultaneously
-	// glm::mat4 
-
-	// Pass to shader
-	shader3D_->setVec3("viewPos", cameraPos);
 
 	// Lighting parameters
 	static float ka = 0.1;      // Ambient coefficient
     static float kd = 0.8;      // Diffuse coefficient
-    static float ks = 1.0;      // Specular coefficient
+    static float ks = 0.4;      // Specular coefficient
     static float p = 32.0;      // Shininess exponent
 
 	shader3D_->setFloat("ka", ka);
@@ -542,34 +558,17 @@ void GameManager::handleDemo3D(){
 	shader3D_->setFloat("ks", ks);
 	shader3D_->setFloat("p", p);
 
-	static bool showAmbient = true, showDiffuse = true, showSpecular = true;
-
-	if(Input::isKeyJustPressed(GLFW_KEY_A)) {
-		showAmbient = !showAmbient;
-	}
-	if(Input::isKeyJustPressed(GLFW_KEY_D)) {
-		showDiffuse = !showDiffuse;
-	}
-	if(Input::isKeyJustPressed(GLFW_KEY_S)) {
-		showSpecular = !showSpecular;
-	}
-
-	shader3D_->setFloat("showAmbient", (float)showAmbient);
-	shader3D_->setFloat("showDiffuse", (float)showDiffuse);
-	shader3D_->setFloat("showSpecular", (float)showSpecular);
-
-	renderer3D_->beginScene(view, projection);
-	
 	static CurrentShape currentShape = CurrentShape::NONE;
+	static bool perfTest = false;
 	// Handle input to switch shapes
     if(Input::isKeyJustPressed(GLFW_KEY_1)){
-        currentShape = CurrentShape::TRIANGLE;
+		currentShape = CurrentShape::TRIANGLE;
 		std::cout<<"Setting current shape to TRIANGLE"<<std::endl;
     } else if(Input::isKeyJustPressed(GLFW_KEY_2)){
-        currentShape = CurrentShape::PLANE;
+		currentShape = CurrentShape::PLANE;
 		std::cout<<"Setting current shape to PLANE"<<std::endl;
     } else if(Input::isKeyJustPressed(GLFW_KEY_3)){
-        currentShape = CurrentShape::CUBE;
+		currentShape = CurrentShape::CUBE;
 		std::cout<<"Setting current shape to CUBE"<<std::endl;
 	} else if(Input::isKeyJustPressed(GLFW_KEY_4)){
 		currentShape = CurrentShape::PYRAMID;
@@ -580,19 +579,80 @@ void GameManager::handleDemo3D(){
 	} else if(Input::isKeyJustPressed(GLFW_KEY_0)){
 		currentShape = CurrentShape::NONE;
 		std::cout<<"Setting current shape to NONE"<<std::endl;
+	} else if(Input::isKeyJustPressed(GLFW_KEY_P)){
+		perfTest = !perfTest;
+		std::cout<<"Toggle performance test: "<<(perfTest ? "ON" : "OFF")<<std::endl;
 	}
-    // Draw current shape
-    if(currentShape == CurrentShape::TRIANGLE){
-        renderer3D_->drawTriangle(model);
-    } else if(currentShape == CurrentShape::PLANE){
-        renderer3D_->drawPlane(model);
-    } else if(currentShape == CurrentShape::CUBE){
-        renderer3D_->drawCube(model);
-    } else if(currentShape == CurrentShape::PYRAMID){
-        renderer3D_->drawPyramid(model);
-    } else if(currentShape == CurrentShape::SPHERE){
-        renderer3D_->drawSphere(model);
-    }
+	
+	if(perfTest){
+		currentShape = CurrentShape::SPHERE;
+		const int gridSize = 20;  // 20×20 = 400 objects
+		const float spacing = 2.0f;
+		// Zoom camera out A LOT
+		glm::vec3 cameraPos = glm::vec3(-10.0f, 10.0f, 30.0f);
+		glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f); // Origin
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); // Up direction
+
+		glm::mat4 view = glm::lookAt(cameraPos, target, up);
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+		shader3D_->setVec3("viewPos", cameraPos);
+
+		renderer3D_->beginScene(view, projection);
+
+		for (int x = 0; x < gridSize; ++x) {
+			for (int z = 0; z < gridSize; ++z) {
+				// Position objects in a grid
+				glm::vec3 position = glm::vec3(
+					(x - gridSize/2) * spacing,
+					0.0f,
+					(z - gridSize/2) * spacing
+				);
+				
+				glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+				model = glm::rotate(model, (float)glfwGetTime() + x * 0.1f + z * 0.1f, 
+								glm::vec3(0.0f, 1.0f, 0.0f));
+				
+				// Draw sphere (more pixels than cube)
+				renderer3D_->drawSphere(model);
+			}
+		}
+    } else {
+		// Create perspective projection matrix, static view matrix, and rotating model matrix for a single triangle in 3D
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+		glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);  // Match your view matrix
+		glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f); // Origin
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); // Up direction
+		glm::mat4 view = glm::lookAt(cameraPos, target, up);
+		glm::mat4 model = IDENTITY_MATRIX;
+
+		if(freeRotate){
+			model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+			model = glm::rotate(model, -(float)glfwGetTime()*1.5f, glm::vec3(1.0f, 0.0f, 0.0f));
+		} else{
+			model = glm::rotate(glm::mat4(1.0f), rotationAngleY, glm::vec3(0.0f, 1.0f, 0.0f));
+			model = glm::rotate(model, rotationAngleX, glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+		// Rotate around Y-axis (clockwise) and X-axis (counter-clockwise) simultaneously
+		// glm::mat4 
+
+		// Pass to shader
+		shader3D_->setVec3("viewPos", cameraPos);
+
+		renderer3D_->beginScene(view, projection);
+
+		if(currentShape == CurrentShape::TRIANGLE){
+			renderer3D_->drawTriangle(model);
+		} else if(currentShape == CurrentShape::PLANE){
+			renderer3D_->drawPlane(model);
+		} else if(currentShape == CurrentShape::CUBE){
+			renderer3D_->drawCube(model);
+		} else if(currentShape == CurrentShape::PYRAMID){
+			renderer3D_->drawPyramid(model);
+		} else if(currentShape == CurrentShape::SPHERE){
+			renderer3D_->drawSphere(model);
+		}
+	}
 
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -605,11 +665,16 @@ void GameManager::handleDemo3D(){
 	if (ImGui::Begin("Info")) {
 		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		ImGui::Text("Press 1-5 to change shape, 0 to reset");
+		ImGui::Text("Press L to cycle lighting modes");
+		ImGui::Text("Press P to toggle performance test");
 		ImGui::Text("Current Shape: %s", currentShapeToString(currentShape).c_str());
+		ImGui::Text("Current Lighting: %s", shaderNames[currentShaderMode]);
+		
+		ImGui::Separator();
 		
 		ImGui::Columns(2, "SliderColumns", false);
 		ImGui::SetColumnWidth(0, 120); // Set first column width
-		
+
 		ImGui::Text("Ambient (ka)");
 		ImGui::NextColumn();
 		ImGui::SliderFloat("##ka", &ka, 0.0f, 1.0f);
