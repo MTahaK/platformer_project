@@ -19,9 +19,9 @@ void main() {
     vec3 lightDir = normalize(lightPos - fragPos); // Direction FROM fragment TO light
 
     float ka = 0.1;      // Ambient coefficient
-    float kd = 0.4;      // Diffuse coefficient
-    float ks = 0.8;      // Specular coefficient
-    float p = 64.0;      // Shininess exponent
+    float kd = 0.8;      // Diffuse coefficient
+    float ks = 1.0;      // Specular coefficient
+    float p = 32.0;      // Shininess exponent
 
     vec3 h = normalize(lightDir + viewDir);
 

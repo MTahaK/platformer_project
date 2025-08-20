@@ -52,75 +52,42 @@ bool Renderer3D::init(Shader& shader) {
 
 	planeIndices_ = {0, 1, 2, 2, 3, 0};
 
-	// // Cube vertices (8 vertices, each vertex has varied colors with green components)
-	// cubeVertices_ = {
-	// 	// Front face (red-green mix)
-	// 	{{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 0: Bottom-left-front (red)
-	// 	{{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 1: Bottom-right-front (green)
-	// 	{{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 2: Top-right-front (yellow)
-	// 	{{-0.5f,  0.5f,  0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 3: Top-left-front (light green)
-
-	// 	// Back face (blue-green mix)
-	// 	{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 4: Bottom-left-back (blue)
-	// 	{{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 5: Bottom-right-back (cyan)
-	// 	{{ 0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 6: Top-right-back (magenta)
-	// 	{{-0.5f,  0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}  // 7: Top-left-back (light blue)
-	// };
-
-	// cubeIndices_ = {
-	// 	// Front face
-	// 	0, 1, 2,  2, 3, 0,
-	// 	// Back face
-	// 	4, 6, 5,  6, 4, 7,
-	// 	// Left face
-	// 	4, 0, 3,  3, 7, 4,
-	// 	// Right face
-	// 	1, 5, 6,  6, 2, 1,
-	// 	// Top face
-	// 	3, 2, 6,  6, 7, 3,
-	// 	// Bottom face
-	// 	4, 5, 1,  1, 0, 4
-	// };
-
-	// All-white so lighting is clear
-	static const glm::vec4 C = {1.0f, 1.0f, 1.0f, 1.0f};
-
 	cubeVertices_ = {
 		// +Z (front)
-		{{-0.5f, -0.5f, 0.5f}, C, {0.0f, 0.0f, 1.0f}},
-		{{0.5f, -0.5f, 0.5f}, C, {0.0f, 0.0f, 1.0f}},
-		{{0.5f, 0.5f, 0.5f}, C, {0.0f, 0.0f, 1.0f}},
-		{{-0.5f, 0.5f, 0.5f}, C, {0.0f, 0.0f, 1.0f}},
+		{{-0.5f,-0.5f, 0.5f}, {1.0f,0.0f,0.0f,1.0f}, { 0.0f, 0.0f, 1.0f}}, // BLF red
+		{{ 0.5f,-0.5f, 0.5f}, {0.0f,1.0f,0.0f,1.0f}, { 0.0f, 0.0f, 1.0f}}, // BRF green
+		{{ 0.5f, 0.5f, 0.5f}, {1.0f,1.0f,0.0f,1.0f}, { 0.0f, 0.0f, 1.0f}}, // TRF yellow
+		{{-0.5f, 0.5f, 0.5f}, {0.5f,1.0f,0.5f,1.0f}, { 0.0f, 0.0f, 1.0f}}, // TLF light green
 
 		// -Z (back)
-		{{0.5f, -0.5f, -0.5f}, C, {0.0f, 0.0f, -1.0f}},
-		{{-0.5f, -0.5f, -0.5f}, C, {0.0f, 0.0f, -1.0f}},
-		{{-0.5f, 0.5f, -0.5f}, C, {0.0f, 0.0f, -1.0f}},
-		{{0.5f, 0.5f, -0.5f}, C, {0.0f, 0.0f, -1.0f}},
+		{{ 0.5f,-0.5f,-0.5f}, {0.0f,1.0f,1.0f,1.0f}, { 0.0f, 0.0f,-1.0f}}, // BRB cyan
+		{{-0.5f,-0.5f,-0.5f}, {0.0f,0.0f,1.0f,1.0f}, { 0.0f, 0.0f,-1.0f}}, // BLB blue
+		{{-0.5f, 0.5f,-0.5f}, {0.5f,0.5f,1.0f,1.0f}, { 0.0f, 0.0f,-1.0f}}, // TLB light blue
+		{{ 0.5f, 0.5f,-0.5f}, {1.0f,0.0f,1.0f,1.0f}, { 0.0f, 0.0f,-1.0f}}, // TRB magenta
 
 		// -X (left)
-		{{-0.5f, -0.5f, -0.5f}, C, {-1.0f, 0.0f, 0.0f}},
-		{{-0.5f, -0.5f, 0.5f}, C, {-1.0f, 0.0f, 0.0f}},
-		{{-0.5f, 0.5f, 0.5f}, C, {-1.0f, 0.0f, 0.0f}},
-		{{-0.5f, 0.5f, -0.5f}, C, {-1.0f, 0.0f, 0.0f}},
+		{{-0.5f,-0.5f,-0.5f}, {0.0f,0.0f,1.0f,1.0f}, {-1.0f, 0.0f, 0.0f}}, // blue
+		{{-0.5f,-0.5f, 0.5f}, {1.0f,0.0f,0.0f,1.0f}, {-1.0f, 0.0f, 0.0f}}, // red
+		{{-0.5f, 0.5f, 0.5f}, {0.5f,1.0f,0.5f,1.0f}, {-1.0f, 0.0f, 0.0f}}, // light green
+		{{-0.5f, 0.5f,-0.5f}, {0.5f,0.5f,1.0f,1.0f}, {-1.0f, 0.0f, 0.0f}}, // light blue
 
 		// +X (right)
-		{{0.5f, -0.5f, 0.5f}, C, {1.0f, 0.0f, 0.0f}},
-		{{0.5f, -0.5f, -0.5f}, C, {1.0f, 0.0f, 0.0f}},
-		{{0.5f, 0.5f, -0.5f}, C, {1.0f, 0.0f, 0.0f}},
-		{{0.5f, 0.5f, 0.5f}, C, {1.0f, 0.0f, 0.0f}},
+		{{ 0.5f,-0.5f, 0.5f}, {0.0f,1.0f,0.0f,1.0f}, { 1.0f, 0.0f, 0.0f}}, // green
+		{{ 0.5f,-0.5f,-0.5f}, {0.0f,1.0f,1.0f,1.0f}, { 1.0f, 0.0f, 0.0f}}, // cyan
+		{{ 0.5f, 0.5f,-0.5f}, {1.0f,0.0f,1.0f,1.0f}, { 1.0f, 0.0f, 0.0f}}, // magenta
+		{{ 0.5f, 0.5f, 0.5f}, {1.0f,1.0f,0.0f,1.0f}, { 1.0f, 0.0f, 0.0f}}, // yellow
 
 		// +Y (top)
-		{{-0.5f, 0.5f, 0.5f}, C, {0.0f, 1.0f, 0.0f}},
-		{{0.5f, 0.5f, 0.5f}, C, {0.0f, 1.0f, 0.0f}},
-		{{0.5f, 0.5f, -0.5f}, C, {0.0f, 1.0f, 0.0f}},
-		{{-0.5f, 0.5f, -0.5f}, C, {0.0f, 1.0f, 0.0f}},
+		{{-0.5f, 0.5f, 0.5f}, {0.5f,1.0f,0.5f,1.0f}, { 0.0f, 1.0f, 0.0f}}, // light green
+		{{ 0.5f, 0.5f, 0.5f}, {1.0f,1.0f,0.0f,1.0f}, { 0.0f, 1.0f, 0.0f}}, // yellow
+		{{ 0.5f, 0.5f,-0.5f}, {1.0f,0.0f,1.0f,1.0f}, { 0.0f, 1.0f, 0.0f}}, // magenta
+		{{-0.5f, 0.5f,-0.5f}, {0.5f,0.5f,1.0f,1.0f}, { 0.0f, 1.0f, 0.0f}}, // light blue
 
 		// -Y (bottom)
-		{{-0.5f, -0.5f, -0.5f}, C, {0.0f, -1.0f, 0.0f}},
-		{{0.5f, -0.5f, -0.5f}, C, {0.0f, -1.0f, 0.0f}},
-		{{0.5f, -0.5f, 0.5f}, C, {0.0f, -1.0f, 0.0f}},
-		{{-0.5f, -0.5f, 0.5f}, C, {0.0f, -1.0f, 0.0f}},
+		{{-0.5f,-0.5f,-0.5f}, {0.0f,0.0f,1.0f,1.0f}, { 0.0f,-1.0f, 0.0f}}, // blue
+		{{ 0.5f,-0.5f,-0.5f}, {0.0f,1.0f,1.0f,1.0f}, { 0.0f,-1.0f, 0.0f}}, // cyan
+		{{ 0.5f,-0.5f, 0.5f}, {0.0f,1.0f,0.0f,1.0f}, { 0.0f,-1.0f, 0.0f}}, // green
+		{{-0.5f,-0.5f, 0.5f}, {1.0f,0.0f,0.0f,1.0f}, { 0.0f,-1.0f, 0.0f}}, // red
 	};
 
 	cubeIndices_ = {
@@ -138,26 +105,48 @@ bool Renderer3D::init(Shader& shader) {
 		20, 21, 22, 20, 22, 23
 	};
 
-	// Pyramid vertices (5 vertices: 4 base + 1 apex)
-	pyramidVertices_ = {
-		// Base vertices (square base in XZ plane)
-		{{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},	// 0: Bottom-left
-		{{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},	// 1: Bottom-right
-		{{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},	// 2: Top-right
-		{{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 3: Top-left
+	// Side normals (normalized): 1/sqrt(5)=0.4472136, 2/sqrt(5)=0.8944272
+	const float NY = 0.4472136f;
+	const float NZ = 0.8944272f;
+	const float NX = 0.8944272f;
 
-		// Apex vertex
-		{{0.0f, 0.5f, 0.0f}, {1.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}} // 4: Apex (magenta)
+	pyramidVertices_ = {
+		// Base (down-facing)
+		{{-0.5f,-0.5f, 0.5f}, {1.0f,0.0f,0.0f,1.0f}, { 0.0f,-1.0f, 0.0f}}, // 0 red
+		{{ 0.5f,-0.5f, 0.5f}, {0.0f,1.0f,0.0f,1.0f}, { 0.0f,-1.0f, 0.0f}}, // 1 green
+		{{ 0.5f,-0.5f,-0.5f}, {0.0f,0.0f,1.0f,1.0f}, { 0.0f,-1.0f, 0.0f}}, // 2 blue
+		{{-0.5f,-0.5f,-0.5f}, {1.0f,1.0f,0.0f,1.0f}, { 0.0f,-1.0f, 0.0f}}, // 3 yellow
+
+		// Front side (z = +0.5)
+		{{-0.5f,-0.5f, 0.5f}, {1.0f,0.0f,0.0f,1.0f}, { 0.0f, NY,  NZ}}, // red
+		{{ 0.5f,-0.5f, 0.5f}, {0.0f,1.0f,0.0f,1.0f}, { 0.0f, NY,  NZ}}, // green
+		{{ 0.0f, 0.5f, 0.0f}, {1.0f,0.0f,1.0f,1.0f}, { 0.0f, NY,  NZ}}, // magenta apex
+
+		// Right side (x = +0.5)
+		{{ 0.5f,-0.5f, 0.5f}, {0.0f,1.0f,0.0f,1.0f}, { NX,  NY,  0.0f}}, // green
+		{{ 0.5f,-0.5f,-0.5f}, {0.0f,0.0f,1.0f,1.0f}, { NX,  NY,  0.0f}}, // blue
+		{{ 0.0f, 0.5f, 0.0f}, {1.0f,0.0f,1.0f,1.0f}, { NX,  NY,  0.0f}}, // magenta apex
+
+		// Back side (z = -0.5)
+		{{ 0.5f,-0.5f,-0.5f}, {0.0f,0.0f,1.0f,1.0f}, { 0.0f, NY, -NZ}}, // blue
+		{{-0.5f,-0.5f,-0.5f}, {1.0f,1.0f,0.0f,1.0f}, { 0.0f, NY, -NZ}}, // yellow
+		{{ 0.0f, 0.5f, 0.0f}, {1.0f,0.0f,1.0f,1.0f}, { 0.0f, NY, -NZ}}, // magenta apex
+
+		// Left side (x = -0.5)
+		{{-0.5f,-0.5f,-0.5f}, {1.0f,1.0f,0.0f,1.0f}, {-NX,  NY,  0.0f}}, // yellow
+		{{-0.5f,-0.5f, 0.5f}, {1.0f,0.0f,0.0f,1.0f}, {-NX,  NY,  0.0f}}, // red
+		{{ 0.0f, 0.5f, 0.0f}, {1.0f,0.0f,1.0f,1.0f}, {-NX,  NY,  0.0f}}, // magenta apex
 	};
 
 	pyramidIndices_ = {
-		// Base (two triangles)
-		0, 2, 1, 0, 3, 2,
-		// Side faces (4 triangles pointing to apex)
-		0, 1, 4, // Front face
-		1, 2, 4, // Right face
-		2, 3, 4, // Back face
-		3, 0, 4	 // Left face
+		// Base (CCW when viewed from below; outward normal -Y)
+		0,2,1,  0,3,2,
+
+		// Sides
+		4,5,6,      // front
+		7,8,9,      // right
+		10,11,12,   // back
+		13,14,15    // left
 	};
 	// Set vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
