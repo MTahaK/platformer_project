@@ -542,6 +542,22 @@ void GameManager::handleDemo3D(){
 	shader3D_->setFloat("ks", ks);
 	shader3D_->setFloat("p", p);
 
+	static bool showAmbient = true, showDiffuse = true, showSpecular = true;
+
+	if(Input::isKeyJustPressed(GLFW_KEY_A)) {
+		showAmbient = !showAmbient;
+	}
+	if(Input::isKeyJustPressed(GLFW_KEY_D)) {
+		showDiffuse = !showDiffuse;
+	}
+	if(Input::isKeyJustPressed(GLFW_KEY_S)) {
+		showSpecular = !showSpecular;
+	}
+
+	shader3D_->setFloat("showAmbient", (float)showAmbient);
+	shader3D_->setFloat("showDiffuse", (float)showDiffuse);
+	shader3D_->setFloat("showSpecular", (float)showSpecular);
+
 	renderer3D_->beginScene(view, projection);
 	
 	static CurrentShape currentShape = CurrentShape::NONE;
