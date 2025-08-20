@@ -15,6 +15,8 @@ class Shader {
 
 		// Load shaders, compile, and link into shader program
 		bool load(const std::string& vertexPath, const std::string& fragmentPath);
+		bool reload();
+		void unload();
 		void shutdown();
 
 		void use() const;

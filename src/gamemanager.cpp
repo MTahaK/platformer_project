@@ -133,8 +133,8 @@ void GameManager::handleMenuState() {
 		
 		// Clean, readable button list
 		renderMenuButton("Start Game", GameState::PLAY);
+		renderMenuButton("3D Demo", GameState::DEMO3D);
 		DEBUG_ONLY(
-			renderMenuButton("3D Demo", GameState::DEMO3D);
 			renderMenuButton("UI Demo", GameState::UIDEMO);
 		);
 		renderMenuButton("Quit", GameState::EXIT);
@@ -455,7 +455,7 @@ void GameManager::handleDemo3D(){
 	if(!is3DInit_){
 		// Create 3D shader
 		shader3D_ = std::make_unique<Shader>();
-		if(!shader3D_->load("shaders/3dvertex.glsl", "shaders/3dfragment.glsl")) {
+		if(!shader3D_->load("shaders/bpvertex.glsl", "shaders/bpfragment.glsl")) {
 			std::cerr << "Failed to load 3D shaders. Exiting application." << std::endl;
 			return;
 		}
@@ -468,13 +468,67 @@ void GameManager::handleDemo3D(){
 	}
 	window_.pollEvents();
 
+	// Load different shaders, or reload shader (for quick testing)
+
+	if(Input::isKeyJustPressed(GLFW_KEY_R)) {
+		shader3D_->reload();
+	}
+
+	static bool freeRotate = true;
+	if(Input::isKeyJustPressed(GLFW_KEY_F)) {
+		freeRotate = !freeRotate;
+	}
+
+	static float rotationAngleY = 0.0f;
+	static float rotationAngleX = 0.0f;
+	
+	if(!freeRotate){
+
+		if(Input::isKeyPressed(GLFW_KEY_LEFT)) {
+			if(Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+				rotationAngleY -= 0.01f;
+			} else {
+				rotationAngleY -= 0.005f;
+			}
+		} else if(Input::isKeyPressed(GLFW_KEY_RIGHT)) {
+			if(Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+				rotationAngleY += 0.01f;
+			} else {
+				rotationAngleY += 0.005f;
+			}
+		}
+		
+		if(Input::isKeyPressed(GLFW_KEY_UP)) {
+			if(Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+				rotationAngleX -= 0.01f;
+			} else {
+				rotationAngleX -= 0.005f;
+			}
+		} else if(Input::isKeyPressed(GLFW_KEY_DOWN)) {
+			if(Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+				rotationAngleX += 0.01f;
+			} else {
+				rotationAngleX += 0.005f;
+			}
+		}
+	}
 	// Create perspective projection matrix, static view matrix, and rotating model matrix for a single triangle in 3D
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);  // Match your view matrix
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), -cameraPos);  // Note the minus
+	glm::mat4 model = IDENTITY_MATRIX;
+	if(freeRotate){
+		model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, -(float)glfwGetTime()*1.5f, glm::vec3(1.0f, 0.0f, 0.0f));
+	} else{
+		model = glm::rotate(glm::mat4(1.0f), rotationAngleY, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, rotationAngleX, glm::vec3(1.0f, 0.0f, 0.0f));
+	}
 	// Rotate around Y-axis (clockwise) and X-axis (counter-clockwise) simultaneously
-	glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, -(float)glfwGetTime()*1.5f, glm::vec3(1.0f, 0.0f, 0.0f));
+	// glm::mat4 
 
+	// Pass to shader
+	shader3D_->setVec3("viewPos", cameraPos);
 	renderer3D_->beginScene(view, projection);
 	
 	static CurrentShape currentShape = CurrentShape::NONE;

@@ -125,6 +125,30 @@ bool Shader::load(const std::string& vertexPath, const std::string& fragmentPath
 	return true; // Return true on success
 }
 
+void Shader::unload() {
+    if (shaderID != 0) {
+        glDeleteProgram(shaderID);
+        shaderID = 0;
+        uniformLocCache_.clear();  // Clear the uniform cache too
+        std::cout << "[Shader] Shader unloaded." << std::endl;
+    }
+}
+
+bool Shader::reload() {
+    if (vertexPath_.empty() || fragmentPath_.empty()) {
+        std::cerr << "[Shader] Cannot reload: no previous paths stored." << std::endl;
+        return false;
+    }
+    
+    std::cout << "[Shader] Reloading shader: " << vertexPath_ << ", " << fragmentPath_ << std::endl;
+    
+    // Unload current shader
+    unload();
+    
+    // Load again using stored paths
+    return load(vertexPath_, fragmentPath_);
+}
+
 void Shader::use() const {
 	// Use the shader program
 	if (shaderID != 0) {
