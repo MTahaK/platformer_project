@@ -40,6 +40,11 @@ class Renderer3D {
 		void drawPyramid(const glm::mat4& transform);
 		void drawSphere(const glm::mat4& transform);
 
+		void drawTriangleColor(const glm::mat4& transform, const glm::vec4& color);
+		void drawPlaneColor(const glm::mat4& transform, const glm::vec4& color);
+		void drawCubeColor(const glm::mat4& transform, const glm::vec4& color);
+		void drawPyramidColor(const glm::mat4& transform, const glm::vec4& color);
+		void drawSphereColor(const glm::mat4& transform, const glm::vec4& color);
 		void setCurrentShape(CurrentShape shape);
 
 		CurrentShape getCurrentShape() const;

@@ -72,6 +72,7 @@ class GameManager {
 
 		// 3D Demo Visuals
 		Shader* shader3D_;                           // Current active shader (points to one of the variants)
+		std::unique_ptr<Shader> shader3DBasic_;
 		std::unique_ptr<Shader> shaderAll_;          // All lighting components
 		std::unique_ptr<Shader> shaderAmbient_;      // Ambient only
 		std::unique_ptr<Shader> shaderDiffuse_;      // Diffuse only  

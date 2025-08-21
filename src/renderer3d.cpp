@@ -228,7 +228,7 @@ void Renderer3D::setLightingUniforms(const glm::vec3& lightPos, const glm::vec3&
 void Renderer3D::drawTriangle(const glm::mat4& transform) {
 	model_ = transform;
 
-	if (currentShape_ != CurrentShape::TRIANGLE) {
+	// if (currentShape_ != CurrentShape::TRIANGLE) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 		glBufferData(GL_ARRAY_BUFFER, triangleVertices_.size() * sizeof(Vertex3D), triangleVertices_.data(), GL_DYNAMIC_DRAW);
 
@@ -236,7 +236,7 @@ void Renderer3D::drawTriangle(const glm::mat4& transform) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangleIndices_.size() * sizeof(unsigned int), triangleIndices_.data(), GL_DYNAMIC_DRAW);
 
 		currentShape_ = CurrentShape::TRIANGLE;
-	}
+	// }
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);
@@ -250,7 +250,7 @@ void Renderer3D::drawTriangle(const glm::mat4& transform) {
 void Renderer3D::drawPlane(const glm::mat4& transform) {
 	model_ = transform;
 
-	if (currentShape_ != CurrentShape::PLANE) {
+	// if (currentShape_ != CurrentShape::PLANE) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 		glBufferData(GL_ARRAY_BUFFER, planeVertices_.size() * sizeof(Vertex3D), planeVertices_.data(), GL_DYNAMIC_DRAW);
 
@@ -258,7 +258,7 @@ void Renderer3D::drawPlane(const glm::mat4& transform) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, planeIndices_.size() * sizeof(unsigned int), planeIndices_.data(), GL_DYNAMIC_DRAW);
 
 		currentShape_ = CurrentShape::PLANE;
-	}
+	// }
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);
@@ -272,7 +272,7 @@ void Renderer3D::drawPlane(const glm::mat4& transform) {
 void Renderer3D::drawCube(const glm::mat4& transform) {
 	model_ = transform;
 
-	if (currentShape_ != CurrentShape::CUBE) {
+	// if (currentShape_ != CurrentShape::CUBE) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 		glBufferData(GL_ARRAY_BUFFER, cubeVertices_.size() * sizeof(Vertex3D), cubeVertices_.data(), GL_DYNAMIC_DRAW);
 
@@ -280,7 +280,7 @@ void Renderer3D::drawCube(const glm::mat4& transform) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices_.size() * sizeof(unsigned int), cubeIndices_.data(), GL_DYNAMIC_DRAW);
 
 		currentShape_ = CurrentShape::CUBE;
-	}
+	// }
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);
@@ -291,10 +291,33 @@ void Renderer3D::drawCube(const glm::mat4& transform) {
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
+void Renderer3D::drawCubeColor(const glm::mat4& transform, const glm::vec4& color) {
+	model_ = transform;
+
+	// if (currentShape_ != CurrentShape::CUBE) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+		glBufferData(GL_ARRAY_BUFFER, cubeVertices_.size() * sizeof(Vertex3D), cubeVertices_.data(), GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices_.size() * sizeof(unsigned int), cubeIndices_.data(), GL_DYNAMIC_DRAW);
+
+		currentShape_ = CurrentShape::CUBE;
+	// }
+
+	if (currentShader_) {
+		currentShader_->setMat4("model", model_);
+		currentShader_->setMat4("view", view_);
+		currentShader_->setMat4("proj", proj_);
+		currentShader_->setVec4("color", color);
+	}
+
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+}
+
 void Renderer3D::drawPyramid(const glm::mat4& transform) {
 	model_ = transform;
 
-	if (currentShape_ != CurrentShape::PYRAMID) {
+	// if (currentShape_ != CurrentShape::PYRAMID) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 		glBufferData(GL_ARRAY_BUFFER, pyramidVertices_.size() * sizeof(Vertex3D), pyramidVertices_.data(), GL_DYNAMIC_DRAW);
 
@@ -302,7 +325,7 @@ void Renderer3D::drawPyramid(const glm::mat4& transform) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, pyramidIndices_.size() * sizeof(unsigned int), pyramidIndices_.data(), GL_DYNAMIC_DRAW);
 
 		currentShape_ = CurrentShape::PYRAMID;
-	}
+	// }
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);
@@ -313,10 +336,33 @@ void Renderer3D::drawPyramid(const glm::mat4& transform) {
 	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
 }
 
+void Renderer3D::drawPyramidColor(const glm::mat4& transform, const glm::vec4& color) {
+	model_ = transform;
+
+	// if (currentShape_ != CurrentShape::PYRAMID) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+		glBufferData(GL_ARRAY_BUFFER, pyramidVertices_.size() * sizeof(Vertex3D), pyramidVertices_.data(), GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, pyramidIndices_.size() * sizeof(unsigned int), pyramidIndices_.data(), GL_DYNAMIC_DRAW);
+
+		currentShape_ = CurrentShape::PYRAMID;
+	// }
+
+	if (currentShader_) {
+		currentShader_->setMat4("model", model_);
+		currentShader_->setMat4("view", view_);
+		currentShader_->setMat4("proj", proj_);
+		currentShader_->setVec4("color", color);
+	}
+
+	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
+}
+
 void Renderer3D::drawSphere(const glm::mat4& transform) {
 	model_ = transform;
 
-	if (currentShape_ != CurrentShape::SPHERE) {
+	// if (currentShape_ != CurrentShape::SPHERE) {
 		// Generate sphere geometry if not already generated
 		if (sphereVertices_.empty()) {
 			const int segments = 32; // Horizontal segments
@@ -376,7 +422,7 @@ void Renderer3D::drawSphere(const glm::mat4& transform) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices_.size() * sizeof(unsigned int), sphereIndices_.data(), GL_DYNAMIC_DRAW);
 
 		currentShape_ = CurrentShape::SPHERE;
-	}
+	// }
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);

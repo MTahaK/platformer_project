@@ -454,13 +454,15 @@ void GameManager::handleDemo3D(){
 
 	if(!is3DInit_){
 		// Create all shader variants
+		shader3DBasic_ = std::make_unique<Shader>();
 		shaderAll_ = std::make_unique<Shader>();
 		shaderAmbient_ = std::make_unique<Shader>();
 		shaderDiffuse_ = std::make_unique<Shader>();
 		shaderSpecular_ = std::make_unique<Shader>();
 		shaderAmbientDiffuse_ = std::make_unique<Shader>();
 		
-		if(!shaderAll_->load("shaders/bpvertex.glsl", "shaders/bp_all.glsl") ||
+		if(!shader3DBasic_->load("shaders/3dvertex.glsl", "shaders/3dfragment.glsl") ||
+		   !shaderAll_->load("shaders/bpvertex.glsl", "shaders/bp_all.glsl") ||
 		   !shaderAmbient_->load("shaders/bpvertex.glsl", "shaders/bp_ambient.glsl") ||
 		   !shaderDiffuse_->load("shaders/bpvertex.glsl", "shaders/bp_diffuse.glsl") ||
 		   !shaderSpecular_->load("shaders/bpvertex.glsl", "shaders/bp_specular.glsl") ||
@@ -553,10 +555,9 @@ void GameManager::handleDemo3D(){
     static float ks = 0.4;      // Specular coefficient
     static float p = 32.0;      // Shininess exponent
 
-	shader3D_->setFloat("ka", ka);
-	shader3D_->setFloat("kd", kd);
-	shader3D_->setFloat("ks", ks);
-	shader3D_->setFloat("p", p);
+	// Light properties
+	static glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 5.0f);
+	static glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	static CurrentShape currentShape = CurrentShape::NONE;
 	static bool perfTest = false;
@@ -583,47 +584,104 @@ void GameManager::handleDemo3D(){
 		perfTest = !perfTest;
 		std::cout<<"Toggle performance test: "<<(perfTest ? "ON" : "OFF")<<std::endl;
 	}
+	static float zoomLevel = 5.0f;
+
+	// Orbital camera controls (spherical coordinates)
+	static float cameraTheta = 0.0f;     // Horizontal rotation (azimuth)
+	static float cameraPhi = 0.0f;       // Vertical rotation (elevation)
+	static float cameraDistance = 5.0f;  // Distance from target
+
+	glm::mat4 lightCubeModel = IDENTITY_MATRIX;
+	lightCubeModel = glm::translate(lightCubeModel, lightPos);
+	lightCubeModel = glm::scale(lightCubeModel, glm::vec3(0.2f));
+
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	// Convert spherical coordinates to Cartesian for orbital camera
+	float totalDistance = cameraDistance + zoomLevel;
+	glm::vec3 cameraPos = glm::vec3(
+		totalDistance * sin(cameraPhi) * cos(cameraTheta),  // X
+		totalDistance * cos(cameraPhi),                     // Y  
+		totalDistance * sin(cameraPhi) * sin(cameraTheta)   // Z
+	);
+	glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f); // Origin
+	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); // Up direction
+	glm::mat4 view = glm::lookAt(cameraPos, target, up);
 	
+	// Draw lightcube
+	// Switch to basic colouring shader for lightcube, then switch back to the currently loaded shader
+	Shader* originalShader = shader3D_;
+	
+	renderer3D_->setShader(*shader3DBasic_);
+	shader3DBasic_->use();
+	
+	renderer3D_->beginScene(view, projection);
+	renderer3D_->drawCubeColor(lightCubeModel, glm::vec4(lightColor, 1.0));
+
+	renderer3D_->setShader(*originalShader);
+	shader3D_->use();
+	renderer3D_->setCurrentShape(currentShape);
+
+	// Pass to shader
+	shader3D_->setVec3("viewPos", cameraPos);
+	shader3D_->setFloat("ka", ka);
+	shader3D_->setFloat("kd", kd);
+	shader3D_->setFloat("ks", ks);
+	shader3D_->setFloat("p", p);
+
+	shader3D_->setVec3("lightPos", lightPos);
+	shader3D_->setVec3("lightColor", lightColor);
+
+
 	if(perfTest){
-		currentShape = CurrentShape::SPHERE;
-		const int gridSize = 20;  // 20×20 = 400 objects
+		const int gridSize = 10;
 		const float spacing = 2.0f;
-		// Zoom camera out A LOT
-		glm::vec3 cameraPos = glm::vec3(-10.0f, 10.0f, 30.0f);
-		glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f); // Origin
-		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); // Up direction
 
-		glm::mat4 view = glm::lookAt(cameraPos, target, up);
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+		// Create a rotation matrix for the entire grid
+		glm::mat4 gridRotation = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+		gridRotation = glm::rotate(gridRotation, -(float)glfwGetTime()*1.5f, glm::vec3(1.0f, 0.0f, 0.0f));
 
-		shader3D_->setVec3("viewPos", cameraPos);
+		for (int x = 0; x < gridSize; x++) {
+			for(int y = 0; y < gridSize; y++){
+				for (int z = 0; z < gridSize; z++) {
+					// Position objects in a grid (relative to grid center)
+					// Use float division to properly center the grid
+					float gridCenter = (gridSize - 1) / 2.0f;
+					glm::vec3 gridPosition = glm::vec3(
+						(x - gridCenter) * spacing,
+						(y - gridCenter) * spacing,
+						(z - gridCenter) * spacing
+					);
+					
+					// Individual shape transformation
+					glm::mat4 shapeModel = glm::translate(glm::mat4(1.0f), gridPosition);
+					shapeModel = glm::rotate(shapeModel, -(float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+					shapeModel = glm::rotate(shapeModel, (float)glfwGetTime()*1.5f, glm::vec3(1.0f, 0.0f, 0.0f));
 
-		renderer3D_->beginScene(view, projection);
-
-		for (int x = 0; x < gridSize; ++x) {
-			for (int z = 0; z < gridSize; ++z) {
-				// Position objects in a grid
-				glm::vec3 position = glm::vec3(
-					(x - gridSize/2) * spacing,
-					0.0f,
-					(z - gridSize/2) * spacing
-				);
-				
-				glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
-				model = glm::rotate(model, (float)glfwGetTime() + x * 0.1f + z * 0.1f, 
-								glm::vec3(0.0f, 1.0f, 0.0f));
-				
-				// Draw sphere (more pixels than cube)
-				renderer3D_->drawSphere(model);
+					// shapeModel = glm::rotate(shapeModel, (float)glfwGetTime() + x * 0.1f + z * 0.1f, 
+											// glm::vec3(0.0f, 1.0f, 0.0f));
+					
+					// Apply grid rotation to the entire arrangement
+					glm::mat4 finalModel = gridRotation * shapeModel;
+					
+					// Draw the current shape type
+					if(currentShape == CurrentShape::TRIANGLE){
+						renderer3D_->drawTriangle(finalModel);
+					} else if(currentShape == CurrentShape::PLANE){
+						renderer3D_->drawPlane(finalModel);
+					} else if(currentShape == CurrentShape::CUBE){
+						renderer3D_->drawCube(finalModel);
+					} else if(currentShape == CurrentShape::PYRAMID){
+						renderer3D_->drawPyramid(finalModel);
+					} else if(currentShape == CurrentShape::SPHERE){
+						renderer3D_->drawSphere(finalModel);
+					} else {
+						// Default to cube if no shape selected
+						renderer3D_->drawCube(finalModel);
+					}
+				}
 			}
 		}
     } else {
-		// Create perspective projection matrix, static view matrix, and rotating model matrix for a single triangle in 3D
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-		glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);  // Match your view matrix
-		glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f); // Origin
-		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); // Up direction
-		glm::mat4 view = glm::lookAt(cameraPos, target, up);
 		glm::mat4 model = IDENTITY_MATRIX;
 
 		if(freeRotate){
@@ -635,11 +693,6 @@ void GameManager::handleDemo3D(){
 		}
 		// Rotate around Y-axis (clockwise) and X-axis (counter-clockwise) simultaneously
 		// glm::mat4 
-
-		// Pass to shader
-		shader3D_->setVec3("viewPos", cameraPos);
-
-		renderer3D_->beginScene(view, projection);
 
 		if(currentShape == CurrentShape::TRIANGLE){
 			renderer3D_->drawTriangle(model);
@@ -658,11 +711,13 @@ void GameManager::handleDemo3D(){
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_Always);
 	ImGui::SetNextWindowPos(ImVec2(15, 15), ImGuiCond_Always);
 	ImGui::SetNextWindowBgAlpha(0.5f); // Transparent background
 
 	if (ImGui::Begin("Info")) {
+		ImGui::SetWindowFontScale(1.1f); // Reset font scale
+
 		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		ImGui::Text("Press 1-5 to change shape, 0 to reset");
 		ImGui::Text("Press L to cycle lighting modes");
@@ -692,9 +747,63 @@ void GameManager::handleDemo3D(){
 		
 		ImGui::Text("Shininess (p)");
 		ImGui::NextColumn();
-		ImGui::SliderFloat("##p", &p, 1.0f, 128.0f);
+		ImGui::SliderFloat("##p", &p, 1.0f, 256.0f);
 		
 		ImGui::Columns(1); // Reset to single column
+		
+		ImGui::Separator();
+		ImGui::Text("Light Properties");
+		
+		ImGui::Columns(2, "LightColumns", false);
+		ImGui::SetColumnWidth(0, 120);
+		
+		ImGui::Text("Light Pos X");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##lightPosX", &lightPos[0], -50.0f, 50.0f);
+		ImGui::NextColumn();
+		
+		ImGui::Text("Light Pos Y");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##lightPosY", &lightPos[1], -50.0f, 50.0f);
+		ImGui::NextColumn();
+		
+		ImGui::Text("Light Pos Z");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##lightPosZ", &lightPos[2], -50.0f, 50.0f);
+		ImGui::NextColumn();
+		
+		ImGui::Text("Light Color");
+		ImGui::NextColumn();
+		ImGui::ColorEdit3("##lightColor", &lightColor[0]);
+		
+		ImGui::Columns(1); // Reset to single column for separator and heading
+		
+		ImGui::Separator();
+		ImGui::Text("Camera Controls");
+		
+		ImGui::Columns(2, "CameraColumns", false);
+		ImGui::SetColumnWidth(0, 120);
+		
+		ImGui::Text("Zoom Level");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##zoomLevel", &zoomLevel, 5.0f, 100.0f);
+		ImGui::NextColumn();
+		
+		ImGui::Text("Camera Theta");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##cameraTheta", &cameraTheta, -3.14159f, 3.14159f);
+		ImGui::NextColumn();
+		
+		ImGui::Text("Camera Phi");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##cameraPhi", &cameraPhi, 0.1f, 3.04159f);
+		ImGui::NextColumn();
+		
+		ImGui::Text("Camera Distance");
+		ImGui::NextColumn();
+		ImGui::SliderFloat("##cameraDistance", &cameraDistance, 1.0f, 20.0f);
+		
+		ImGui::Columns(1);
 	}
 	ImGui::End();
 

@@ -7,8 +7,8 @@ in vec3 normal;
 uniform vec3 viewPos;
 uniform float ka, kd, ks, p;
 
-const vec3 lightPos = vec3(100.0, 100.0, -10.0);
-const vec3 lightColor = vec3(1.0, 1.0, 1.0);
+uniform vec3 lightPos;
+uniform vec3 lightColor;
 
 out vec4 FragColor;
 
