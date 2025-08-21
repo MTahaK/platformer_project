@@ -759,17 +759,17 @@ void GameManager::handleDemo3D(){
 		
 		ImGui::Text("Light Pos X");
 		ImGui::NextColumn();
-		ImGui::SliderFloat("##lightPosX", &lightPos[0], -50.0f, 50.0f);
+		ImGui::SliderFloat("##lightPosX", &lightPos[0], -15.0f, 15.0f);
 		ImGui::NextColumn();
 		
 		ImGui::Text("Light Pos Y");
 		ImGui::NextColumn();
-		ImGui::SliderFloat("##lightPosY", &lightPos[1], -50.0f, 50.0f);
+		ImGui::SliderFloat("##lightPosY", &lightPos[1], -15.0f, 15.0f);
 		ImGui::NextColumn();
 		
 		ImGui::Text("Light Pos Z");
 		ImGui::NextColumn();
-		ImGui::SliderFloat("##lightPosZ", &lightPos[2], -50.0f, 50.0f);
+		ImGui::SliderFloat("##lightPosZ", &lightPos[2], -15.0f, 15.0f);
 		ImGui::NextColumn();
 		
 		ImGui::Text("Light Color");
