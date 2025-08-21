@@ -37,14 +37,15 @@ class Renderer3D {
 		void drawTriangle(const glm::mat4& transform);
 		void drawPlane(const glm::mat4& transform);
 		void drawCube(const glm::mat4& transform);
+		void drawLightCube(const glm::mat4& transform, const glm::vec4& color);
 		void drawPyramid(const glm::mat4& transform);
 		void drawSphere(const glm::mat4& transform);
 
-		void drawTriangleColor(const glm::mat4& transform, const glm::vec4& color);
-		void drawPlaneColor(const glm::mat4& transform, const glm::vec4& color);
-		void drawCubeColor(const glm::mat4& transform, const glm::vec4& color);
-		void drawPyramidColor(const glm::mat4& transform, const glm::vec4& color);
-		void drawSphereColor(const glm::mat4& transform, const glm::vec4& color);
+		// void drawTriangleColor(const glm::mat4& transform, const glm::vec4& color);
+		// void drawPlaneColor(const glm::mat4& transform, const glm::vec4& color);
+		// void drawCubeColor(const glm::mat4& transform, const glm::vec4& color);
+		// void drawPyramidColor(const glm::mat4& transform, const glm::vec4& color);
+		// void drawSphereColor(const glm::mat4& transform, const glm::vec4& color);
 		void setCurrentShape(CurrentShape shape);
 
 		CurrentShape getCurrentShape() const;
@@ -59,6 +60,9 @@ class Renderer3D {
 		std::vector<Vertex3D> cubeVertices_;
 		std::vector<unsigned int> cubeIndices_;
 
+		std::vector<Vertex3D> lightCubeVertices_;
+		std::vector<unsigned int> lightCubeIndices_;
+
 		std::vector<Vertex3D> pyramidVertices_;
 		std::vector<unsigned int> pyramidIndices_;
 
@@ -68,8 +72,27 @@ class Renderer3D {
 		GLuint shader_ = 0;
 		Shader* currentShader_ = nullptr;  // Keep reference to current shader
 		GLuint vao_;
-		GLuint vbo_;
-		GLuint ebo_;
+		// GLuint vbo_;
+		// GLuint ebo_;
+
+		
+		GLuint triangleVBO_;
+		GLuint triangleEBO_;
+		
+		GLuint planeVBO_;
+		GLuint planeEBO_;
+		
+		GLuint cubeVBO_;
+		GLuint cubeEBO_;
+		
+		GLuint lightCubeVBO_;
+		GLuint lightCubeEBO_;
+
+		GLuint pyramidVBO_;
+		GLuint pyramidEBO_;
+
+		GLuint sphereVBO_;
+		GLuint sphereEBO_;
 
 		glm::mat4 model_;
 		glm::mat4 view_;

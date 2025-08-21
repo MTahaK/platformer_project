@@ -24,11 +24,6 @@ bool Renderer3D::init(Shader& shader) {
 	glGenVertexArrays(1, &vao_);
 	glBindVertexArray(vao_);
 
-	glGenBuffers(1, &vbo_);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-
-	glGenBuffers(1, &ebo_);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 
 	// Set up triangle geometry
 	// The layout for this will be the same for any shape.
@@ -105,6 +100,45 @@ bool Renderer3D::init(Shader& shader) {
 		20, 21, 22, 20, 22, 23
 	};
 
+	lightCubeVertices_ = {
+		// +Z (front)
+		{{-0.5f,-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f, 1.0f}}, // BLF red
+		{{ 0.5f,-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f, 1.0f}}, // BRF green
+		{{ 0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f, 1.0f}}, // TRF yellow
+		{{-0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f, 1.0f}}, // TLF light green
+
+		// -Z (back)
+		{{ 0.5f,-0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f,-1.0f}}, // BRB cyan
+		{{-0.5f,-0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f,-1.0f}}, // BLB blue
+		{{-0.5f, 0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f,-1.0f}}, // TLB light blue
+		{{ 0.5f, 0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f,-1.0f}}, // TRB magenta
+
+		// -X (left)
+		{{-0.5f,-0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}}, // blue
+		{{-0.5f,-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}}, // red
+		{{-0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}}, // light green
+		{{-0.5f, 0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}}, // light blue
+
+		// +X (right)
+		{{ 0.5f,-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 1.0f, 0.0f, 0.0f}}, // green
+		{{ 0.5f,-0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 1.0f, 0.0f, 0.0f}}, // cyan
+		{{ 0.5f, 0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 1.0f, 0.0f, 0.0f}}, // magenta
+		{{ 0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 1.0f, 0.0f, 0.0f}}, // yellow
+
+		// +Y (top)
+		{{-0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 1.0f, 0.0f}}, // light green
+		{{ 0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 1.0f, 0.0f}}, // yellow
+		{{ 0.5f, 0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 1.0f, 0.0f}}, // magenta
+		{{-0.5f, 0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f, 1.0f, 0.0f}}, // light blue
+
+		// -Y (bottom)
+		{{-0.5f,-0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f,-1.0f, 0.0f}}, // blue
+		{{ 0.5f,-0.5f,-0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f,-1.0f, 0.0f}}, // cyan
+		{{ 0.5f,-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f,-1.0f, 0.0f}}, // green
+		{{-0.5f,-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f, 1.0f}, { 0.0f,-1.0f, 0.0f}}, // red
+	};
+
+	lightCubeIndices_ = cubeIndices_;
 	// Side normals (normalized): 1/sqrt(5)=0.4472136, 2/sqrt(5)=0.8944272
 	const float NY = 0.4472136f;
 	const float NZ = 0.8944272f;
@@ -148,6 +182,100 @@ bool Renderer3D::init(Shader& shader) {
 		10,11,12,   // back
 		13,14,15    // left
 	};
+
+	if (sphereVertices_.empty()) {
+		const int segments = 32; // Horizontal segments
+		const int rings = 16;	 // Vertical rings
+		const float radius = 1.0f;
+
+		sphereVertices_.clear();
+		sphereIndices_.clear();
+
+		// Generate vertices
+		for (int ring = 0; ring <= rings; ring++) {
+			float phi = M_PI * float(ring) / float(rings); // Vertical angle
+			float y = cos(phi) * radius;
+			float ringRadius = sin(phi) * radius;
+
+			for (int seg = 0; seg <= segments; seg++) {
+				float theta = 2.0f * M_PI * float(seg) / float(segments); // Horizontal angle
+				float x = ringRadius * cos(theta);
+				float z = ringRadius * sin(theta);
+
+				// Position
+				glm::vec3 pos(x, y, z);
+
+				// Normal (for a unit sphere, normal equals position)
+				glm::vec3 normal = normalize(pos);
+
+				// Color (white for now, lighting will handle shading)
+				glm::vec4 color(1.0f, 1.0f, 1.0f, 1.0f);
+
+				sphereVertices_.push_back({pos, color, normal});
+			}
+		}
+
+		// Generate indices for triangles
+		for (int ring = 0; ring < rings; ring++) {
+			for (int seg = 0; seg < segments; seg++) {
+				int current = ring * (segments + 1) + seg;
+				int next = current + segments + 1;
+
+				// Two triangles per quad
+				sphereIndices_.push_back(current);
+				sphereIndices_.push_back(current + 1);
+				sphereIndices_.push_back(next);
+
+				sphereIndices_.push_back(current + 1);
+				sphereIndices_.push_back(next + 1);
+				sphereIndices_.push_back(next);
+			}
+		}
+	}
+
+	glGenBuffers(1, &triangleVBO_);
+	glGenBuffers(1, &triangleEBO_);
+	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO_);
+	glBufferData(GL_ARRAY_BUFFER, triangleVertices_.size() * sizeof(Vertex3D), triangleVertices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangleIndices_.size() * sizeof(unsigned int), triangleIndices_.data(), GL_DYNAMIC_DRAW);
+
+	glGenBuffers(1, &planeVBO_);
+	glGenBuffers(1, &planeEBO_);
+	glBindBuffer(GL_ARRAY_BUFFER, planeVBO_);
+	glBufferData(GL_ARRAY_BUFFER, planeVertices_.size() * sizeof(Vertex3D), planeVertices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planeEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, planeIndices_.size() * sizeof(unsigned int), planeIndices_.data(), GL_DYNAMIC_DRAW);
+
+
+	glGenBuffers(1, &cubeVBO_);
+	glGenBuffers(1, &cubeEBO_);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO_);
+	glBufferData(GL_ARRAY_BUFFER, cubeVertices_.size() * sizeof(Vertex3D), cubeVertices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices_.size() * sizeof(unsigned int), cubeIndices_.data(), GL_DYNAMIC_DRAW);
+
+	glGenBuffers(1, &lightCubeVBO_);
+	glGenBuffers(1, &lightCubeEBO_);
+	glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO_);
+	glBufferData(GL_ARRAY_BUFFER, lightCubeVertices_.size() * sizeof(Vertex3D), lightCubeVertices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, lightCubeEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, lightCubeIndices_.size() * sizeof(unsigned int), lightCubeIndices_.data(), GL_DYNAMIC_DRAW);
+
+	glGenBuffers(1, &pyramidVBO_);
+	glGenBuffers(1, &pyramidEBO_);
+	glBindBuffer(GL_ARRAY_BUFFER, pyramidVBO_);
+	glBufferData(GL_ARRAY_BUFFER, pyramidVertices_.size() * sizeof(Vertex3D), pyramidVertices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pyramidEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, pyramidIndices_.size() * sizeof(unsigned int), pyramidIndices_.data(), GL_DYNAMIC_DRAW);
+
+	glGenBuffers(1, &sphereVBO_);
+	glGenBuffers(1, &sphereEBO_);
+	glBindBuffer(GL_ARRAY_BUFFER, sphereVBO_);
+	glBufferData(GL_ARRAY_BUFFER, sphereVertices_.size() * sizeof(Vertex3D), sphereVertices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices_.size() * sizeof(unsigned int), sphereIndices_.data(), GL_DYNAMIC_DRAW);
+
 	// Set vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
 	glEnableVertexAttribArray(0);
@@ -169,23 +297,63 @@ bool Renderer3D::init(Shader& shader) {
 }
 
 void Renderer3D::shutdown() {
-	// Clean up resources
-	if (vao_) {
-		glDeleteVertexArrays(1, &vao_);
-		vao_ = 0;
-	}
-	if (vbo_) {
-		glDeleteBuffers(1, &vbo_);
-		vbo_ = 0;
-	}
-	if (ebo_) {
-		glDeleteBuffers(1, &ebo_);
-		ebo_ = 0;
-	}
-	shaderLoaded_ = false;
-	shader_ = 0;
+    // Clean up resources
+    if (vao_) {
+        glDeleteVertexArrays(1, &vao_);
+        vao_ = 0;
+    }
+    if (triangleVBO_) {
+        glDeleteBuffers(1, &triangleVBO_);
+        triangleVBO_ = 0;
+    }
+    if (triangleEBO_) {
+        glDeleteBuffers(1, &triangleEBO_);
+        triangleEBO_ = 0;
+    }
+    if (planeVBO_) {
+        glDeleteBuffers(1, &planeVBO_);
+        planeVBO_ = 0;
+    }
+    if (planeEBO_) {
+        glDeleteBuffers(1, &planeEBO_);
+        planeEBO_ = 0;
+    }
+    if (cubeVBO_) {
+        glDeleteBuffers(1, &cubeVBO_);
+        cubeVBO_ = 0;
+    }
+    if (cubeEBO_) {
+        glDeleteBuffers(1, &cubeEBO_);
+        cubeEBO_ = 0;
+    }
+    if (lightCubeVBO_) {
+        glDeleteBuffers(1, &lightCubeVBO_);
+        lightCubeVBO_ = 0;
+    }
+    if (lightCubeEBO_) {
+        glDeleteBuffers(1, &lightCubeEBO_);
+        lightCubeEBO_ = 0;
+    }
+    if (pyramidVBO_) {
+        glDeleteBuffers(1, &pyramidVBO_);
+        pyramidVBO_ = 0;
+    }
+    if (pyramidEBO_) {
+        glDeleteBuffers(1, &pyramidEBO_);
+        pyramidEBO_ = 0;
+    }
+    if (sphereVBO_) {
+        glDeleteBuffers(1, &sphereVBO_);
+        sphereVBO_ = 0;
+    }
+    if (sphereEBO_) {
+        glDeleteBuffers(1, &sphereEBO_);
+        sphereEBO_ = 0;
+    }
+    shaderLoaded_ = false;
+    shader_ = 0;
 
-	std::cout << "[Renderer3D] Renderer shutdown successfully." << std::endl;
+    std::cout << "[Renderer3D] Renderer shutdown successfully." << std::endl;
 }
 
 void Renderer3D::setCurrentShape(CurrentShape shape) { currentShape_ = shape; }
@@ -228,15 +396,20 @@ void Renderer3D::setLightingUniforms(const glm::vec3& lightPos, const glm::vec3&
 void Renderer3D::drawTriangle(const glm::mat4& transform) {
 	model_ = transform;
 
-	// if (currentShape_ != CurrentShape::TRIANGLE) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, triangleVertices_.size() * sizeof(Vertex3D), triangleVertices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO_);
+	glBufferData(GL_ARRAY_BUFFER, triangleVertices_.size() * sizeof(Vertex3D), triangleVertices_.data(), GL_DYNAMIC_DRAW);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangleIndices_.size() * sizeof(unsigned int), triangleIndices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangleIndices_.size() * sizeof(unsigned int), triangleIndices_.data(), GL_DYNAMIC_DRAW);
 
-		currentShape_ = CurrentShape::TRIANGLE;
-	// }
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, color));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, normal));
+	glEnableVertexAttribArray(2);
+
+	currentShape_ = CurrentShape::TRIANGLE;
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);
@@ -250,15 +423,19 @@ void Renderer3D::drawTriangle(const glm::mat4& transform) {
 void Renderer3D::drawPlane(const glm::mat4& transform) {
 	model_ = transform;
 
-	// if (currentShape_ != CurrentShape::PLANE) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, planeVertices_.size() * sizeof(Vertex3D), planeVertices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, planeVBO_);
+	glBufferData(GL_ARRAY_BUFFER, planeVertices_.size() * sizeof(Vertex3D), planeVertices_.data(), GL_DYNAMIC_DRAW);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, planeIndices_.size() * sizeof(unsigned int), planeIndices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planeEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, planeIndices_.size() * sizeof(unsigned int), planeIndices_.data(), GL_DYNAMIC_DRAW);
 
-		currentShape_ = CurrentShape::PLANE;
-	// }
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, color));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, normal));
+	glEnableVertexAttribArray(2);
+	currentShape_ = CurrentShape::PLANE;
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);
@@ -272,15 +449,20 @@ void Renderer3D::drawPlane(const glm::mat4& transform) {
 void Renderer3D::drawCube(const glm::mat4& transform) {
 	model_ = transform;
 
-	// if (currentShape_ != CurrentShape::CUBE) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, cubeVertices_.size() * sizeof(Vertex3D), cubeVertices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO_);
+	glBufferData(GL_ARRAY_BUFFER, cubeVertices_.size() * sizeof(Vertex3D), cubeVertices_.data(), GL_DYNAMIC_DRAW);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices_.size() * sizeof(unsigned int), cubeIndices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices_.size() * sizeof(unsigned int), cubeIndices_.data(), GL_DYNAMIC_DRAW);
 
-		currentShape_ = CurrentShape::CUBE;
-	// }
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, color));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, normal));
+	glEnableVertexAttribArray(2);
+
+	currentShape_ = CurrentShape::CUBE;
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);
@@ -291,55 +473,23 @@ void Renderer3D::drawCube(const glm::mat4& transform) {
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
-void Renderer3D::drawCubeColor(const glm::mat4& transform, const glm::vec4& color) {
+void Renderer3D::drawLightCube(const glm::mat4& transform, const glm::vec4& color) {
 	model_ = transform;
 
-	std::vector<Vertex3D> cubeVertices = {
-		// +Z (front)
-		{{-0.5f,-0.5f, 0.5f}, color, { 0.0f, 0.0f, 1.0f}}, // BLF red
-		{{ 0.5f,-0.5f, 0.5f}, color, { 0.0f, 0.0f, 1.0f}}, // BRF green
-		{{ 0.5f, 0.5f, 0.5f}, color, { 0.0f, 0.0f, 1.0f}}, // TRF yellow
-		{{-0.5f, 0.5f, 0.5f}, color, { 0.0f, 0.0f, 1.0f}}, // TLF light green
+	glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO_);
+	glBufferData(GL_ARRAY_BUFFER, lightCubeVertices_.size() * sizeof(Vertex3D), lightCubeVertices_.data(), GL_DYNAMIC_DRAW);
 
-		// -Z (back)
-		{{ 0.5f,-0.5f,-0.5f}, color, { 0.0f, 0.0f,-1.0f}}, // BRB cyan
-		{{-0.5f,-0.5f,-0.5f}, color, { 0.0f, 0.0f,-1.0f}}, // BLB blue
-		{{-0.5f, 0.5f,-0.5f}, color, { 0.0f, 0.0f,-1.0f}}, // TLB light blue
-		{{ 0.5f, 0.5f,-0.5f}, color, { 0.0f, 0.0f,-1.0f}}, // TRB magenta
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, lightCubeEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, lightCubeIndices_.size() * sizeof(unsigned int), lightCubeIndices_.data(), GL_DYNAMIC_DRAW);
 
-		// -X (left)
-		{{-0.5f,-0.5f,-0.5f}, color, {-1.0f, 0.0f, 0.0f}}, // blue
-		{{-0.5f,-0.5f, 0.5f}, color, {-1.0f, 0.0f, 0.0f}}, // red
-		{{-0.5f, 0.5f, 0.5f}, color, {-1.0f, 0.0f, 0.0f}}, // light green
-		{{-0.5f, 0.5f,-0.5f}, color, {-1.0f, 0.0f, 0.0f}}, // light blue
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, color));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, normal));
+	glEnableVertexAttribArray(2);
 
-		// +X (right)
-		{{ 0.5f,-0.5f, 0.5f}, color, { 1.0f, 0.0f, 0.0f}}, // green
-		{{ 0.5f,-0.5f,-0.5f}, color, { 1.0f, 0.0f, 0.0f}}, // cyan
-		{{ 0.5f, 0.5f,-0.5f}, color, { 1.0f, 0.0f, 0.0f}}, // magenta
-		{{ 0.5f, 0.5f, 0.5f}, color, { 1.0f, 0.0f, 0.0f}}, // yellow
-
-		// +Y (top)
-		{{-0.5f, 0.5f, 0.5f}, color, { 0.0f, 1.0f, 0.0f}}, // light green
-		{{ 0.5f, 0.5f, 0.5f}, color, { 0.0f, 1.0f, 0.0f}}, // yellow
-		{{ 0.5f, 0.5f,-0.5f}, color, { 0.0f, 1.0f, 0.0f}}, // magenta
-		{{-0.5f, 0.5f,-0.5f}, color, { 0.0f, 1.0f, 0.0f}}, // light blue
-
-		// -Y (bottom)
-		{{-0.5f,-0.5f,-0.5f}, color, { 0.0f,-1.0f, 0.0f}}, // blue
-		{{ 0.5f,-0.5f,-0.5f}, color, { 0.0f,-1.0f, 0.0f}}, // cyan
-		{{ 0.5f,-0.5f, 0.5f}, color, { 0.0f,-1.0f, 0.0f}}, // green
-		{{-0.5f,-0.5f, 0.5f}, color, { 0.0f,-1.0f, 0.0f}}, // red
-	};
-	// if (currentShape_ != CurrentShape::CUBE) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * sizeof(Vertex3D), cubeVertices.data(), GL_DYNAMIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices_.size() * sizeof(unsigned int), cubeIndices_.data(), GL_DYNAMIC_DRAW);
-
-		currentShape_ = CurrentShape::CUBE;
-	// }
+	currentShape_ = CurrentShape::CUBE;
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);
@@ -354,15 +504,20 @@ void Renderer3D::drawCubeColor(const glm::mat4& transform, const glm::vec4& colo
 void Renderer3D::drawPyramid(const glm::mat4& transform) {
 	model_ = transform;
 
-	// if (currentShape_ != CurrentShape::PYRAMID) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, pyramidVertices_.size() * sizeof(Vertex3D), pyramidVertices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, pyramidVBO_);
+	glBufferData(GL_ARRAY_BUFFER, pyramidVertices_.size() * sizeof(Vertex3D), pyramidVertices_.data(), GL_DYNAMIC_DRAW);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, pyramidIndices_.size() * sizeof(unsigned int), pyramidIndices_.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pyramidEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, pyramidIndices_.size() * sizeof(unsigned int), pyramidIndices_.data(), GL_DYNAMIC_DRAW);
 
-		currentShape_ = CurrentShape::PYRAMID;
-	// }
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, color));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, normal));
+	glEnableVertexAttribArray(2);
+
+	currentShape_ = CurrentShape::PYRAMID;
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);
@@ -373,93 +528,26 @@ void Renderer3D::drawPyramid(const glm::mat4& transform) {
 	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
 }
 
-void Renderer3D::drawPyramidColor(const glm::mat4& transform, const glm::vec4& color) {
-	model_ = transform;
-
-	// if (currentShape_ != CurrentShape::PYRAMID) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, pyramidVertices_.size() * sizeof(Vertex3D), pyramidVertices_.data(), GL_DYNAMIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, pyramidIndices_.size() * sizeof(unsigned int), pyramidIndices_.data(), GL_DYNAMIC_DRAW);
-
-		currentShape_ = CurrentShape::PYRAMID;
-	// }
-
-	if (currentShader_) {
-		currentShader_->setMat4("model", model_);
-		currentShader_->setMat4("view", view_);
-		currentShader_->setMat4("proj", proj_);
-		currentShader_->setVec4("color", color);
-	}
-
-	glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
-}
 
 void Renderer3D::drawSphere(const glm::mat4& transform) {
 	model_ = transform;
 
-	// if (currentShape_ != CurrentShape::SPHERE) {
-		// Generate sphere geometry if not already generated
-		if (sphereVertices_.empty()) {
-			const int segments = 32; // Horizontal segments
-			const int rings = 16;	 // Vertical rings
-			const float radius = 1.0f;
+	// Upload to GPU
+	glBindBuffer(GL_ARRAY_BUFFER, sphereVBO_);
+	glBufferData(GL_ARRAY_BUFFER, sphereVertices_.size() * sizeof(Vertex3D), sphereVertices_.data(), GL_DYNAMIC_DRAW);
 
-			sphereVertices_.clear();
-			sphereIndices_.clear();
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereEBO_);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices_.size() * sizeof(unsigned int), sphereIndices_.data(), GL_DYNAMIC_DRAW);
 
-			// Generate vertices
-			for (int ring = 0; ring <= rings; ring++) {
-				float phi = M_PI * float(ring) / float(rings); // Vertical angle
-				float y = cos(phi) * radius;
-				float ringRadius = sin(phi) * radius;
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, position));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, color));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), (void*)offsetof(Vertex3D, normal));
+	glEnableVertexAttribArray(2);
 
-				for (int seg = 0; seg <= segments; seg++) {
-					float theta = 2.0f * M_PI * float(seg) / float(segments); // Horizontal angle
-					float x = ringRadius * cos(theta);
-					float z = ringRadius * sin(theta);
+	currentShape_ = CurrentShape::SPHERE;
 
-					// Position
-					glm::vec3 pos(x, y, z);
-
-					// Normal (for a unit sphere, normal equals position)
-					glm::vec3 normal = normalize(pos);
-
-					// Color (white for now, lighting will handle shading)
-					glm::vec4 color(1.0f, 1.0f, 1.0f, 1.0f);
-
-					sphereVertices_.push_back({pos, color, normal});
-				}
-			}
-
-			// Generate indices for triangles
-			for (int ring = 0; ring < rings; ring++) {
-				for (int seg = 0; seg < segments; seg++) {
-					int current = ring * (segments + 1) + seg;
-					int next = current + segments + 1;
-
-					// Two triangles per quad
-					sphereIndices_.push_back(current);
-					sphereIndices_.push_back(current + 1);
-					sphereIndices_.push_back(next);
-
-					sphereIndices_.push_back(current + 1);
-					sphereIndices_.push_back(next + 1);
-					sphereIndices_.push_back(next);
-				}
-			}
-		}
-
-		// Upload to GPU
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, sphereVertices_.size() * sizeof(Vertex3D), sphereVertices_.data(), GL_DYNAMIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices_.size() * sizeof(unsigned int), sphereIndices_.data(), GL_DYNAMIC_DRAW);
-
-		currentShape_ = CurrentShape::SPHERE;
-	// }
 
 	if (currentShader_) {
 		currentShader_->setMat4("model", model_);

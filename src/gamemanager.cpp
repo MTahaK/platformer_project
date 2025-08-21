@@ -615,7 +615,7 @@ void GameManager::handleDemo3D(){
 	shader3DBasic_->use();
 	
 	renderer3D_->beginScene(view, projection);
-	renderer3D_->drawCubeColor(lightCubeModel, glm::vec4(lightColor, 1.0));
+	renderer3D_->drawLightCube(lightCubeModel, glm::vec4(lightColor, 1.0));
 
 	renderer3D_->setShader(*originalShader);
 	shader3D_->use();
