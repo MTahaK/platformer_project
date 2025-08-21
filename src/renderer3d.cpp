@@ -373,12 +373,12 @@ void Renderer3D::drawSphere(const glm::mat4& transform) {
 			sphereIndices_.clear();
 
 			// Generate vertices
-			for (int ring = 0; ring <= rings; ++ring) {
+			for (int ring = 0; ring <= rings; ring++) {
 				float phi = M_PI * float(ring) / float(rings); // Vertical angle
 				float y = cos(phi) * radius;
 				float ringRadius = sin(phi) * radius;
 
-				for (int seg = 0; seg <= segments; ++seg) {
+				for (int seg = 0; seg <= segments; seg++) {
 					float theta = 2.0f * M_PI * float(seg) / float(segments); // Horizontal angle
 					float x = ringRadius * cos(theta);
 					float z = ringRadius * sin(theta);
@@ -397,19 +397,19 @@ void Renderer3D::drawSphere(const glm::mat4& transform) {
 			}
 
 			// Generate indices for triangles
-			for (int ring = 0; ring < rings; ++ring) {
-				for (int seg = 0; seg < segments; ++seg) {
+			for (int ring = 0; ring < rings; ring++) {
+				for (int seg = 0; seg < segments; seg++) {
 					int current = ring * (segments + 1) + seg;
 					int next = current + segments + 1;
 
 					// Two triangles per quad
 					sphereIndices_.push_back(current);
-					sphereIndices_.push_back(next);
 					sphereIndices_.push_back(current + 1);
+					sphereIndices_.push_back(next);
 
 					sphereIndices_.push_back(current + 1);
-					sphereIndices_.push_back(next);
 					sphereIndices_.push_back(next + 1);
+					sphereIndices_.push_back(next);
 				}
 			}
 		}
