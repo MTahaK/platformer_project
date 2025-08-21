@@ -588,7 +588,7 @@ void GameManager::handleDemo3D(){
 
 	// Orbital camera controls (spherical coordinates)
 	static float cameraTheta = 0.0f;     // Horizontal rotation (azimuth)
-	static float cameraPhi = 0.0f;       // Vertical rotation (elevation)
+	static float cameraPhi = 0.1f;       // Vertical rotation (elevation)
 	static float cameraDistance = 5.0f;  // Distance from target
 
 	glm::mat4 lightCubeModel = IDENTITY_MATRIX;

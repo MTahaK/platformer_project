@@ -294,9 +294,46 @@ void Renderer3D::drawCube(const glm::mat4& transform) {
 void Renderer3D::drawCubeColor(const glm::mat4& transform, const glm::vec4& color) {
 	model_ = transform;
 
+	std::vector<Vertex3D> cubeVertices = {
+		// +Z (front)
+		{{-0.5f,-0.5f, 0.5f}, color, { 0.0f, 0.0f, 1.0f}}, // BLF red
+		{{ 0.5f,-0.5f, 0.5f}, color, { 0.0f, 0.0f, 1.0f}}, // BRF green
+		{{ 0.5f, 0.5f, 0.5f}, color, { 0.0f, 0.0f, 1.0f}}, // TRF yellow
+		{{-0.5f, 0.5f, 0.5f}, color, { 0.0f, 0.0f, 1.0f}}, // TLF light green
+
+		// -Z (back)
+		{{ 0.5f,-0.5f,-0.5f}, color, { 0.0f, 0.0f,-1.0f}}, // BRB cyan
+		{{-0.5f,-0.5f,-0.5f}, color, { 0.0f, 0.0f,-1.0f}}, // BLB blue
+		{{-0.5f, 0.5f,-0.5f}, color, { 0.0f, 0.0f,-1.0f}}, // TLB light blue
+		{{ 0.5f, 0.5f,-0.5f}, color, { 0.0f, 0.0f,-1.0f}}, // TRB magenta
+
+		// -X (left)
+		{{-0.5f,-0.5f,-0.5f}, color, {-1.0f, 0.0f, 0.0f}}, // blue
+		{{-0.5f,-0.5f, 0.5f}, color, {-1.0f, 0.0f, 0.0f}}, // red
+		{{-0.5f, 0.5f, 0.5f}, color, {-1.0f, 0.0f, 0.0f}}, // light green
+		{{-0.5f, 0.5f,-0.5f}, color, {-1.0f, 0.0f, 0.0f}}, // light blue
+
+		// +X (right)
+		{{ 0.5f,-0.5f, 0.5f}, color, { 1.0f, 0.0f, 0.0f}}, // green
+		{{ 0.5f,-0.5f,-0.5f}, color, { 1.0f, 0.0f, 0.0f}}, // cyan
+		{{ 0.5f, 0.5f,-0.5f}, color, { 1.0f, 0.0f, 0.0f}}, // magenta
+		{{ 0.5f, 0.5f, 0.5f}, color, { 1.0f, 0.0f, 0.0f}}, // yellow
+
+		// +Y (top)
+		{{-0.5f, 0.5f, 0.5f}, color, { 0.0f, 1.0f, 0.0f}}, // light green
+		{{ 0.5f, 0.5f, 0.5f}, color, { 0.0f, 1.0f, 0.0f}}, // yellow
+		{{ 0.5f, 0.5f,-0.5f}, color, { 0.0f, 1.0f, 0.0f}}, // magenta
+		{{-0.5f, 0.5f,-0.5f}, color, { 0.0f, 1.0f, 0.0f}}, // light blue
+
+		// -Y (bottom)
+		{{-0.5f,-0.5f,-0.5f}, color, { 0.0f,-1.0f, 0.0f}}, // blue
+		{{ 0.5f,-0.5f,-0.5f}, color, { 0.0f,-1.0f, 0.0f}}, // cyan
+		{{ 0.5f,-0.5f, 0.5f}, color, { 0.0f,-1.0f, 0.0f}}, // green
+		{{-0.5f,-0.5f, 0.5f}, color, { 0.0f,-1.0f, 0.0f}}, // red
+	};
 	// if (currentShape_ != CurrentShape::CUBE) {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-		glBufferData(GL_ARRAY_BUFFER, cubeVertices_.size() * sizeof(Vertex3D), cubeVertices_.data(), GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * sizeof(Vertex3D), cubeVertices.data(), GL_DYNAMIC_DRAW);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices_.size() * sizeof(unsigned int), cubeIndices_.data(), GL_DYNAMIC_DRAW);
