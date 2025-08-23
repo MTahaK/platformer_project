@@ -208,7 +208,6 @@ bool Renderer3D::init(Shader& shader) {
 				// Normal (for a unit sphere, normal equals position)
 				glm::vec3 normal = normalize(pos);
 
-				// Color (white for now, lighting will handle shading)
 				glm::vec4 color(1.0f, 1.0f, 1.0f, 1.0f);
 
 				sphereVertices_.push_back({pos, color, normal});

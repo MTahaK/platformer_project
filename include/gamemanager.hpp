@@ -16,7 +16,8 @@
 
 enum class GameState {
 	MENU,
-	// LOAD, may not used
+	LEVEL_SELECT,
+	// LOAD, // may not used
 	PLAY,
 	PAUSE,
 	DEAD,
@@ -64,6 +65,7 @@ class GameManager {
 
 	private:
 		GameState gameState_ = GameState::MENU;
+		bool showLevelSelect_ = false;
 		
 		// 2D Visuals
 		Window& window_;

@@ -35,6 +35,9 @@ void GameManager::runGameLoop() {
 		case GameState::MENU:
 			handleMenuState();
 			break;
+		case GameState::LEVEL_SELECT:
+			handleMenuState(); // For now, LEVEL_SELECT uses same handler as MENU
+			break;
 		case GameState::PLAY:
 			handlePlayState();
 			break;
@@ -123,24 +126,59 @@ void GameManager::handleMenuState() {
 		auto renderMenuButton = [&](const char* text, GameState targetState) {
 			ImVec2 buttonSize(400, 50);
 			ImGui::SetCursorPosX((windowWidth - buttonSize.x) * 0.5f);
-			
+
 			if (ImGui::Button(text, buttonSize)) {
-				setState(targetState);
-				DEBUG_ONLY(std::cout << "Switching to " << text << " state." << std::endl;);
+				if (targetState != gameState_) {
+					setState(targetState);
+					DEBUG_ONLY(std::cout << "Switching to " << text << " state." << std::endl;);
+				}
 			}
 			ImGui::Dummy(ImVec2(0.0f, 20.0f)); // Spacing after each button
 		};
 		
 		// Clean, readable button list
 		renderMenuButton("Start Game", GameState::PLAY);
-		renderMenuButton("3D Demo", GameState::DEMO3D);
-		DEBUG_ONLY(
-			renderMenuButton("UI Demo", GameState::UIDEMO);
-		);
-		renderMenuButton("Quit", GameState::EXIT);
+		ImVec2 buttonSize(400, 50);
+        ImGui::SetCursorPosX((windowWidth - buttonSize.x) * 0.5f);
+        if (ImGui::Button("Level Select", buttonSize)) {
+            showLevelSelect_ = true;  // Open popup immediately when button pressed
+        }
+        ImGui::Dummy(ImVec2(0.0f, 20.0f));
+        renderMenuButton("3D Demo", GameState::DEMO3D);
+        DEBUG_ONLY(
+            renderMenuButton("UI Demo", GameState::UIDEMO);
+        );
+        renderMenuButton("Quit", GameState::EXIT);
+
+        
 	}
 	ImGui::End();
 
+	
+	if(showLevelSelect_){
+		viewport = ImGui::GetMainViewport();
+		ImVec2 windowSize(800, 600);
+		ImVec2 windowPos(viewport->WorkPos.x + (viewport->WorkSize.x - windowSize.x) * 0.5f,
+							viewport->WorkPos.y + (viewport->WorkSize.y - windowSize.y) * 0.5f);
+		ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
+		ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);
+
+		if (ImGui::Begin("Level Select", nullptr, menuFlags)) { 
+			ImGui::Text("Select a Level:");
+			ImGui::Separator();
+			
+			if (ImGui::Button("Level 1")) {
+				setState(GameState::PLAY);
+			}
+			
+			if (ImGui::Button("Cancel")) {
+				showLevelSelect_ = false;
+				// Close window
+			}
+			
+		}
+		ImGui::End();
+	}
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	finishDraw(window_, renderer_, shader_);
