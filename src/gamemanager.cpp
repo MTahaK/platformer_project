@@ -98,9 +98,6 @@ void GameManager::handleMenuState() {
 
 	if (ImGui::Begin("Main Menu", nullptr, menuFlags)) {
 
-		// Push larger font size for title
-		// ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]); // Use default font but we'll scale it
-		ImGui::SetWindowFocus(); // This focuses the window for keyboard input
 		// Center the title text
 		float windowHeight = ImGui::GetWindowSize().y;
 		float spacingAmount = windowHeight * 0.10f; // 15% of window height
@@ -141,8 +138,22 @@ void GameManager::handleMenuState() {
 		ImVec2 buttonSize(400, 50);
         ImGui::SetCursorPosX((windowWidth - buttonSize.x) * 0.5f);
         if (ImGui::Button("Level Select", buttonSize)) {
-            showLevelSelect_ = true;  // Open popup immediately when button pressed
-        }
+			std::cout << "Opening Level Select" << std::endl;
+            ImGui::OpenPopup("Select a Level");
+		}
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+		if (ImGui::BeginPopupModal("Select a Level", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::Text("You can select a level here.");
+			ImGui::Separator();
+
+			if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::EndPopup();
+		}
         ImGui::Dummy(ImVec2(0.0f, 20.0f));
         renderMenuButton("3D Demo", GameState::DEMO3D);
         DEBUG_ONLY(
@@ -154,31 +165,6 @@ void GameManager::handleMenuState() {
 	}
 	ImGui::End();
 
-	
-	if(showLevelSelect_){
-		viewport = ImGui::GetMainViewport();
-		ImVec2 windowSize(800, 600);
-		ImVec2 windowPos(viewport->WorkPos.x + (viewport->WorkSize.x - windowSize.x) * 0.5f,
-							viewport->WorkPos.y + (viewport->WorkSize.y - windowSize.y) * 0.5f);
-		ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
-		ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);
-
-		if (ImGui::Begin("Level Select", nullptr, menuFlags)) { 
-			ImGui::Text("Select a Level:");
-			ImGui::Separator();
-			
-			if (ImGui::Button("Level 1")) {
-				setState(GameState::PLAY);
-			}
-			
-			if (ImGui::Button("Cancel")) {
-				showLevelSelect_ = false;
-				// Close window
-			}
-			
-		}
-		ImGui::End();
-	}
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	finishDraw(window_, renderer_, shader_);
