@@ -2,10 +2,15 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <fstream>
+#include "debug.hpp"
 #include "tilemap.hpp"
+
+namespace fs = std::filesystem;
 
 // Pre-level-load, load in just level metadata for display
 struct LevelMetaData {
+	fs::path filepath; // Full path to file
 	std::string filename;
 	std::string displayName;
 	glm::ivec2 dimensions; // First lines of tilemap file gives dims
@@ -27,25 +32,19 @@ class LevelManager {
 		// load the level at currLevelIndex_.
 
 		// Phase 1: Discovery
-		bool extractMetadata(const std::string& filepath, LevelMetaData& metadata);
-		std::string generateDisplayName(const std::string& filename);
+		bool extractMetadata(const fs::directory_entry& entry, LevelMetaData& metadata);
+		std::string generateDisplayName(const std::string& filename); // May be unused
 		bool loadLevelSelection(); // Iterates over directory structure, extracts metadata, and populates level options
 
 		// Phase 2: Display (for UI)
 		std::vector<LevelMetaData>& getAvailableLevels(); // Returned vector is then given to UI engine to display levels
 
-		// Phase 3: Player makes selection
-		bool hasSelection() const { return currLevelIndex_ >= 0; }
-		void selectLevel(int index) { currLevelIndex_ = index; } // Sets current level index
-		int getSelectedLevelIndex() const { return currLevelIndex_; }
-		const LevelMetaData& getSelectedLevelMetaData() const;
-		void clearSelection() { currLevelIndex_ = -1; }
+		// Phase 3: Player makes selection (handled by ImGui)
 
 		// Phase 4: Load after confirmation, to be run after confirmation button is pressed
-		Tilemap loadSelectedLevel();
+		Tilemap loadLevel(int index); // Load level at specific index
 
 	private:
 		std::vector<LevelMetaData> availableLevels_;
 		std::string levelsDir_;
-		int currLevelIndex_ = -1; // Select within availableLevels_
 };
