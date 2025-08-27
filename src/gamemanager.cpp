@@ -1,10 +1,13 @@
 #include "gamemanager.hpp"
 #include "helpers.hpp"
 
-GameManager::GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap,
+GameManager::GameManager(Window& window, Shader& shader, Renderer2D& renderer, LevelManager& levelManager, Tilemap& tilemap, PlayerObject& player,
 						 std::vector<GameObject>& objects, Physics& physics)
-	: window_(window), shader_(shader), renderer_(renderer), player_(player), tilemap_(tilemap), objects_(objects), physics_(physics) {
+	: window_(window), shader_(shader), renderer_(renderer), levelManager_(levelManager), tilemap_(tilemap), player_(player), objects_(objects), physics_(physics) {
 	lastFrameTime_ = glfwGetTime();
+	gameState_ = GameState::MENU;
+
+	hasLevels_ = levelManager_.loadLevelList();  // pre-load levels list
 }
 
 void GameManager::setState(GameState state) {
@@ -141,19 +144,6 @@ void GameManager::handleMenuState() {
 			std::cout << "Opening Level Select" << std::endl;
             ImGui::OpenPopup("Select a Level");
 		}
-		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-		if (ImGui::BeginPopupModal("Select a Level", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			ImGui::Text("You can select a level here.");
-			ImGui::Separator();
-
-			if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			ImGui::SetItemDefaultFocus();
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			ImGui::EndPopup();
-		}
         ImGui::Dummy(ImVec2(0.0f, 20.0f));
         renderMenuButton("3D Demo", GameState::DEMO3D);
         DEBUG_ONLY(
@@ -161,9 +151,29 @@ void GameManager::handleMenuState() {
         );
         renderMenuButton("Quit", GameState::EXIT);
 
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+		if (ImGui::BeginPopupModal("Select a Level", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGuiStyle& style = ImGui::GetStyle();			
+			// Darken background dim colour
+			style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.1f, 0.1f, 0.1f, 0.8f);
+
+			ImGui::SetWindowFontScale(2.0f); // Make text 2x larger
+			ImGui::Text("You can select a level here.");
+			ImGui::Separator();
+	
+			if (ImGui::Button("OK", ImVec2(400, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(400, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::EndPopup();
+		}
+
         
 	}
 	ImGui::End();
+
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

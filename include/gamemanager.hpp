@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include "tilemap.hpp"
+#include "level.hpp"
 #include "physics.hpp"
 #include "renderer2d.hpp"
 #include "renderer3d.hpp"
@@ -36,8 +37,8 @@ class GameManager {
 		~GameManager() = default;
 
 		// Full initialization constructor
-		GameManager(Window& window, Shader& shader, Renderer2D& renderer, PlayerObject& player, Tilemap& tilemap,
-					std::vector<GameObject>& objects, Physics& physics);
+		GameManager(Window& window, Shader& shader, Renderer2D& renderer, LevelManager& levelManager, Tilemap& tilemap,
+					PlayerObject& player, std::vector<GameObject>& objects, Physics& physics);
 
 		void runGameLoop();
 		void setState(GameState state);
@@ -66,29 +67,33 @@ class GameManager {
 	private:
 		GameState gameState_ = GameState::MENU;
 		bool showLevelSelect_ = false;
-		
+
 		// 2D Visuals
 		Window& window_;
 		Shader& shader_;
 		Renderer2D& renderer_;
 
 		// 3D Demo Visuals
-		Shader* shader3D_;                           // Current active shader (points to one of the variants)
+		Shader* shader3D_; // Current active shader (points to one of the variants)
 		std::unique_ptr<Shader> shader3DBasic_;
-		std::unique_ptr<Shader> shaderAll_;          // All lighting components
-		std::unique_ptr<Shader> shaderAmbient_;      // Ambient only
-		std::unique_ptr<Shader> shaderDiffuse_;      // Diffuse only  
-		std::unique_ptr<Shader> shaderSpecular_;     // Specular only
+		std::unique_ptr<Shader> shaderAll_;			   // All lighting components
+		std::unique_ptr<Shader> shaderAmbient_;		   // Ambient only
+		std::unique_ptr<Shader> shaderDiffuse_;		   // Diffuse only
+		std::unique_ptr<Shader> shaderSpecular_;	   // Specular only
 		std::unique_ptr<Shader> shaderAmbientDiffuse_; // Ambient + Diffuse
 		std::unique_ptr<Renderer3D> renderer3D_;
 		bool is3DInit_ = false;
 
+		// Level Management
+		LevelManager& levelManager_;
+		// Tilemap& currTilemap_;
+		Tilemap& tilemap_;
+		bool hasLevels_ = false;
+
 		// Gameplay
 		PlayerObject& player_;
-		Tilemap& tilemap_;
 		std::vector<GameObject>& objects_;
 		Physics& physics_;
-
 
 		// Timing management for game loop
 		float lastFrameTime_ = 0.0f;

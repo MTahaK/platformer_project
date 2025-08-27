@@ -20,13 +20,9 @@ int main(void) {
 
 	Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
 
-	// Set player position in tilemap
+	LevelManager levelManager("./assets/levels");
+
 	PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
-
-	// Set player scale to (0.6f, 1.0f)
-	// player.setScale(glm::vec2(0.6f, 1.0f));
-
-	player.setGrounded(true); // Set the player object to be grounded initially
 
 	Input::initialize(window.getWindow());
 
@@ -52,7 +48,7 @@ int main(void) {
 	deathWall.setBehavior(std::make_unique<DeathWallBehavior>(deathWallBehavior));
 	objects.push_back(std::move(deathWall));
 
-	GameManager gameManager(window, shader, renderer, player, tilemap, objects, physicsSystem);
+	GameManager gameManager(window, shader, renderer, levelManager, tilemap, player, objects, physicsSystem);
 
 	while (!window.shouldClose()) {
 		gameManager.runGameLoop();

@@ -22,19 +22,17 @@ class LevelManager {
 	public:
 		LevelManager(const std::string &levelsDir);
 
+		bool setLevelDir(const std::string &levelsDir);
 		// Level system follows 4 phase approach:
 		// 1. Pre-load: Gather metadata (Discovery)
 		// 2. System displays level selections (Display)
 		// 3. Player makes selection (Select).
 		// 4. Load the selected level after confirmation (Load)
 
-		// When the player initially selects a level, currLevelIndex_ is set. Then, when the player confirms,
-		// load the level at currLevelIndex_.
-
 		// Phase 1: Discovery
 		bool extractMetadata(const fs::directory_entry& entry, LevelMetaData& metadata);
 		std::string generateDisplayName(const std::string& filename); // May be unused
-		bool loadLevelSelection(); // Iterates over directory structure, extracts metadata, and populates level options
+		bool loadLevelList(); // Iterates over directory structure, extracts metadata, and populates level options
 
 		// Phase 2: Display (for UI)
 		std::vector<LevelMetaData>& getAvailableLevels(); // Returned vector is then given to UI engine to display levels
@@ -43,6 +41,9 @@ class LevelManager {
 
 		// Phase 4: Load after confirmation, to be run after confirmation button is pressed
 		Tilemap loadLevel(int index); // Load level at specific index
+
+		void clearLevelList();
+		void refreshLevelList();
 
 	private:
 		std::vector<LevelMetaData> availableLevels_;

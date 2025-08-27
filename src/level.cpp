@@ -27,7 +27,7 @@ bool LevelManager::extractMetadata(const fs::directory_entry& entry, LevelMetaDa
 	return true;
 }
 
-bool LevelManager::loadLevelSelection() {
+bool LevelManager::loadLevelList() {
 	// Iterates over directory provided in constructor, extracts metadata, and populates level options
 	for (const auto& entry : fs::directory_iterator(levelsDir_)) {
 		if (entry.is_regular_file() && entry.path().extension() == ".tmap") {
@@ -38,6 +38,7 @@ bool LevelManager::loadLevelSelection() {
 		}
 	}
 	return !availableLevels_.empty();
+	// false if no levels found, true if level list populated
 }
 
 std::vector<LevelMetaData>& LevelManager::getAvailableLevels() {
@@ -50,3 +51,4 @@ Tilemap LevelManager::loadLevel(int index) {
 	}
 	auto& metadata = availableLevels_[index];
 	return loadTilemapFromFile(metadata.filepath.string(), 1.0f);
+}
