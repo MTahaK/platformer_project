@@ -162,15 +162,109 @@ void GameManager::handleMenuState() {
 			ImGui::SetWindowFontScale(2.0f); // Make text 2x larger
 			ImGui::Text("You can select a level here.");
 			ImGui::Separator();
-	
-			if (ImGui::Button("OK", ImVec2(400, 0))) { ImGui::CloseCurrentPopup(); }
-			ImGui::SetItemDefaultFocus();
+			auto& levels = levelManager_.getAvailableLevels();
+
+			static int selectedLevelIndex = -1;
+
+			if (levels.empty()) {
+				ImGui::Text("No levels found in ./assets/levels/");
+				ImGui::Text("Please add some .tmap files to the levels directory.");
+			} else {
+				// Level list section
+				ImGui::Text("Select a Level:");
+				ImGui::Separator();
+				
+				// Create scrollable child window for level list
+				if (ImGui::BeginChild("LevelList", ImVec2(400, 200), true, ImGuiWindowFlags_HorizontalScrollbar)) {
+					for (int i = 0; i < levels.size(); i++) {
+						const auto& level = levels[i];
+						bool isSelected = (selectedLevelIndex == i);
+						
+						// Use Selectable for larger, more prominent selection boxes
+						if (ImGui::Selectable(level.displayName.c_str(), isSelected, 0, ImVec2(0, 30))) {
+							selectedLevelIndex = i;
+						}
+						
+						// Optional: Add hover tooltip with basic info
+						if (ImGui::IsItemHovered()) {
+							ImGui::BeginTooltip();
+							ImGui::Text("File: %s", level.filename.c_str());
+							ImGui::Text("Size: %dx%d tiles", level.dimensions.x, level.dimensions.y);
+							ImGui::EndTooltip();
+						}
+					}
+				}
+				ImGui::EndChild();
+				
+				ImGui::Separator();
+				
+				// Level details section (shown when a level is selected)
+				if (selectedLevelIndex >= 0 && selectedLevelIndex < levels.size()) {
+					const auto& selectedLevel = levels[selectedLevelIndex];
+					
+					ImGui::Text("Level Details:");
+					ImGui::Indent();
+					ImGui::Text("Name: %s", selectedLevel.displayName.c_str());
+					ImGui::Text("File: %s", selectedLevel.filename.c_str());
+					ImGui::Text("Dimensions: %dx%d tiles", selectedLevel.dimensions.x, selectedLevel.dimensions.y);
+					// Add more metadata fields here as you expand the system
+					// ImGui::Text("Description: %s", selectedLevel.description.c_str());
+					ImGui::Unindent();
+					
+					ImGui::Separator();
+				}
+			}
+			
+			// Button section
+			ImGui::Spacing();
+			
+			// Load Level button (only enabled when a level is selected)
+			if (selectedLevelIndex >= 0 && !levels.empty()) {
+				if (ImGui::Button("Load Level", ImVec2(120, 0))) {
+					try {
+						// Load the selected level
+						tilemap_ = levelManager_.loadLevel(selectedLevelIndex);
+						
+						// Reset player to new level's starting position
+						player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
+						player_.setVelocity(glm::vec2(0.0f, 0.0f));
+						player_.setAcceleration(glm::vec2(0.0f, 0.0f));
+						player_.sensorUpdate();
+						player_.setShouldDie(false);
+						player_.setGoalCount(0);
+						player_.setInGoal(false);
+						
+						// Reset death wall if it exists
+						if (!objects_.empty()) {
+							auto* deathWallBehavior = dynamic_cast<DeathWallBehavior*>(objects_[0].getBehavior());
+							if (deathWallBehavior) {
+								deathWallBehavior->reset(objects_[0]);
+							}
+						}
+						
+						ImGui::CloseCurrentPopup();
+						selectedLevelIndex = -1; // Reset for next time
+						setState(GameState::PLAY);
+						
+					} catch (const std::exception& e) {
+						std::cerr << "Failed to load level: " << e.what() << std::endl;
+					}
+				}
+				ImGui::SetItemDefaultFocus();
+			} else {
+				// Show disabled button when no level is selected
+				ImGui::BeginDisabled();
+				ImGui::Button("Load Level", ImVec2(120, 0));
+				ImGui::EndDisabled();
+			}
+			
 			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(400, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { 
+				ImGui::CloseCurrentPopup();
+				selectedLevelIndex = -1; // Reset selection
+			}
 			ImGui::EndPopup();
 		}
-
-        
 	}
 	ImGui::End();
 
