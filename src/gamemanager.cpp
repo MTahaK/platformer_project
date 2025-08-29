@@ -154,14 +154,12 @@ void GameManager::handleMenuState() {
 		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-		if (ImGui::BeginPopupModal("Select a Level", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginPopupModal("Select a Level", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar)) {
 			ImGuiStyle& style = ImGui::GetStyle();			
 			// Darken background dim colour
 			style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.1f, 0.1f, 0.1f, 0.8f);
 
 			ImGui::SetWindowFontScale(2.0f); // Make text 2x larger
-			ImGui::Text("You can select a level here.");
-			ImGui::Separator();
 			auto& levels = levelManager_.getAvailableLevels();
 
 			static int selectedLevelIndex = -1;
@@ -176,7 +174,8 @@ void GameManager::handleMenuState() {
 				
 				// Create scrollable child window for level list
 				if (ImGui::BeginChild("LevelList", ImVec2(400, 200), true, ImGuiWindowFlags_HorizontalScrollbar)) {
-					for (int i = 0; i < levels.size(); i++) {
+					ImGui::SetWindowFontScale(2.0f);
+					for (int i = 0; i < (int)levels.size(); i++) {
 						const auto& level = levels[i];
 						bool isSelected = (selectedLevelIndex == i);
 						
@@ -196,22 +195,27 @@ void GameManager::handleMenuState() {
 				}
 				ImGui::EndChild();
 				
-				ImGui::Separator();
-				
+				// ImGui::Separator();
+				ImGui::SameLine();
 				// Level details section (shown when a level is selected)
-				if (selectedLevelIndex >= 0 && selectedLevelIndex < levels.size()) {
-					const auto& selectedLevel = levels[selectedLevelIndex];
-					
-					ImGui::Text("Level Details:");
-					ImGui::Indent();
-					ImGui::Text("Name: %s", selectedLevel.displayName.c_str());
-					ImGui::Text("File: %s", selectedLevel.filename.c_str());
-					ImGui::Text("Dimensions: %dx%d tiles", selectedLevel.dimensions.x, selectedLevel.dimensions.y);
-					// Add more metadata fields here as you expand the system
-					// ImGui::Text("Description: %s", selectedLevel.description.c_str());
-					ImGui::Unindent();
-					
-					ImGui::Separator();
+
+				if (selectedLevelIndex >= 0 && selectedLevelIndex < (int)levels.size()) {
+					if (ImGui::BeginChild("LevelDetails", ImVec2(400, 200), true, ImGuiWindowFlags_HorizontalScrollbar)) {
+						ImGui::SetWindowFontScale(2.0f);
+						const auto& selectedLevel = levels[selectedLevelIndex];
+						
+						ImGui::Text("Level Details:");
+						ImGui::Indent();
+						ImGui::Text("Name: %s", selectedLevel.displayName.c_str());
+						ImGui::Text("File: %s", selectedLevel.filename.c_str());
+						ImGui::Text("Dimensions: %dx%d tiles", selectedLevel.dimensions.x, selectedLevel.dimensions.y);
+						// Add more metadata fields here as you expand the system
+						// ImGui::Text("Description: %s", selectedLevel.description.c_str());
+						ImGui::Unindent();
+						
+						ImGui::Separator();
+					}
+					ImGui::EndChild();
 				}
 			}
 			
@@ -220,7 +224,7 @@ void GameManager::handleMenuState() {
 			
 			// Load Level button (only enabled when a level is selected)
 			if (selectedLevelIndex >= 0 && !levels.empty()) {
-				if (ImGui::Button("Load Level", ImVec2(120, 0))) {
+				if (ImGui::Button("Load Level", ImVec2(400, 0))) {
 					try {
 						// Load the selected level
 						tilemap_ = levelManager_.loadLevel(selectedLevelIndex);
@@ -254,12 +258,12 @@ void GameManager::handleMenuState() {
 			} else {
 				// Show disabled button when no level is selected
 				ImGui::BeginDisabled();
-				ImGui::Button("Load Level", ImVec2(120, 0));
+				ImGui::Button("Load Level", ImVec2(400, 0));
 				ImGui::EndDisabled();
 			}
 			
 			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { 
+			if (ImGui::Button("Cancel", ImVec2(400, 0))) { 
 				ImGui::CloseCurrentPopup();
 				selectedLevelIndex = -1; // Reset selection
 			}
