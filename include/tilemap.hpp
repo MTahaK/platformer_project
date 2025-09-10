@@ -14,6 +14,7 @@ enum class TileEnum { EMPTY, SOLID, PLAYER, DWALLSTART, DWALLEND, GOAL };
 struct TileType {
 		TileEnum type; // Type of the tile (e.g., EMPTY, SOLID)
 		bool visible;
+		bool solid;
 		glm::vec4 color; // Color of the tile
 };
 

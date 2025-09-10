@@ -8,7 +8,7 @@ Tilemap::Tilemap(int width, int height, float tileSize) : width_(width), height_
 		for (int x = 0; x < width_; ++x) {
 			// Initialize empty
 			tiles_[y][x].position = tileIndexToWorldPos(x, y);
-			tiles_[y][x].tileType = {TileEnum::EMPTY, false, glm::vec4(0.0f)};
+			tiles_[y][x].tileType = {TileEnum::EMPTY, false, false, glm::vec4(0.0f)};
 		}
 	}
 }
@@ -18,7 +18,8 @@ Tile& Tilemap::getTile(int x, int y) { return tiles_[y][x]; }
 bool Tilemap::isSolidTile(int x, int y) {
 	if (x < 0 || x >= width_ || y < 0 || y >= height_)
 		return false;
-	return tiles_[y][x].tileType.type == TileEnum::SOLID;
+	return tiles_[y][x].tileType.type == TileEnum::SOLID ||
+		   tiles_[y][x].tileType.solid == true;
 }
 
 bool Tilemap::isGoalTile(int x, int y) {
@@ -78,15 +79,15 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 
 			switch (c) {
 			case '#': // Solid tile
-				type = {TileEnum::SOLID, true, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f)};
+				type = {TileEnum::SOLID, true, true, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f)};
 				break;
 			case '.': // Empty tile
 			default:
-				type = {TileEnum::EMPTY, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f)};
+				type = {TileEnum::EMPTY, false, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f)};
 				break;
 			case 'P': // Player start position
 				if(!startSet) {
-					type = {TileEnum::PLAYER, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f)};
+					type = {TileEnum::PLAYER, false, false, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f)};
 					tilemap.setPlayerPos(x, y);
 					startSet = true;
 					break;
@@ -97,7 +98,7 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 			case '[':
 				// Death wall starts and ends will always be within a solid 'wall' tile
 				if (!dwallStartSet) {
-					type = {TileEnum::DWALLSTART, true, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f)};
+					type = {TileEnum::DWALLSTART, true, true, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f)};
 					tilemap.setDeathWallStartPos(x, y);
 					dwallStartSet = true;
 					break;
@@ -107,7 +108,7 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 				
 			case ']':
 				if (!dwallEndSet) {
-					type = {TileEnum::DWALLEND, true, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f)};
+					type = {TileEnum::DWALLEND, true, true, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f)};
 					tilemap.setDeathWallEndPos(x, y);
 					dwallEndSet = true;
 				} else {
@@ -115,7 +116,7 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 				}
 				break;
 			case 'G': // Goal tile
-				type = {TileEnum::GOAL, true, rgbaToVec4("0, 74, 20, 255")};
+				type = {TileEnum::GOAL, true, false, rgbaToVec4("0, 74, 20, 255")};
 				tilemap.setGoalPos(x, y); // Set goal position
 				break;
 			}

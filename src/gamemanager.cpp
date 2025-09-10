@@ -519,69 +519,180 @@ void GameManager::handleDeadState() {
 	}
 }
 
-void GameManager::handleWinState() {
-	float currentFrameTime = glfwGetTime();
-	float deltaTime = currentFrameTime - lastFrameTime_;
-	lastFrameTime_ = currentFrameTime;
+// void GameManager::handleWinState() {
+// 	float currentFrameTime = glfwGetTime();
+// 	float deltaTime = currentFrameTime - lastFrameTime_;
+// 	lastFrameTime_ = currentFrameTime;
 
-	// Poll for events
+// 	// Poll for events
+// 	window_.pollEvents();
+
+// 	// Initialize timer when first entering WIN state
+// 	if (winTimer_ <= 0.0f) {
+// 		winTimer_ = 5.0f; // 5 second countdown
+// 		DEBUG_ONLY(std::cout << "WIN state entered, starting 5 second countdown..." << std::endl;);
+// 	}
+
+// 	// Update countdown timer
+// 	winTimer_ -= deltaTime;
+// 	DEBUG_ONLY(std::cout << "Win countdown: " << winTimer_ << std::endl;);
+
+// 	auto inputResult = playerInput(player_);
+
+// 	if (inputResult == InputResult::PAUSE) {
+// 		setState(GameState::PAUSE);
+// 		DEBUG_ONLY(std::cout << "Pausing game." << std::endl;);
+// 		return;
+// 	} else if (inputResult == InputResult::FORCE_QUIT) {
+// 		setState(GameState::EXIT);
+// 		DEBUG_ONLY(std::cout << "Quitting application." << std::endl;);
+// 		return;
+// 	}
+// 	physics_.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
+
+// 	physics_.playerMovementStep(player_, deltaTime);
+// 	physics_.checkPlayerWorldCollisions(player_, tilemap_);
+
+// 	// Continue rendering the game world during countdown
+// 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
+// 	drawObjects(window_, renderer_, shader_, objects_);
+// 	finishDraw(window_, renderer_, shader_);
+
+// 	// When timer expires, reset player and return to PLAY state
+// 	if (winTimer_ <= 0.0f) {
+// 		// Reset player to starting position
+// 		player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
+// 		player_.setVelocity(glm::vec2(0.0f, 0.0f));
+// 		player_.setAcceleration(glm::vec2(0.0f, 0.0f));
+// 		player_.sensorUpdate();
+
+// 		// Reset goal-related states
+// 		player_.setGoalCount(0);
+// 		player_.setInGoal(false);
+
+// 		// Reset win timer for next time
+// 		winTimer_ = 0.0f;
+
+// 		// Reset death wall
+// 		auto* deathWallBehavior = dynamic_cast<DeathWallBehavior*>(objects_[0].getBehavior());
+// 		deathWallBehavior->reset(objects_[0]);
+
+// 		// Transition back to PLAY state
+// 		setState(GameState::PLAY);
+// 		DEBUG_ONLY(std::cout << "Player reset, returning to PLAY state." << std::endl;);
+// 	}
+// }
+
+void GameManager::handleWinState(){
+	// Alternate win endpoint: show win screen, offer player option to restart level or go back to menu.
+
+	// Poll events but don't update game systems
 	window_.pollEvents();
+	Input::update();
 
-	// Initialize timer when first entering WIN state
-	if (winTimer_ <= 0.0f) {
-		winTimer_ = 5.0f; // 5 second countdown
-		DEBUG_ONLY(std::cout << "WIN state entered, starting 5 second countdown..." << std::endl;);
-	}
-
-	// Update countdown timer
-	winTimer_ -= deltaTime;
-	DEBUG_ONLY(std::cout << "Win countdown: " << winTimer_ << std::endl;);
-
-	auto inputResult = playerInput(player_);
-
-	if (inputResult == InputResult::PAUSE) {
-		setState(GameState::PAUSE);
-		DEBUG_ONLY(std::cout << "Pausing game." << std::endl;);
-		return;
-	} else if (inputResult == InputResult::FORCE_QUIT) {
-		setState(GameState::EXIT);
-		DEBUG_ONLY(std::cout << "Quitting application." << std::endl;);
-		return;
-	}
-	physics_.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
-
-	physics_.playerMovementStep(player_, deltaTime);
-	physics_.checkPlayerWorldCollisions(player_, tilemap_);
-
-	// Continue rendering the game world during countdown
+	// Still render the current frame (game world frozen)
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
 	drawObjects(window_, renderer_, shader_, objects_);
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	auto menuFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImVec2 windowSize(800, 600);
+	ImVec2 windowPos(viewport->WorkPos.x + (viewport->WorkSize.x - windowSize.x) * 0.5f,
+					 viewport->WorkPos.y + (viewport->WorkSize.y - windowSize.y) * 0.5f);
+	ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);
+
+	if (ImGui::Begin("WinScreen", nullptr, menuFlags)) {
+
+		// Push larger font size for title
+		// ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]); // Use default font but we'll scale it
+		ImGui::SetWindowFocus(); // This focuses the window for keyboard input
+		// Center the title text
+		float windowHeight = ImGui::GetWindowSize().y;
+		float spacingAmount = windowHeight * 0.10f; // 15% of window height
+		ImGui::Dummy(ImVec2(0.0f, spacingAmount));
+
+		const char* title = "Level Complete";
+		ImGui::SetWindowFontScale(3.0f); // Make text 2x larger
+		float windowWidth = ImGui::GetWindowSize().x;
+		float textWidth = ImGui::CalcTextSize(title).x;
+		ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+
+		ImGui::Text("%s", title);
+
+		ImGui::SetWindowFontScale(2.0f); // Reset font scale
+
+		// ImGui::PopFont();
+
+		// Add scalable spacing - more space between title and instructions
+		spacingAmount = windowHeight * 0.3f; // 30% of window height
+		ImGui::Dummy(ImVec2(0.0f, spacingAmount));
+
+		// Center the button
+		ImVec2 buttonSize(400, 50);
+		float buttonWidth = buttonSize.x;
+		ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+		if (ImGui::Button("Restart Level", buttonSize)) {
+			// tilemap_ remains the same as when level was loaded
+
+			player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
+			player_.setVelocity(glm::vec2(0.0f, 0.0f));
+			player_.setAcceleration(glm::vec2(0.0f, 0.0f));
+			player_.sensorUpdate();
+			player_.setShouldDie(false);
+			player_.setGoalCount(0);
+			player_.setInGoal(false);
+			
+			// Reset death wall if it exists
+			if (!objects_.empty()) {
+				auto* deathWallBehavior = dynamic_cast<DeathWallBehavior*>(objects_[0].getBehavior());
+				if (deathWallBehavior) {
+					deathWallBehavior->reset(objects_[0]);
+				}
+			}
+			setState(GameState::PLAY);
+			DEBUG_ONLY(std::cout<<"Restarting level"<<std::endl;);
+		}
+
+		// Add spacing between buttons
+		ImGui::Dummy(ImVec2(0.0f, 20.0f)); // 20 pixels of vertical space
+
+		// Center the second button
+		ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+		if (ImGui::Button("Menu", buttonSize)) {
+			setState(GameState::MENU);
+			DEBUG_ONLY(std::cout << "Switching to MENU state." << std::endl;);
+		}
+
+		ImGui::Dummy(ImVec2(0.0f, 20.0f)); // 20 pixels of vertical space
+
+		// Center the second button
+		ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+		if (ImGui::Button("Quit", buttonSize)) {
+			setState(GameState::EXIT);
+			DEBUG_ONLY(std::cout << "Switching to EXIT state." << std::endl;);
+		}
+	}
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	finishDraw(window_, renderer_, shader_);
 
-	// When timer expires, reset player and return to PLAY state
-	if (winTimer_ <= 0.0f) {
-		// Reset player to starting position
-		player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
-		player_.setVelocity(glm::vec2(0.0f, 0.0f));
-		player_.setAcceleration(glm::vec2(0.0f, 0.0f));
-		player_.sensorUpdate();
-
-		// Reset goal-related states
-		player_.setGoalCount(0);
-		player_.setInGoal(false);
-
-		// Reset win timer for next time
-		winTimer_ = 0.0f;
-
-		// Reset death wall
-		auto* deathWallBehavior = dynamic_cast<DeathWallBehavior*>(objects_[0].getBehavior());
-		deathWallBehavior->reset(objects_[0]);
-
-		// Transition back to PLAY state
-		setState(GameState::PLAY);
-		DEBUG_ONLY(std::cout << "Player reset, returning to PLAY state." << std::endl;);
+	// Handle pause-specific input
+	if (Input::isKeyJustPressed(GLFW_KEY_ESCAPE) || Input::isKeyJustPressed(GLFW_KEY_P)) {
+		setState(GameState::PLAY); // Resume game
+		DEBUG_ONLY(std::cout << "Resuming game." << std::endl;);
 	}
+
 }
+
 void GameManager::handleDemo3D(){
 
 	if(!is3DInit_){
