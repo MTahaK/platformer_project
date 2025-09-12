@@ -415,20 +415,42 @@ void GameManager::handlePauseState() {
 			DEBUG_ONLY(std::cout << "Switching to PLAY state." << std::endl;);
 		}
 
-		// Add spacing between buttons
-		ImGui::Dummy(ImVec2(0.0f, 20.0f)); // 20 pixels of vertical space
-
-		// Center the second button
+		ImGui::Dummy(ImVec2(0.0f, 20.0f));
 		ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
 
-		if (ImGui::Button("Menu", buttonSize)) {
+		if (ImGui::Button("Restart Level", buttonSize)) {
+			// tilemap_ remains the same as when level was loaded
+
+			player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
+			player_.setVelocity(glm::vec2(0.0f, 0.0f));
+			player_.setAcceleration(glm::vec2(0.0f, 0.0f));
+			player_.sensorUpdate();
+			player_.setShouldDie(false);
+			player_.setGoalCount(0);
+			player_.setInGoal(false);
+			
+			levelCountdown_ = true;
+			
+			// Reset death wall if it exists
+			if (!objects_.empty()) {
+				auto* deathWallBehavior = dynamic_cast<DeathWallBehavior*>(objects_[0].getBehavior());
+				if (deathWallBehavior) {
+					deathWallBehavior->reset(objects_[0]);
+				}
+			}
+			setState(GameState::PLAY);
+			DEBUG_ONLY(std::cout<<"Restarting level"<<std::endl;);
+		}
+
+		ImGui::Dummy(ImVec2(0.0f, 20.0f)); // 20 pixels of vertical space
+		ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+		if (ImGui::Button("Quit to Menu", buttonSize)) {
 			setState(GameState::MENU);
 			DEBUG_ONLY(std::cout << "Switching to MENU state." << std::endl;);
 		}
 
-		ImGui::Dummy(ImVec2(0.0f, 20.0f)); // 20 pixels of vertical space
-
-		// Center the second button
+		ImGui::Dummy(ImVec2(0.0f, 20.0f));
 		ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
 
 		if (ImGui::Button("Quit", buttonSize)) {
@@ -660,6 +682,7 @@ void GameManager::handleWinState(){
 			player_.setGoalCount(0);
 			player_.setInGoal(false);
 			
+			levelCountdown_ = true;
 			// Reset death wall if it exists
 			if (!objects_.empty()) {
 				auto* deathWallBehavior = dynamic_cast<DeathWallBehavior*>(objects_[0].getBehavior());
