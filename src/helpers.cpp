@@ -208,6 +208,43 @@ void finishDraw3D(Window& window, Renderer3D& renderer, Shader& shader) {
 	window.swap();
 }
 
+void renderCountdown(float countdownTime) {
+    if (countdownTime <= 0) return;
+    
+    // Get the foreground draw list (draws over everything)
+    ImDrawList* drawList = ImGui::GetForegroundDrawList();
+    
+    // Get viewport size for centering
+    ImVec2 viewport = ImGui::GetMainViewport()->Size;
+    
+    // Create countdown text
+    std::string countdownText = std::to_string((int)ceil(countdownTime));
+    
+    // Use large font and its size
+    ImFont* font = Fonts::largeFont ? Fonts::largeFont : ImGui::GetFont();
+    float fontSize = Fonts::largeFont ? Fonts::largeSize : ImGui::GetFontSize();
+    
+    // Calculate text size for centering
+    ImVec2 textSize = font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, countdownText.c_str());
+    ImVec2 textPos = ImVec2(
+        (viewport.x - textSize.x) * 0.5f,
+        (viewport.y - textSize.y) * 0.5f
+    );
+    
+    // Draw text with outline for visibility
+    ImU32 outlineColor = IM_COL32(0, 0, 0, 255);
+    ImU32 textColor = IM_COL32(255, 255, 255, 255);
+    
+    // Draw outline (offset in 4 directions)
+    drawList->AddText(font, fontSize, ImVec2(textPos.x-3, textPos.y), outlineColor, countdownText.c_str());
+    drawList->AddText(font, fontSize, ImVec2(textPos.x+3, textPos.y), outlineColor, countdownText.c_str());
+    drawList->AddText(font, fontSize, ImVec2(textPos.x, textPos.y-3), outlineColor, countdownText.c_str());
+    drawList->AddText(font, fontSize, ImVec2(textPos.x, textPos.y+3), outlineColor, countdownText.c_str());
+    
+    // Draw main text
+    drawList->AddText(font, fontSize, textPos, textColor, countdownText.c_str());
+}
+
 void updateDeathWall(GameObject& deathWall, float deltaTime) {
 	// Call the behavior's update method
 	deathWall.updateBehavior(deltaTime);

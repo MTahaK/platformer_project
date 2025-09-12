@@ -238,6 +238,8 @@ void GameManager::handleMenuState() {
 						player_.setGoalCount(0);
 						player_.setInGoal(false);
 						
+						levelCountdown_ = true;
+
 						// Reset death wall if it exists
 						if (!objects_.empty()) {
 							auto* deathWallBehavior = dynamic_cast<DeathWallBehavior*>(objects_[0].getBehavior());
@@ -294,42 +296,52 @@ void GameManager::handlePlayState() {
 	// Poll for events
 	window_.pollEvents();
 
-	auto inputResult = playerInput(player_);
-
-	if (inputResult == InputResult::PAUSE) {
-		setState(GameState::PAUSE);
-		DEBUG_ONLY(std::cout << "Pausing game." << std::endl;);
-		return;
+	if(levelCountdown_){
+		if(countdownTimer_ <= 0.0f){
+			countdownTimer_ = 3.0f;
+		}
+		countdownTimer_ -= deltaTime;
+		if(countdownTimer_ <= 0.0f){
+			levelCountdown_ = false;
+		}
+	} else{
+		auto inputResult = playerInput(player_);
+	
+		if (inputResult == InputResult::PAUSE) {
+			setState(GameState::PAUSE);
+			DEBUG_ONLY(std::cout << "Pausing game." << std::endl;);
+			return;
+		}
+		physics_.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
+	
+		updatePStatePlayer(player_, physics_, tilemap_, objects_, deltaTime);
+		if (player_.checkIfInGoal()) {
+			// Transition to WIN state
+			setState(GameState::WIN);
+			DEBUG_ONLY(std::cout << "Player reached goal, transitioning to WIN state." << std::endl;);
+			return;
+		}
+		if (player_.getShouldDie()) {
+			// Transition to DEAD state
+			setState(GameState::DEAD);
+			DEBUG_ONLY(std::cout << "Player died, transitioning to DEAD state." << std::endl;);
+			return;
+		}
+		updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
 	}
-	physics_.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
-
-	updatePStatePlayer(player_, physics_, tilemap_, objects_, deltaTime);
-	if (player_.checkIfInGoal()) {
-		// Transition to WIN state
-		setState(GameState::WIN);
-		DEBUG_ONLY(std::cout << "Player reached goal, transitioning to WIN state." << std::endl;);
-		return;
-	}
-	if (player_.getShouldDie()) {
-		// Transition to DEAD state
-		setState(GameState::DEAD);
-		DEBUG_ONLY(std::cout << "Player died, transitioning to DEAD state." << std::endl;);
-		return;
-	}
-	updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
 
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
 	drawObjects(window_, renderer_, shader_, objects_);
 
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	
+	ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_Always);
+	ImGui::SetNextWindowPos(ImVec2(15, 15), ImGuiCond_Always);
+	ImGui::SetNextWindowBgAlpha(0.5f); // Transparent background
+	
 	if (g_debugEnabled) {
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-
-		ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_Always);
-		ImGui::SetNextWindowPos(ImVec2(15, 15), ImGuiCond_Always);
-		ImGui::SetNextWindowBgAlpha(0.5f); // Transparent background
-
 		if (ImGui::Begin("Debug Info")) {
 			ImGui::Text("Player Position: %.2f, %.2f", player_.getPosition().x, player_.getPosition().y);
 			ImGui::Text("Player Velocity: %.2f, %.2f", player_.getVelocity().x, player_.getVelocity().y);
@@ -337,10 +349,11 @@ void GameManager::handlePlayState() {
 			ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		}
 		ImGui::End();
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
+	if(levelCountdown_) renderCountdown(countdownTimer_);
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	finishDraw(window_, renderer_, shader_);
 
 	auto frameEnd = std::chrono::high_resolution_clock::now();

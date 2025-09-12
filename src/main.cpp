@@ -12,6 +12,7 @@ int main(void) {
 
 	// Setup Dear ImGui context
 	UserInterface ui(&window);
+	Fonts::initialize();
 
 	renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
 

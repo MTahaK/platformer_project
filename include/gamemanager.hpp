@@ -94,8 +94,9 @@ class GameManager {
 		PlayerObject& player_;
 		std::vector<GameObject>& objects_;
 		Physics& physics_;
+		bool levelCountdown_ = true;
 
 		// Timing management for game loop
 		float lastFrameTime_ = 0.0f;
-		float winTimer_ = 0.0f; // Timer for WIN state countdown
+		float countdownTimer_ = 0.0f; // Timer for WIN state countdown
 };
