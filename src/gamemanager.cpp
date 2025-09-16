@@ -941,7 +941,9 @@ void GameManager::handleDemo3D(){
 					
 					// Apply grid rotation to the entire arrangement
 					glm::mat4 finalModel = gridRotation * shapeModel;
-					
+					// Compute normal matrix
+					glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(finalModel)));
+					shader3D_->setMat3("normalMatrix", normalMatrix);
 					// Draw the current shape type
 					if(currentShape == CurrentShape::TRIANGLE){
 						renderer3D_->drawTriangle(finalModel);
@@ -972,6 +974,10 @@ void GameManager::handleDemo3D(){
 		}
 		// Rotate around Y-axis (clockwise) and X-axis (counter-clockwise) simultaneously
 		// glm::mat4 
+		
+		// Compute normal matrix
+		glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
+		shader3D_->setMat3("normalMatrix", normalMatrix);
 
 		if(currentShape == CurrentShape::TRIANGLE){
 			renderer3D_->drawTriangle(model);
