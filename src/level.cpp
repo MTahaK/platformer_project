@@ -12,7 +12,7 @@ bool LevelManager::extractMetadata(const fs::directory_entry& entry, LevelMetaDa
 	// - is a regular file
 	// - has a .tmap extension
 	metadata.filepath = entry.path();
-	metadata.filename = metadata.filepath.filename();
+	metadata.filename = metadata.filepath.filename().string();
 	metadata.displayName = metadata.filepath.filename().string();
 
 	// Extract dimensions from .tmap file (first two lines)
