@@ -37,6 +37,13 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 		}
 	}
 	player.sensorUpdate(); // KEEP THIS UPDATE HERE! ESSENTIAL FOR PREVENTING SENSORS FROM LAGGING BEHIND
+
+	// Direction update
+	if(player.getVelocity().x > 0) {
+		player.facingDirection_ = FacingDirection::RIGHT;
+	} else if (player.getVelocity().x < 0) {
+		player.facingDirection_ = FacingDirection::LEFT;
+	}
 }
 
 void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {

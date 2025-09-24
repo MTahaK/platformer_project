@@ -9,6 +9,11 @@ struct Sensor {
 		glm::vec4 color;	// Only used for debug view
 };
 
+enum class FacingDirection {
+		LEFT,
+		RIGHT
+};
+
 // PlayerObject class inherits from GameObject
 class PlayerObject : public GameObject {
 
@@ -34,6 +39,9 @@ class PlayerObject : public GameObject {
 
 		bool checkIfInGoal() { return inGoal_; }
 		bool getShouldDie() const { return shouldDie_; }
+
+		// I don't feel like making this private
+		FacingDirection facingDirection_ = FacingDirection::RIGHT;
 
 	private:
 		// PlayerObject adds four 'sensors' to detect collisions
