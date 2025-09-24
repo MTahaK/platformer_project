@@ -5,8 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
-#include "shader.hpp"
 #include <string>
+#include "shader.hpp"
 #include "globals.hpp"
 
 struct BatchVertex {

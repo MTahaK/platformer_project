@@ -74,7 +74,7 @@ $(BUILD_DIR)/vendor_%.o: $(VENDOR_DIR)/%.cpp
 
 -include $(DEPS)
 
-clean:
+clean:    
 	rm -rf $(BUILD_DIR) $(TARGET)
 
 # Clean only project files, preserve external dependencies
