@@ -188,10 +188,6 @@ void Renderer2D::drawTexturedQuad(Shader& shader, const glm::mat4& transform, co
 
 void Renderer2D::drawLine(Shader& shader, const glm::vec2& start, const glm::vec2& end, const glm::vec4& color) {
 
-	// Save the currently bound VAO
-	GLint previousVAO;
-	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &previousVAO);
-
 	// Update the vertex buffer with the line endpoints
 	float vertices[] = {start.x, start.y, end.x, end.y};
 	glBindVertexArray(lineVAO_);
@@ -216,5 +212,5 @@ void Renderer2D::drawLine(Shader& shader, const glm::vec2& start, const glm::vec
 	glDrawArrays(GL_LINES, 0, 2); // Draw two vertices as a line
 
 	// Restore previous VAO
-	glBindVertexArray(previousVAO);
+	glBindVertexArray(vao_);
 }
