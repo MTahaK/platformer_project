@@ -1,8 +1,8 @@
 #include <iostream>
 #include "texture.hpp"
-#include "vendor/stb_image.cpp" // Include stb_image implementation
+#include "vendor/stb_image.h" // Include stb_image implementation
 
-Texture::Texture(const std::string& filePath, bool hasAlpha = true)
+Texture::Texture(const std::string& filePath, bool hasAlpha)
 	: texID_(0), width_(0), height_(0), channels_(0),
 	  filePath_(filePath), localBuffer_(nullptr), hasAlpha_(hasAlpha) {
 
@@ -38,7 +38,7 @@ Texture::~Texture() {
 	glDeleteTextures(1, &texID_);
 }
 
-void Texture::bind(unsigned int slot = 0) const{
+void Texture::bind(unsigned int slot) const{
 
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, texID_);
@@ -47,7 +47,7 @@ void Texture::bind(unsigned int slot = 0) const{
 void Texture::unbind() const{
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-	
+
 }
 
 inline void Texture::free() {

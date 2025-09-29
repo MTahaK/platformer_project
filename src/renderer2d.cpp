@@ -24,11 +24,11 @@ bool Renderer2D::init(Shader& shader) {
 
 	// Define the vertex data for a quad
 	float vertices[] = {
-		// x, y
-		-0.5f, -0.5f, // Bottom-left
-		0.5f,  -0.5f, // Bottom-right
-		0.5f,  0.5f,  // Top-right
-		-0.5f, 0.5f	  // Top-left
+		// x, y, u, v
+		-0.5f, -0.5f, 0.0f, 0.0f, // Bottom-left
+		0.5f,  -0.5f, 1.0f, 0.0f, // Bottom-right
+		0.5f,  0.5f,  1.0f, 1.0f, // Top-right
+		-0.5f, 0.5f,  0.0f, 1.0f  // Top-left
 	};
 
 	// Indices for the quad
@@ -45,21 +45,26 @@ bool Renderer2D::init(Shader& shader) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// Set vertex attribute pointers
+
+	// Vertex positions
 	glVertexAttribPointer(0,				 // attribute location (in vertex shader)
 						  2,				 // number of components (x, y)
 						  GL_FLOAT,			 // data type
 						  GL_FALSE,			 // normalize?
-						  2 * sizeof(float), // stride (bytes between vertices)
+						  4*sizeof(float), // stride (bytes between vertices)
 						  (void*)0			 // offset into data
 	);
-
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(2*sizeof(float))); // Texture
 	glEnableVertexAttribArray(0); // Enable the vertex attribute at location 0
+	glEnableVertexAttribArray(1); // Enable the vertex attribute at location 1
 
 	// Unbind VAO to avoid accidental modification
 	glBindVertexArray(0);
 
 	// Set up glClearColor
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark grey
+	glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Successful initialization
 	std::cout << "[Renderer2D] Renderer initialized successfully." << std::endl;
@@ -147,6 +152,9 @@ void Renderer2D::drawQuad(Shader& shader, const glm::mat4& transform, const glm:
 	// Set the MVP matrix in the shader
 	shader.setMat4("MVP", mvp);
 	shader.setVec4("color", color); // Set the color uniform
+
+	shader.setInt("useTexture", 0);
+	shader.setInt("slot", 0);
 
 	// Draw the quad using the EBO, VAO already bound in beginScene
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

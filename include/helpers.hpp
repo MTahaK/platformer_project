@@ -20,6 +20,7 @@
 #include "physics.hpp"
 #include "tilemap.hpp"
 #include "debug.hpp"
+#include "texture.hpp"
 #include "gamemanager.hpp"
 #include "globals.hpp"
 #include "userinterface.hpp"

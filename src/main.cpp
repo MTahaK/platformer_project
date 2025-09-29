@@ -49,6 +49,11 @@ int main(void) {
 	deathWall.setBehavior(std::make_unique<DeathWallBehavior>(deathWallBehavior));
 	objects.push_back(std::move(deathWall));
 
+	Texture playerTexture("./assets/textures/player.png");
+	playerTexture.bind(0);
+
+	player.texture_ = &playerTexture;
+
 	GameManager gameManager(window, shader, renderer, levelManager, tilemap, player, objects, physicsSystem);
 
 	while (!window.shouldClose()) {

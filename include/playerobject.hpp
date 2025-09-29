@@ -3,7 +3,7 @@
 #include "gameobject.hpp"
 #include "tilemap.hpp"
 #include "globals.hpp"
-
+#include "texture.hpp"
 struct Sensor {
 		glm::vec2 position; // Position of the sensor relative to the player
 		glm::vec4 color;	// Only used for debug view
@@ -42,6 +42,9 @@ class PlayerObject : public GameObject {
 
 		// I don't feel like making this private
 		FacingDirection facingDirection_ = FacingDirection::RIGHT;
+
+		// Pointer to texture
+		Texture* texture_ = nullptr;
 
 	private:
 		// PlayerObject adds four 'sensors' to detect collisions
