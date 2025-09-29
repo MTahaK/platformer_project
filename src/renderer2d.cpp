@@ -207,6 +207,9 @@ void Renderer2D::drawLine(Shader& shader, const glm::vec2& start, const glm::vec
 	// Set the color uniform
 	shader.setVec4("color", color);
 
+	shader.setInt("useTexture", 0);
+	shader.setInt("slot", 0);
+
 	glEnable(GL_LINE_SMOOTH);
 	glLineWidth(2.0f);
 
