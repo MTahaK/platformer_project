@@ -1,8 +1,9 @@
-#include "renderer2d.hpp"
-#include "shader.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "renderer2d.hpp"
+#include "shader.hpp"
+#include "texture.hpp"
 
 Renderer2D::~Renderer2D() { shutdown(); }
 
@@ -143,6 +144,8 @@ void Renderer2D::beginScene(Shader& shader, const glm::mat4& view, const glm::ma
 }
 
 void Renderer2D::drawQuad(Shader& shader, const glm::mat4& transform, const glm::vec4& color) {
+	// Ensure our quad VAO is bound (other renderers may have changed it)
+	glBindVertexArray(vao_);
 	// Set the model matrix to the provided transform
 	model_ = transform;
 
@@ -154,6 +157,29 @@ void Renderer2D::drawQuad(Shader& shader, const glm::mat4& transform, const glm:
 	shader.setVec4("color", color); // Set the color uniform
 
 	shader.setInt("useTexture", 0);
+	shader.setInt("slot", 0);
+
+	// Draw the quad using the EBO, VAO already bound in beginScene
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void Renderer2D::drawTexturedQuad(Shader& shader, const glm::mat4& transform, const glm::vec4& color, Texture *texture) {
+	// Ensure our quad VAO is bound
+	glBindVertexArray(vao_);
+
+	// Set the model matrix to the provided transform
+	model_ = transform;
+
+	// Compute MVP
+	glm::mat4 mvp = proj_ * view_ * model_;
+
+	// Bind and configure texture
+	texture->bind(0); // Bind to texture unit 0
+
+	// Set the MVP matrix and uniforms
+	shader.setMat4("MVP", mvp);
+	shader.setVec4("color", color);
+	shader.setInt("useTexture", 1);
 	shader.setInt("slot", 0);
 
 	// Draw the quad using the EBO, VAO already bound in beginScene

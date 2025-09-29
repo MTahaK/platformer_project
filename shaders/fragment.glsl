@@ -12,7 +12,7 @@ void main()
 	// Set the fragment color to the uniform color
 	if(useTexture == 1){
 		// vec2 transformedUV = TexCoord * uvScale + uvOffset;
-		FragColor = texture(slot, v_TexCoord) * color;
+		FragColor = texture(slot, v_TexCoord);
 	} else {
 		FragColor = color;
 	}

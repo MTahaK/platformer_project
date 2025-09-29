@@ -176,15 +176,12 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 	tilemap.renderTileMap(shader, renderer); // Render the tilemap
 
 	glm::mat4 model = player.getModelMatrix();
-	if(player.texture_ != nullptr){
-		std::cout<<"Drawing texture\n";
-		player.texture_->bind(0);
-		shader.setInt("useTexture", 1);
-		shader.setInt("slot", 0);
-	} else{
-		shader.setInt("useTexture", 0);
+	if (player.texture_ != nullptr) {
+		std::cout << "Drawing texture\n";
+		renderer.drawTexturedQuad(shader, model, player.getColor(), player.texture_);
+	} else {
+		renderer.drawQuad(shader, model, player.getColor()); // Draw the player object
 	}
-	renderer.drawQuad(shader, model, player.getColor()); // Draw the player object
 
 	// Draw player sensors
 	if (g_debugEnabled) {
@@ -201,7 +198,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 
 void drawObjects(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects) {
 	for (const auto& object : objects) {
-		glm::mat4 model = object.getModelMatrix();
+		glm::mat4 model = object.getModelMatrix();   
 		renderer.drawQuad(shader, model, object.getColor());
 	}
 }

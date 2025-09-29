@@ -9,6 +9,9 @@
 #include "shader.hpp"
 #include "globals.hpp"
 
+// Forward declaration to avoid circular include with texture.hpp
+class Texture;
+
 struct BatchVertex {
 		glm::vec2 position;
 		glm::vec4 color;
@@ -25,6 +28,8 @@ class Renderer2D {
 		void shutdown();
 		void beginScene(Shader& shader, const glm::mat4& view, const glm::mat4& proj); // Runs at start of frame before drawing
 		void drawQuad(Shader& shader, const glm::mat4& transform, const glm::vec4& color);
+		// Draw a textured quad (binds texture unit 0 and sets useTexture=1)
+		void drawTexturedQuad(Shader& shader, const glm::mat4& transform, const glm::vec4& color, Texture *texture);
 		void drawLine(Shader& shader, const glm::vec2& start, const glm::vec2& end, const glm::vec4& color);
 		void endScene(); // Runs at end of frame after drawing
 		// Doesn't really do anything now, as I'm using immediate rendering
