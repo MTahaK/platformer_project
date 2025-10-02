@@ -2,8 +2,17 @@
 
 void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 	// Horizontal pass
+	glm::vec2 oldVel = player.getVelocity();
 	float velX = player.getAcceleration().x * deltaTime; // Calculate velocity based on acceleration
 	player.addVelocity(glm::vec2(velX, 0.0f));			 // ! *Add* velocity
+
+	// Prevent deceleration from overshooting zero (flipping sign)
+	// Ensures that velocity must hit 0 the frame before the player's direction of 
+	// travel can actually change
+    if ((oldVel.x > 0.0f && player.getVelocity().x < 0.0f) ||
+        (oldVel.x < 0.0f && player.getVelocity().x > 0.0f)) {
+        player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
+    }
 
 	if (std::abs(player.getVelocity().x) >= MAX_VELOCITY) { // Limit horizontal velocity
 		if (velX > 0.0f) {
@@ -14,27 +23,14 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 	}
 	if (std::abs(player.getVelocity().x) < 0.01f) {
 		player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
-		// player.sensorUpdate();
 	}
-	
-	// Direction update
-	if(player.getAcceleration().x > 0 && player.getVelocity().x > 0) {
-		player.setFacingDirection(FacingDirection::RIGHT);
-	} else if (player.getAcceleration().x < 0 && player.getVelocity().x < 0) {
-		player.setFacingDirection(FacingDirection::LEFT);
-	}
-	
 	// Vertical pass + gravity
 	if (player.isGrounded()) {
 		player.setVelocity(glm::vec2(player.getVelocity().x, 0));
-		player.sensorUpdate(); // KEEP THIS UPDATE HERE! ESSENTIAL FOR PREVENTING SENSORS FROM LAGGING BEHIND
-		
-		// return; // Early return, no vertical movement needed
 	}
 	float velY = (player.getAcceleration().y + gravity) * deltaTime;
 	
 	player.addVelocity(glm::vec2(0.0f, velY));
-	player.applyVelocity(deltaTime);
 	
 	if (std::abs(player.getVelocity().y) >= MAX_VELOCITY) { // Limit vertical velocity
 		if (velY > 0.0f) {
@@ -43,6 +39,7 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 			player.setVelocity(glm::vec2(player.getVelocity().x, -MAX_VELOCITY));
 		}
 	}
+	player.applyVelocity(deltaTime);
 	player.sensorUpdate(); // KEEP THIS UPDATE HERE! ESSENTIAL FOR PREVENTING SENSORS FROM LAGGING BEHIND
 
 }

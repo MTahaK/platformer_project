@@ -37,6 +37,7 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
 InputResult playerInput(GameObject& player) {
 	
 	if (Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)) {
+		player.setFacingDirection(FacingDirection::LEFT);
 		if (player.getVelocity().x > 0) {
 			// Player is currently moving right, increase acceleration in opposite direction
 			player.setAcceleration(glm::vec2(-turnaroundAccel, player.getAcceleration().y));
@@ -44,6 +45,7 @@ InputResult playerInput(GameObject& player) {
 			player.setAcceleration(glm::vec2(-movementAccel, player.getAcceleration().y));
 		}
 	} else if (Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)) {
+		player.setFacingDirection(FacingDirection::RIGHT);
 		if (player.getVelocity().x < 0) {
 			// Player is currently moving left, increase acceleration in opposite direction
 			player.setAcceleration(glm::vec2(turnaroundAccel, player.getAcceleration().y));
@@ -178,6 +180,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 	glm::mat4 model = player.getModelMatrix();
 	if (player.getTexture() != nullptr) {
 		// renderer.drawTexturedQuad(shader, model, player.getColor(), player.getTexture());
+		
 		renderer.setPlayerUVRect(player.uvMin, player.uvMax);
 		renderer.drawPlayer(shader, model, player.getColor(), player.getTexture());
 	} else {
