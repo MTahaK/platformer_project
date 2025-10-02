@@ -5,6 +5,8 @@
 #include <vector>
 #include <memory>
 #include "behavior.hpp"
+#include "texture.hpp"
+
 struct AABB {
 		float left, right, top, bottom;
 };
@@ -121,7 +123,7 @@ class GameObject {
 		Texture* getTexture() const { return texture_; }
 		void setTexture(Texture* texture) { texture_ = texture; }
 		void clearTexture() { texture_ = nullptr; }
-		
+
 	private:
 		glm::vec2 position_; // X, Y position
 		glm::vec2 scale_;	 // Scaling coefficient (in each direction)

@@ -56,7 +56,7 @@ int main(void) {
 	objects.push_back(std::move(deathWall));
 
 
-	player.texture_ = &sonicTexture;
+	player.setTexture(&sonicTexture);
 
 	GameManager gameManager(window, shader, renderer, levelManager, tilemap, player, objects, physicsSystem);
 

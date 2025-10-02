@@ -40,9 +40,9 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 
 	// Direction update
 	if(player.getVelocity().x > 0) {
-		player.facingDirection_ = FacingDirection::RIGHT;
+		player.setFacingDirection(FacingDirection::RIGHT);
 	} else if (player.getVelocity().x < 0) {
-		player.facingDirection_ = FacingDirection::LEFT;
+		player.setFacingDirection(FacingDirection::LEFT);
 	}
 }
 

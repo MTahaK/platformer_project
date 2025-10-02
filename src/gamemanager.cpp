@@ -327,7 +327,7 @@ void GameManager::handlePlayState() {
 			DEBUG_ONLY(std::cout << "Player died, transitioning to DEAD state." << std::endl;);
 			return;
 		}
-		updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
+		// updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
 	}
 
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
