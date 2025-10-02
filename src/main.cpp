@@ -16,12 +16,18 @@ int main(void) {
 
 	renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
 
-	// --- TILEMAP SETUP ---
+	// --- ASSET LOADING ---
 	std::string tilemapFile = "./assets/levels/test2.tmap";
 
 	Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
-
+	
 	LevelManager levelManager("./assets/levels");
+	
+	Texture defTexture("./assets/textures/player.png");
+	Texture sonicTexture("./assets/textures/sonic.png");
+
+	defTexture.bind(0);
+	sonicTexture.bind(1);
 
 	PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
 
@@ -49,10 +55,8 @@ int main(void) {
 	deathWall.setBehavior(std::make_unique<DeathWallBehavior>(deathWallBehavior));
 	objects.push_back(std::move(deathWall));
 
-	Texture playerTexture("./assets/textures/player.png");
-	playerTexture.bind(0);
 
-	player.texture_ = &playerTexture;
+	player.texture_ = &sonicTexture;
 
 	GameManager gameManager(window, shader, renderer, levelManager, tilemap, player, objects, physicsSystem);
 

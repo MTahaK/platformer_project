@@ -9,6 +9,11 @@ struct AABB {
 		float left, right, top, bottom;
 };
 
+enum class FacingDirection {
+		LEFT,
+		RIGHT
+};
+
 bool checkCollision(const AABB& a, const AABB& b);
 
 class GameObject {
@@ -108,6 +113,15 @@ class GameObject {
 		void handlePlayerCollision(class PlayerObject& player);
 		Behavior* getBehavior() const { return behavior_.get(); }
 
+		// Texture rendering and management
+		FacingDirection getFacingDirection() const { return facingDirection_; }
+		void setFacingDirection(FacingDirection dir) { facingDirection_ = dir; }
+		void swapFacingDirection();
+
+		Texture* getTexture() const { return texture_; }
+		void setTexture(Texture* texture) { texture_ = texture; }
+		void clearTexture() { texture_ = nullptr; }
+		
 	private:
 		glm::vec2 position_; // X, Y position
 		glm::vec2 scale_;	 // Scaling coefficient (in each direction)
@@ -123,6 +137,12 @@ class GameObject {
 		AABB aabb_;								   // Axis-aligned bounding box for collision detection
 
 		bool isGrounded_ = false;
+
+		// Ok fine I'll make it private
+		FacingDirection facingDirection_ = FacingDirection::RIGHT;
+
+		// Pointer to texture
+		Texture* texture_ = nullptr;
 
 		// Behavior system
 		std::unique_ptr<Behavior> behavior_;

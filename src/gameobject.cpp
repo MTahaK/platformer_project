@@ -92,3 +92,7 @@ void GameObject::handlePlayerCollision(PlayerObject& player) {
 		behavior_->onPlayerCollision(*this, player);
 	}
 }
+
+void GameObject::swapFacingDirection() {
+	facingDirection_ = (facingDirection_ == FacingDirection::LEFT) ? FacingDirection::RIGHT : FacingDirection::LEFT;
+}
