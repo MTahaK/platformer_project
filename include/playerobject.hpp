@@ -57,6 +57,7 @@ class PlayerObject : public GameObject {
 		}
 
 		MoveState moveState_ = MoveState::IDLE;
+		MoveState prevMoveState_ = MoveState::IDLE;
 
 		void updateMoveState();
 
@@ -90,6 +91,9 @@ class PlayerObject : public GameObject {
 		inline UVRect gridCellUV(int col, int row, int cols, int rows);
 
 		void updateAnimation(float deltaTime, float frameDuration);
+
+		float frameTimer = 0.0f;
+		glm::ivec2 currentFrame = glm::ivec2(0, 0);
 
 	private:
 		// PlayerObject adds four 'sensors' to detect collisions

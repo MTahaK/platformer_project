@@ -306,14 +306,14 @@ void GameManager::handlePlayState() {
 		}
 	} else{
 		auto inputResult = playerInput(player_);
-	
+		
 		if (inputResult == InputResult::PAUSE) {
 			setState(GameState::PAUSE);
 			DEBUG_ONLY(std::cout << "Pausing game." << std::endl;);
 			return;
 		}
 		physics_.deltaTime = deltaTime; // Update physics system delta time - kinda weird, might consolidate
-	
+		
 		updatePStatePlayer(player_, physics_, tilemap_, objects_, deltaTime);
 		if (player_.checkIfInGoal()) {
 			// Transition to WIN state
@@ -327,18 +327,19 @@ void GameManager::handlePlayState() {
 			DEBUG_ONLY(std::cout << "Player died, transitioning to DEAD state." << std::endl;);
 			return;
 		}
+		static float frameDuration;
+		player_.updateMoveState();
+		if(player_.moveState_ == MoveState::RUN2){
+			frameDuration = 1 / 20.0f; // 20 FPS
+		} else{
+			frameDuration = 1 / 10.0f; // 10 FPS
+		}
+		player_.updateAnimation(deltaTime, frameDuration);
+
+		
 		// updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
 	}
-	static float anim_frame_duration = 1 / 8.0f;
-	player_.updateAnimation(deltaTime, anim_frame_duration);
 	
-	if(player_.getFacingDirection() == FacingDirection::RIGHT){
-			player_.uvMin = glm::vec2(1.0f, 0.0f);
-			player_.uvMax = glm::vec2(0.0f, 1.0f);
-	} else if(player_.getFacingDirection() == FacingDirection::LEFT){
-			player_.uvMin = glm::vec2(0.0f, 0.0f);
-			player_.uvMax = glm::vec2(1.0f, 1.0f);
-	}
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
 	drawObjects(window_, renderer_, shader_, objects_);
 
@@ -346,7 +347,7 @@ void GameManager::handlePlayState() {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	
-	ImGui::SetNextWindowSize(ImVec2(450, 230), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(570, 240), ImGuiCond_Always);
 	ImGui::SetNextWindowPos(ImVec2(15, 15), ImGuiCond_Always);
 	ImGui::SetNextWindowBgAlpha(0.5f); // Transparent background
 	
@@ -356,6 +357,8 @@ void GameManager::handlePlayState() {
 			ImGui::Text("Player Position: %.2f, %.2f", player_.getPosition().x, player_.getPosition().y);
 			ImGui::Text("Player Velocity: %.2f, %.2f", player_.getVelocity().x, player_.getVelocity().y);
 			ImGui::Text("Player Move State: %s", moveStateToString(player_.moveState_).c_str());
+			ImGui::Text("Player Animation Frame Indices: (%d, %d)", player_.currentFrame.x, player_.currentFrame.y);
+			ImGui::Text("Player UV: Min(%.2f, %.2f) Max(%.2f, %.2f)", player_.uvMin.x, player_.uvMin.y, player_.uvMax.x, player_.uvMax.y);
 			ImGui::Text("Player Facing Direction: %s", facingDirectionToString(player_.getFacingDirection()).c_str());
 			ImGui::Text("Player Grounded: %s", player_.isGrounded() ? "Yes" : "No");
 			ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);

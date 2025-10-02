@@ -83,19 +83,19 @@ InputResult playerInput(GameObject& player) {
 		return InputResult::PAUSE;
 	}
 
-	std::ostringstream oss;
-	glm::vec2 velocity = player.getVelocity();
-	glm::vec2 acceleration = player.getAcceleration();
-	bool grounded = player.isGrounded();
+	// std::ostringstream oss;
+	// glm::vec2 velocity = player.getVelocity();
+	// glm::vec2 acceleration = player.getAcceleration();
+	// bool grounded = player.isGrounded();
 
-	oss << "Vel (X,Y): (" << velocity.x << ", " << velocity.y << ")  "
-		<< "Acc (X,Y): (" << acceleration.x << ", " << acceleration.y << ")  "
-		<< "Grounded?: " << std::boolalpha << grounded << "  "
-		<< "Debug: " << g_debugEnabled;
-	std::string output = oss.str();
-	output.resize(90, ' '); // Pad to overwrite old output cleanly
+	// oss << "Vel (X,Y): (" << velocity.x << ", " << velocity.y << ")  "
+	// 	<< "Acc (X,Y): (" << acceleration.x << ", " << acceleration.y << ")  "
+	// 	<< "Grounded?: " << std::boolalpha << grounded << "  "
+	// 	<< "Debug: " << g_debugEnabled;
+	// std::string output = oss.str();
+	// output.resize(90, ' '); // Pad to overwrite old output cleanly
 
-	std::cout << "\r" << output << std::flush;
+	// std::cout << "\r" << output << std::flush;
 	return InputResult::CONTINUE; // Continue normal processing;
 }
 

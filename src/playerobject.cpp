@@ -77,9 +77,7 @@ UVRect PlayerObject::gridCellUV(int col, int row, int cols, int rows) {
 }
 
 void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
-	static float frameTimer = 0.0f;
 	frameTimer += deltaTime;
-
 	int totalFrames = 1;
 	glm::ivec2 startFrame(0);
 	glm::ivec2 endFrame(0);
@@ -115,16 +113,43 @@ void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
 			break;
 	}
 
+	if(moveState_ != prevMoveState_){
+        prevMoveState_ = moveState_;
+        currentFrame = startFrame;
+        frameTimer = 0.0f;
+    }
+
+	// Sprite 'array' is a 8x7 grid, 8 cols, 7 rows
+	// Bounds are defined in player object as numFramesX/Y
 	if(frameTimer >= frameDuration){
-		frameTimer -= frameDuration; // Reset timer but keep overflow
-
-		// Update horizontal frame
-		u_offset_ += 1.0f / float(totalFrames);
-		if(u_offset_ > (float(endFrame.x) + 1.0f) / float(numFramesX)){
-			u_offset_ = float(startFrame.x) / float(numFramesX);
+		// Current frame has lingered for long enough, advance frame
+		frameTimer -= frameDuration;
+		
+		if (currentFrame == endFrame) {
+			// If we've reached the end frame, loop back to start
+			DEBUG_ONLY(std::cout << "Looping animation back to start frame\n";);
+			currentFrame = startFrame;
 		}
-
-		// Update vertical frame
-		v_offset_ = float(startFrame.y) / float(numFramesY); // Just set to the starting row for now
+		// If we've gone past the end of this row, wrap to next row
+        if(currentFrame.x > numFramesX - 1){
+			currentFrame.x = 0;
+            currentFrame.y++;
+        }
+		
+		currentFrame.x++;
+        // If we've gone past the last row, wrap back to start
+		// Based on the setup of the sprite sheet, this is actually unnecessary
+        // if(currentFrame.y > numFramesY - 1){
+        //     currentFrame = startFrame; // Reset to first frame
+        // }
 	}
+
+	UVRect rect = gridCellUV(currentFrame.x, currentFrame.y, numFramesX, numFramesY);
+	uvMin = glm::vec2(rect.u0, rect.v0);
+	uvMax = glm::vec2(rect.u1, rect.v1);
+
+
+	if(getFacingDirection() == FacingDirection::RIGHT){
+        std::swap(uvMin.x, uvMax.x);
+    }
 }

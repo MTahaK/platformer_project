@@ -90,7 +90,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 	// Before this block runs at least once, in_goal is still false
 	if (player.getGoalCount() >= 4 && !player.checkIfInGoal()) {
 		player.setInGoal(true);
-		DEBUG_ONLY(std::cout << "Player has reached the goal!\n";);
+		// DEBUG_ONLY(std::cout << "Player has reached the goal!\n";);
 	}
 
 	// Check collisions with the tilemap using sensors
@@ -105,8 +105,8 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 			float tileposx = tile.position.x;
 			float tileright = tileposx + tilemap.getTileSize();
 
-			DEBUG_ONLY(std::cout << "Left sensor position: " << player.getLeftSensor().position.x << "\n";
-					   std::cout << "Tile right position: " << tileright << "\n";);
+			// DEBUG_ONLY(std::cout << "Left sensor position: " << player.getLeftSensor().position.x << "\n";
+			// 		   std::cout << "Tile right position: " << tileright << "\n";);
 
 			if (player.getLeftSensor().position.x < tileright) {
 				// If left sensor is to left of right tile edge, snap it to the right edge
@@ -124,8 +124,8 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 			auto tile = tilemap.getTile(tileidx.x, tileidx.y);
 			float tileleft = tile.position.x; // Tile position is bottom left corner, can just use position.x
 
-			DEBUG_ONLY(std::cout << "Right sensor position: " << player.getRightSensor().position.x << "\n";
-					   std::cout << "Tile left position: " << tileleft << "\n";);
+			// DEBUG_ONLY(std::cout << "Right sensor position: " << player.getRightSensor().position.x << "\n";
+			// 		   std::cout << "Tile left position: " << tileleft << "\n";);
 
 			if (player.getRightSensor().position.x > tileleft) {
 				// If right sensor is to right of left tile edge, snap it to the left edge
@@ -144,8 +144,8 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 			float tileposx = tile.position.x;
 			float tileright = tileposx + tilemap.getTileSize();
 
-			DEBUG_ONLY(std::cout << "Left sensor position: " << player.getLeftSensor().position.x << "\n";
-					   std::cout << "Tile right position: " << tileright << "\n";);
+			// DEBUG_ONLY(std::cout << "Left sensor position: " << player.getLeftSensor().position.x << "\n";
+			// 		   std::cout << "Tile right position: " << tileright << "\n";);
 
 			if (player.getLeftSensor().position.x < tileright) {
 				// If left sensor is to left of right tile edge, snap it to the right edge
@@ -162,8 +162,8 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 			auto tile = tilemap.getTile(tileidx.x, tileidx.y);
 			float tileleft = tile.position.x; // Tile position is bottom left corner, can just use position.x
 
-			DEBUG_ONLY(std::cout << "Right sensor position: " << player.getRightSensor().position.x << "\n";
-					   std::cout << "Tile left position: " << tileleft << "\n";);
+			// DEBUG_ONLY(std::cout << "Right sensor position: " << player.getRightSensor().position.x << "\n";
+			// 		   std::cout << "Tile left position: " << tileleft << "\n";);
 
 			if (player.getRightSensor().position.x > tileleft) {
 				// If right sensor is to right of left tile edge, snap it to the left edge
@@ -180,8 +180,8 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 		auto tile = tilemap.getTile(tileidx.x, tileidx.y);
 		float tilebot = tile.position.y; // Tile position is bottom left corner, can just use position.y
 
-		DEBUG_ONLY(std::cout << "Top sensor position: " << player.getTopSensor().position.x << "\n";
-				   std::cout << "Tile bottom position: " << tilebot << "\n";);
+		// DEBUG_ONLY(std::cout << "Top sensor position: " << player.getTopSensor().position.x << "\n";
+		// 		   std::cout << "Tile bottom position: " << tilebot << "\n";);
 		if (player.getTopSensor().position.y > tilebot) {
 			// If the bottom sensor is above the tile top, snap it to the tile top
 			player.offsetPosition(glm::vec2(0.0f, tilebot - player.getTopSensor().position.y - EPSILON));
@@ -199,8 +199,8 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 		auto tile = tilemap.getTile(tileidx.x, tileidx.y);
 		float tileposy = tile.position.y;
 		float tiletop = tileposy + tilemap.getTileSize();
-		DEBUG_ONLY(std::cout << "Bottom sensor position: " << player.getBottomSensor().position.x << "\n";
-				   std::cout << "Tile top position: " << tiletop << "\n";);
+		// DEBUG_ONLY(std::cout << "Bottom sensor position: " << player.getBottomSensor().position.x << "\n";
+		// 		   std::cout << "Tile top position: " << tiletop << "\n";);
 		if (player.getBottomSensor().position.y < tiletop) {
 			// If the bottom sensor is above the tile top, snap it to the tile top
 			player.offsetPosition(glm::vec2(0.0f, tiletop - player.getBottomSensor().position.y + EPSILON));
