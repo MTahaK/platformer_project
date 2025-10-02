@@ -37,7 +37,8 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
 InputResult playerInput(GameObject& player) {
 	
 	if (Input::isKeyPressed(GLFW_KEY_LEFT) || Input::isKeyPressed(GLFW_KEY_A)) {
-		player.setFacingDirection(FacingDirection::LEFT);
+		// If not grounded, tie direction to INPUT (typical of 2D Sonic)
+		if (!player.isGrounded()) player.setFacingDirection(FacingDirection::LEFT);
 		if (player.getVelocity().x > 0) {
 			// Player is currently moving right, increase acceleration in opposite direction
 			player.setAcceleration(glm::vec2(-turnaroundAccel, player.getAcceleration().y));
@@ -45,7 +46,7 @@ InputResult playerInput(GameObject& player) {
 			player.setAcceleration(glm::vec2(-movementAccel, player.getAcceleration().y));
 		}
 	} else if (Input::isKeyPressed(GLFW_KEY_RIGHT) || Input::isKeyPressed(GLFW_KEY_D)) {
-		player.setFacingDirection(FacingDirection::RIGHT);
+		if (!player.isGrounded()) player.setFacingDirection(FacingDirection::RIGHT);
 		if (player.getVelocity().x < 0) {
 			// Player is currently moving left, increase acceleration in opposite direction
 			player.setAcceleration(glm::vec2(turnaroundAccel, player.getAcceleration().y));

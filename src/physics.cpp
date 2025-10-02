@@ -24,6 +24,18 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 	if (std::abs(player.getVelocity().x) < 0.01f) {
 		player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
 	}
+	
+	// Update facing direction based on velocity if grounded (midair update tied to input)
+	if(player.isGrounded()){
+		if(player.getVelocity().x < 0.0f) {
+			// Moving left
+			player.setFacingDirection(FacingDirection::LEFT);
+		} else if (player.getVelocity().x > 0.0f) {
+			// Moving right
+			player.setFacingDirection(FacingDirection::RIGHT);
+		}
+	}
+
 	// Vertical pass + gravity
 	if (player.isGrounded()) {
 		player.setVelocity(glm::vec2(player.getVelocity().x, 0));
@@ -40,6 +52,7 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 		}
 	}
 	player.applyVelocity(deltaTime);
+
 	player.sensorUpdate(); // KEEP THIS UPDATE HERE! ESSENTIAL FOR PREVENTING SENSORS FROM LAGGING BEHIND
 
 }

@@ -346,11 +346,12 @@ void GameManager::handlePlayState() {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	
-	ImGui::SetNextWindowSize(ImVec2(300, 150), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(450, 230), ImGuiCond_Always);
 	ImGui::SetNextWindowPos(ImVec2(15, 15), ImGuiCond_Always);
 	ImGui::SetNextWindowBgAlpha(0.5f); // Transparent background
 	
 	if (g_debugEnabled) {
+		ImGui::PushFont(Fonts::mediumFont);
 		if (ImGui::Begin("Debug Info")) {
 			ImGui::Text("Player Position: %.2f, %.2f", player_.getPosition().x, player_.getPosition().y);
 			ImGui::Text("Player Velocity: %.2f, %.2f", player_.getVelocity().x, player_.getVelocity().y);
@@ -360,6 +361,7 @@ void GameManager::handlePlayState() {
 			ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		}
 		ImGui::End();
+		ImGui::PopFont();
 	}
 	if(levelCountdown_) renderCountdown(countdownTimer_);
 
