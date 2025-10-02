@@ -177,8 +177,9 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 
 	glm::mat4 model = player.getModelMatrix();
 	if (player.getTexture() != nullptr) {
-		std::cout << "Drawing texture\n";
-		renderer.drawTexturedQuad(shader, model, player.getColor(), player.getTexture());
+		// renderer.drawTexturedQuad(shader, model, player.getColor(), player.getTexture());
+		renderer.setPlayerUVRect(player.uvMin, player.uvMax);
+		renderer.drawPlayer(shader, model, player.getColor(), player.getTexture());
 	} else {
 		renderer.drawQuad(shader, model, player.getColor()); // Draw the player object
 	}

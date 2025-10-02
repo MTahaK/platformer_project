@@ -30,6 +30,9 @@ class Renderer2D {
 		void drawQuad(Shader& shader, const glm::mat4& transform, const glm::vec4& color);
 		// Draw a textured quad (binds texture unit 0 and sets useTexture=1)
 		void drawTexturedQuad(Shader& shader, const glm::mat4& transform, const glm::vec4& color, Texture *texture);
+		// Player-specific: dynamic VBO for per-frame UV updates
+		void setPlayerUVRect(const glm::vec2& uvMin, const glm::vec2& uvMax);
+		void drawPlayer(Shader& shader, const glm::mat4& transform, const glm::vec4& color, Texture* texture);
 		void drawLine(Shader& shader, const glm::vec2& start, const glm::vec2& end, const glm::vec4& color);
 		void endScene(); // Runs at end of frame after drawing
 		// Doesn't really do anything now, as I'm using immediate rendering
@@ -51,6 +54,10 @@ class Renderer2D {
 		GLuint vao_;
 		GLuint vbo_;
 		GLuint ebo_;
+
+		// Player-specific buffers (same layout as generic quad)
+		GLuint playerVAO_ = 0;
+		GLuint playerVBO_ = 0;
 
 		GLuint lineVAO_;
 		GLuint lineVBO_;

@@ -62,6 +62,34 @@ bool Renderer2D::init(Shader& shader) {
 	// Unbind VAO to avoid accidental modification
 	glBindVertexArray(0);
 
+	// --- Player-specific dynamic quad setup ---
+	glGenVertexArrays(1, &playerVAO_);
+	glBindVertexArray(playerVAO_);
+
+	glGenBuffers(1, &playerVBO_);
+	glBindBuffer(GL_ARRAY_BUFFER, playerVBO_);
+
+	// Initialize with the same quad vertex layout; UVs will be updated per-frame
+	float pVertices[] = {
+		// x, y, u, v
+		-0.5f, -0.5f, 0.0f, 0.0f,
+		 0.5f, -0.5f, 1.0f, 0.0f,
+		 0.5f,  0.5f, 1.0f, 1.0f,
+		-0.5f,  0.5f, 0.0f, 1.0f
+	};
+	glBufferData(GL_ARRAY_BUFFER, sizeof(pVertices), pVertices, GL_DYNAMIC_DRAW);
+
+	// Bind the same EBO so index order matches
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+
+	// Attribute layout identical to generic VAO
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(0);
+
 	// Set up glClearColor
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // Dark grey
 	glEnable(GL_BLEND);
@@ -183,6 +211,43 @@ void Renderer2D::drawTexturedQuad(Shader& shader, const glm::mat4& transform, co
 	shader.setInt("slot", 0);
 
 	// Draw the quad using the EBO, VAO already bound in beginScene
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void Renderer2D::setPlayerUVRect(const glm::vec2& uvMin, const glm::vec2& uvMax) {
+	// Update only the UV components in the dynamic VBO
+	// Layout per vertex: [x, y, u, v]
+	struct UVPair { float u, v; };
+	UVPair uvs[4];
+	// BL, BR, TR, TL
+	uvs[0] = { uvMin.x, uvMin.y };
+	uvs[1] = { uvMax.x, uvMin.y };
+	uvs[2] = { uvMax.x, uvMax.y };
+	uvs[3] = { uvMin.x, uvMax.y };
+
+	glBindBuffer(GL_ARRAY_BUFFER, playerVBO_);
+	float playerVertices[16] = {
+		-0.5f, -0.5f, uvs[0].u, uvs[0].v,
+		 0.5f, -0.5f, uvs[1].u, uvs[1].v,
+		 0.5f,  0.5f, uvs[2].u, uvs[2].v,
+		-0.5f,  0.5f, uvs[3].u, uvs[3].v
+	};
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(playerVertices), playerVertices);
+}
+
+void Renderer2D::drawPlayer(Shader& shader, const glm::mat4& transform, const glm::vec4& color, Texture* texture) {
+	// Bind player VAO to use dynamic VBO UVs
+	glBindVertexArray(playerVAO_);
+
+	model_ = transform;
+	glm::mat4 mvp = proj_ * view_ * model_;
+
+	texture->bind(0);
+	shader.setMat4("MVP", mvp);
+	shader.setVec4("color", color);
+	shader.setInt("useTexture", 1);
+	shader.setInt("slot", 0);
+
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 

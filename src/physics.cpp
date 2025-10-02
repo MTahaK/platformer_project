@@ -12,23 +12,30 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 			player.setVelocity(glm::vec2(-MAX_VELOCITY, player.getVelocity().y));
 		}
 	}
-	player.applyVelocity(deltaTime);
 	if (std::abs(player.getVelocity().x) < 0.01f) {
 		player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));
 		// player.sensorUpdate();
 	}
-
+	
+	// Direction update
+	if(player.getAcceleration().x > 0 && player.getVelocity().x > 0) {
+		player.setFacingDirection(FacingDirection::RIGHT);
+	} else if (player.getAcceleration().x < 0 && player.getVelocity().x < 0) {
+		player.setFacingDirection(FacingDirection::LEFT);
+	}
+	
 	// Vertical pass + gravity
 	if (player.isGrounded()) {
 		player.setVelocity(glm::vec2(player.getVelocity().x, 0));
 		player.sensorUpdate(); // KEEP THIS UPDATE HERE! ESSENTIAL FOR PREVENTING SENSORS FROM LAGGING BEHIND
-
-		return; // Early return, no vertical movement needed
+		
+		// return; // Early return, no vertical movement needed
 	}
 	float velY = (player.getAcceleration().y + gravity) * deltaTime;
-
+	
 	player.addVelocity(glm::vec2(0.0f, velY));
-
+	player.applyVelocity(deltaTime);
+	
 	if (std::abs(player.getVelocity().y) >= MAX_VELOCITY) { // Limit vertical velocity
 		if (velY > 0.0f) {
 			player.setVelocity(glm::vec2(player.getVelocity().x, MAX_VELOCITY));
@@ -38,12 +45,6 @@ void Physics::playerMovementStep(PlayerObject& player, float deltaTime) {
 	}
 	player.sensorUpdate(); // KEEP THIS UPDATE HERE! ESSENTIAL FOR PREVENTING SENSORS FROM LAGGING BEHIND
 
-	// Direction update
-	if(player.getVelocity().x > 0) {
-		player.setFacingDirection(FacingDirection::RIGHT);
-	} else if (player.getVelocity().x < 0) {
-		player.setFacingDirection(FacingDirection::LEFT);
-	}
 }
 
 void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap) {

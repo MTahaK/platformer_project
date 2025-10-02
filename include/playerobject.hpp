@@ -8,6 +8,12 @@ struct Sensor {
 		glm::vec4 color;	// Only used for debug view
 };
 
+enum class MoveState { IDLE, WALK, RUN1, RUN2, JUMP, FALL };
+
+struct UVRect {
+		float u0, v0, u1, v1;
+}; // min/max, normalized
+
 // PlayerObject class inherits from GameObject
 class PlayerObject : public GameObject {
 
@@ -33,6 +39,57 @@ class PlayerObject : public GameObject {
 
 		bool checkIfInGoal() { return inGoal_; }
 		bool getShouldDie() const { return shouldDie_; }
+
+		float u_offset_ = 0.0f; // Horizontal texture offset for animation
+		float v_offset_ = 0.0f; // Vertical texture offset for animation
+
+		glm::vec2 uvMin = glm::vec2(0.0f, 0.0f); // UV coordinates for texture mapping
+		glm::vec2 uvMax = glm::vec2(1.0f, 1.0f);
+
+		void flipUVY() {
+			// Not a real flip, essentially sets UV to 'right facing' according to texture
+			uvMin.y = 1.0f;
+			uvMax.y = 0.0f;
+		}
+		void flipUVX() {
+			uvMin.x = 1.0f;
+			uvMax.x = 0.0f;
+		}
+
+		MoveState moveState_ = MoveState::IDLE;
+
+		void updateMoveState();
+
+		int numFramesIdle = 31;
+		int numFramesWalk = 8;
+		int numFramesRun1 = 8;
+		int numFramesRun2 = 8;
+
+		int numFramesX = 8;
+		int numFramesY = 7;
+
+		int atlasW = 320;
+		int atlasH = 266;
+
+		int texW = atlasW / numFramesX;
+		int texH = atlasH / numFramesY;
+
+		// starting and ending 'indices' as pairs for each animation in sprite sheet
+		glm::ivec2 walkStart = glm::ivec2(0, 0);
+		glm::ivec2 walkEnd = glm::ivec2(7, 0);
+
+		glm::ivec2 run1Start = glm::ivec2(0, 1);
+		glm::ivec2 run1End = glm::ivec2(7, 1);
+
+		glm::ivec2 run2Start = glm::ivec2(0, 2);
+		glm::ivec2 run2End = glm::ivec2(7, 2);
+
+		glm::ivec2 idleStart = glm::ivec2(0, 3);
+		glm::ivec2 idleEnd = glm::ivec2(6, 6);
+
+		inline UVRect gridCellUV(int col, int row, int cols, int rows, int texW, int texH);
+
+		void updateAnimation(float deltaTime, float frameDuration);
 
 	private:
 		// PlayerObject adds four 'sensors' to detect collisions

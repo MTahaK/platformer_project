@@ -329,7 +329,16 @@ void GameManager::handlePlayState() {
 		}
 		// updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
 	}
-
+	static float anim_frame_duration = 1 / 8.0f;
+	player_.updateAnimation(deltaTime, anim_frame_duration);
+	
+	if(player_.getFacingDirection() == FacingDirection::RIGHT){
+			player_.uvMin = glm::vec2(1.0f, 0.0f);
+			player_.uvMax = glm::vec2(0.0f, 1.0f);
+	} else if(player_.getFacingDirection() == FacingDirection::LEFT){
+			player_.uvMin = glm::vec2(0.0f, 0.0f);
+			player_.uvMax = glm::vec2(1.0f, 1.0f);
+	}
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
 	drawObjects(window_, renderer_, shader_, objects_);
 
