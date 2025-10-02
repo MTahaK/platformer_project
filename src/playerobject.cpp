@@ -49,10 +49,10 @@ bool PlayerObject::tileGoalCollision(Tilemap& tilemap, const Sensor& sensor) {
 
 void PlayerObject::updateMoveState(){
 	auto speedX = abs(getVelocity().x);
-	if(speedX > EPSILON){
-		if(speedX < 5.0f){
+	if(speedX > 0.0f){
+		if(speedX < 6.0f){
 			moveState_ = MoveState::WALK;
-		}else if(speedX < 10.0f){
+		}else if(speedX < 18.0f){
 			moveState_ = MoveState::RUN1;
 		}else{
 			moveState_ = MoveState::RUN2;
@@ -76,31 +76,38 @@ UVRect PlayerObject::gridCellUV(int col, int row, int cols, int rows) {
     return {u0, v0, u1, v1};
 }
 
+void PlayerObject::initAnimation(){
+	currentFrame = idleStart;
+	UVRect rect = gridCellUV(currentFrame.x, currentFrame.y, numFramesX, numFramesY);
+	uvMin = glm::vec2(rect.u0, rect.v0);
+	uvMax = glm::vec2(rect.u1, rect.v1);
+	if(getFacingDirection() == FacingDirection::RIGHT){
+        std::swap(uvMin.x, uvMax.x);
+    }
+}
+
 void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
 	frameTimer += deltaTime;
-	int totalFrames = 1;
 	glm::ivec2 startFrame(0);
 	glm::ivec2 endFrame(0);
 
 	switch(moveState_){
 		case MoveState::IDLE:
-			totalFrames = numFramesIdle;
 			startFrame = idleStart;
 			endFrame = idleEnd;
 			break;
 		case MoveState::WALK:
-			totalFrames = numFramesWalk;
 			startFrame = walkStart;
 			endFrame = walkEnd;
 			break;
 		case MoveState::RUN1:
-			totalFrames = numFramesRun1;
 			startFrame = run1Start;
 			endFrame = run1End;
 			break;
 		case MoveState::RUN2:
-			totalFrames = numFramesRun2;
 			startFrame = run2Start;
+			endFrame = run2End;
+			break;
 			endFrame = run2End;
 			break;
 		case MoveState::JUMP:
@@ -127,7 +134,7 @@ void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
 		
 		if (currentFrame == endFrame) {
 			// If we've reached the end frame, loop back to start
-			DEBUG_ONLY(std::cout << "Looping animation back to start frame\n";);
+			// DEBUG_ONLY(std::cout << "Looping animation back to start frame\n";);
 			currentFrame = startFrame;
 		}
 		// If we've gone past the end of this row, wrap to next row

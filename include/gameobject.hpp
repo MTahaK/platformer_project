@@ -92,6 +92,7 @@ class GameObject {
 		const std::string& getName() const { return name_; }
 
 		const glm::vec2& getVelocity() const { return velocity_; } // Returns the velocity vector
+		const glm::vec2 getSpeed() const { return glm::vec2(abs(velocity_.x), abs(velocity_.y)); } // Returns the speed (magnitude of velocity) vector
 
 		const glm::vec2& getAcceleration() const { return acceleration_; } // Returns the acceleration vector
 

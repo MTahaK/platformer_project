@@ -30,6 +30,8 @@ int main(void) {
 	sonicTexture.bind(1);
 
 	PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
+	player.initAnimation();
+
 
 	Input::initialize(window.getWindow());
 

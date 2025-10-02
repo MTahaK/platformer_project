@@ -40,9 +40,6 @@ class PlayerObject : public GameObject {
 		bool checkIfInGoal() { return inGoal_; }
 		bool getShouldDie() const { return shouldDie_; }
 
-		float u_offset_ = 0.0f; // Horizontal texture offset for animation
-		float v_offset_ = 0.0f; // Vertical texture offset for animation
-
 		glm::vec2 uvMin = glm::vec2(0.0f, 0.0f); // UV coordinates for texture mapping
 		glm::vec2 uvMax = glm::vec2(1.0f, 1.0f);
 
@@ -89,7 +86,7 @@ class PlayerObject : public GameObject {
 		glm::ivec2 idleEnd = glm::ivec2(6, 6);
 
 		inline UVRect gridCellUV(int col, int row, int cols, int rows);
-
+		void initAnimation();
 		void updateAnimation(float deltaTime, float frameDuration);
 
 		float frameTimer = 0.0f;

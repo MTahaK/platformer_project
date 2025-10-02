@@ -233,6 +233,10 @@ void GameManager::handleMenuState() {
 						player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
 						player_.setVelocity(glm::vec2(0.0f, 0.0f));
 						player_.setAcceleration(glm::vec2(0.0f, 0.0f));
+						player_.moveState_ = MoveState::IDLE;
+						player_.prevMoveState_ = MoveState::IDLE;
+						player_.currentFrame = player_.idleStart;
+						player_.initAnimation();
 						player_.sensorUpdate();
 						player_.setShouldDie(false);
 						player_.setGoalCount(0);
@@ -329,10 +333,16 @@ void GameManager::handlePlayState() {
 		}
 		static float frameDuration;
 		player_.updateMoveState();
-		if(player_.moveState_ == MoveState::RUN2){
+		if(player_.getSpeed().x <= 5.0f){
+			frameDuration = 1 / 8.0f; // 8 FPS
+		} else if(player_.getSpeed().x <= 10.0f){
+			frameDuration = 1 / 12.0f; // 12 FPS
+		} else if(player_.getSpeed().x <= 16.0f){
+			frameDuration = 1 / 16.0f; // 16 FPS
+		} else if(player_.getSpeed().x <= 28.0f){
 			frameDuration = 1 / 20.0f; // 20 FPS
-		} else{
-			frameDuration = 1 / 10.0f; // 10 FPS
+		} else if(player_.getSpeed().x > 25.0f){
+			frameDuration = 1 / 30.0f; // 24 FPS
 		}
 		player_.updateAnimation(deltaTime, frameDuration);
 
@@ -347,7 +357,7 @@ void GameManager::handlePlayState() {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	
-	ImGui::SetNextWindowSize(ImVec2(570, 240), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(570, 280), ImGuiCond_Always);
 	ImGui::SetNextWindowPos(ImVec2(15, 15), ImGuiCond_Always);
 	ImGui::SetNextWindowBgAlpha(0.5f); // Transparent background
 	
