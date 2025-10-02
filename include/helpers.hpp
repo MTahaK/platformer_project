@@ -59,3 +59,5 @@ void updateDeathWall(GameObject& deathWall, float deltaTime);
 
 // UTILITY FUNCTIONS
 std::string currentShapeToString(CurrentShape shape);
+std::string facingDirectionToString(FacingDirection dir);
+std::string moveStateToString(MoveState state);

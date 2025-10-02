@@ -87,7 +87,7 @@ class PlayerObject : public GameObject {
 		glm::ivec2 idleStart = glm::ivec2(0, 3);
 		glm::ivec2 idleEnd = glm::ivec2(6, 6);
 
-		inline UVRect gridCellUV(int col, int row, int cols, int rows, int texW, int texH);
+		inline UVRect gridCellUV(int col, int row, int cols, int rows);
 
 		void updateAnimation(float deltaTime, float frameDuration);
 

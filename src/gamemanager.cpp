@@ -346,7 +346,7 @@ void GameManager::handlePlayState() {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	
-	ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(300, 150), ImGuiCond_Always);
 	ImGui::SetNextWindowPos(ImVec2(15, 15), ImGuiCond_Always);
 	ImGui::SetNextWindowBgAlpha(0.5f); // Transparent background
 	
@@ -354,6 +354,8 @@ void GameManager::handlePlayState() {
 		if (ImGui::Begin("Debug Info")) {
 			ImGui::Text("Player Position: %.2f, %.2f", player_.getPosition().x, player_.getPosition().y);
 			ImGui::Text("Player Velocity: %.2f, %.2f", player_.getVelocity().x, player_.getVelocity().y);
+			ImGui::Text("Player Move State: %s", moveStateToString(player_.moveState_).c_str());
+			ImGui::Text("Player Facing Direction: %s", facingDirectionToString(player_.getFacingDirection()).c_str());
 			ImGui::Text("Player Grounded: %s", player_.isGrounded() ? "Yes" : "No");
 			ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		}

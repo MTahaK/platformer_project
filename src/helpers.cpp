@@ -295,3 +295,31 @@ std::string currentShapeToString(CurrentShape shape) {
 	}
 	return "N/A";
 }
+
+std::string facingDirectionToString(FacingDirection dir){
+	switch (dir) {
+		case FacingDirection::LEFT:
+			return "Left";
+		case FacingDirection::RIGHT:
+			return "Right";
+	}
+	return "N/A";
+}
+
+std::string moveStateToString(MoveState state){
+	switch (state) {
+		case MoveState::IDLE:
+			return "Idle";
+		case MoveState::WALK:
+			return "Walk";
+		case MoveState::RUN1:
+			return "Run1";
+		case MoveState::RUN2:
+			return "Run2";
+		case MoveState::JUMP:
+			return "Jump";
+		case MoveState::FALL:
+			return "Fall";
+	}
+	return "N/A";
+}

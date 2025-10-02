@@ -61,7 +61,7 @@ void PlayerObject::updateMoveState(){
 		moveState_ = MoveState::IDLE;
 	}
 }
-UVRect PlayerObject::gridCellUV(int col, int row, int cols, int rows, int texW, int texH) {
+UVRect PlayerObject::gridCellUV(int col, int row, int cols, int rows) {
 	const float cw = 1.0f / cols;           // normalized cell width
     const float ch = 1.0f / rows;           // normalized cell height
 
@@ -72,12 +72,6 @@ UVRect PlayerObject::gridCellUV(int col, int row, int cols, int rows, int texW, 
 
 	v0 = 1.0f - (row + 1) * ch;
 	v1 = 1.0f - row * ch;
-
-    // Optional half-texel inset to avoid bleeding with linear filtering/mips
-    // const float padU = 0.5f / float(texW);
-    // const float padV = 0.5f / float(texH);
-    // u0 += padU;  v0 += padV;
-    // u1 -= padU;  v1 -= padV;
 
     return {u0, v0, u1, v1};
 }
