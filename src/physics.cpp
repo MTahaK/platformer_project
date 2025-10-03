@@ -97,6 +97,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 	if (player.getVelocity().x < 0.0f) {
 		// Negative velocity, don't need to check right sensor
 		if (player.tileCollision(tilemap, player.getLeftSensor())) {
+
 			player.setVelocity(glm::vec2(0.0f, player.getVelocity().y));		 // Stop horizontal movement
 			player.setAcceleration(glm::vec2(0.0f, player.getAcceleration().y)); // Reset horizontal acceleration
 

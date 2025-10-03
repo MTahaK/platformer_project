@@ -49,7 +49,7 @@ bool PlayerObject::tileGoalCollision(Tilemap& tilemap, const Sensor& sensor) {
 
 void PlayerObject::updateMoveState(){
 	auto speedX = abs(getVelocity().x);
-	if(speedX > 0.0f){
+	if(speedX > 0.1f){
 		if(speedX < 6.0f){
 			moveState_ = MoveState::WALK;
 		}else if(speedX < 18.0f){
