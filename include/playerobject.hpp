@@ -58,19 +58,8 @@ class PlayerObject : public GameObject {
 
 		void updateMoveState();
 
-		int numFramesIdle = 31;
-		int numFramesWalk = 8;
-		int numFramesRun1 = 8;
-		int numFramesRun2 = 8;
-
 		int numFramesX = 8;
 		int numFramesY = 7;
-
-		int atlasW = 320;
-		int atlasH = 266;
-
-		int texW = atlasW / numFramesX;
-		int texH = atlasH / numFramesY;
 
 		// starting and ending 'indices' as pairs for each animation in sprite sheet
 		glm::ivec2 walkStart = glm::ivec2(0, 0);
