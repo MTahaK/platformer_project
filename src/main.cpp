@@ -24,7 +24,7 @@ int main(void) {
 	LevelManager levelManager("./assets/levels");
 	
 	Texture defTexture("./assets/textures/player.png");
-	Texture sonicTexture("./assets/textures/sonic_resprite2.png");
+	Texture sonicTexture("./assets/textures/sonic_resprite6.png");
 
 	defTexture.bind(0);
 	sonicTexture.bind(1);
