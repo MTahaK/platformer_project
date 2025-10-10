@@ -235,7 +235,7 @@ void GameManager::handleMenuState() {
 						player_.setAcceleration(glm::vec2(0.0f, 0.0f));
 						player_.moveState_ = MoveState::IDLE;
 						player_.prevMoveState_ = MoveState::IDLE;
-						player_.currentFrame = player_.idleStart;
+						player_.currentFrame = player_.idleAnim.startIdx;
 						player_.initAnimation();
 						player_.sensorUpdate();
 						player_.setShouldDie(false);

@@ -9,7 +9,7 @@ struct Sensor {
 		glm::vec4 color;	// Only used for debug view
 };
 
-struct AnimBounds {
+struct SpriteAnim {
 	std::string animName;
 	glm::ivec2 startIdx;
 	glm::ivec2 endIdx;
@@ -71,10 +71,10 @@ class PlayerObject : public GameObject {
 
 		// starting and ending 'indices' as pairs for each animation in sprite sheet
 
-		AnimBounds walkAnim = {"WALK", glm::ivec2(0,0), glm::ivec2(7,0)};
-		AnimBounds run1Anim = {"RUN1", glm::ivec2(0,1), glm::ivec2(7,1)};
-		AnimBounds run2Anim = {"RUN2", glm::ivec2(0,2), glm::ivec2(7,2)};
-		AnimBounds idleAnim = {"IDLE", glm::ivec2(0,3), glm::ivec2(6,6)};
+		SpriteAnim walkAnim = {"WALK", glm::ivec2(0,0), glm::ivec2(7,0)};
+		SpriteAnim run1Anim = {"RUN1", glm::ivec2(0,1), glm::ivec2(7,1)};
+		SpriteAnim run2Anim = {"RUN2", glm::ivec2(0,2), glm::ivec2(7,2)};
+		SpriteAnim idleAnim = {"IDLE", glm::ivec2(0,3), glm::ivec2(6,6)};
 
 		inline UVRect gridCellUV(int col, int row, int cols, int rows);
 		void initAnimation();

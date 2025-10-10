@@ -77,7 +77,7 @@ UVRect PlayerObject::gridCellUV(int col, int row, int cols, int rows) {
 }
 
 void PlayerObject::initAnimation(){
-	currentFrame = idleStart;
+	currentFrame = idleAnim.startIdx;
 	UVRect rect = gridCellUV(currentFrame.x, currentFrame.y, numFramesX, numFramesY);
 	uvMin = glm::vec2(rect.u0, rect.v0);
 	uvMax = glm::vec2(rect.u1, rect.v1);
@@ -88,27 +88,20 @@ void PlayerObject::initAnimation(){
 
 void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
 	frameTimer += deltaTime;
-	glm::ivec2 startFrame(0);
-	glm::ivec2 endFrame(0);
+	SpriteAnim anim;
 
 	switch(moveState_){
 		case MoveState::IDLE:
-			startFrame = idleStart;
-			endFrame = idleEnd;
+			anim = idleAnim;
 			break;
 		case MoveState::WALK:
-			startFrame = walkStart;
-			endFrame = walkEnd;
+			anim = walkAnim;
 			break;
 		case MoveState::RUN1:
-			startFrame = run1Start;
-			endFrame = run1End;
+			anim = run1Anim;
 			break;
 		case MoveState::RUN2:
-			startFrame = run2Start;
-			endFrame = run2End;
-			break;
-			endFrame = run2End;
+			anim = run2Anim;
 			break;
 		case MoveState::JUMP:
 			// Jumping animation not implemented yet
@@ -122,7 +115,7 @@ void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
 
 	if(moveState_ != prevMoveState_){ 
         prevMoveState_ = moveState_;
-        currentFrame = startFrame;
+        currentFrame = anim.startIdx;
         frameTimer = 0.0f;
     }
 
@@ -131,11 +124,11 @@ void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
 	if(frameTimer >= frameDuration){
 		// Current frame has lingered for long enough, advance frame
 		frameTimer -= frameDuration;
-		
-		if (currentFrame == endFrame) {
+
+		if (currentFrame == anim.endIdx) {
 			// If we've reached the end frame, loop back to start
 			// DEBUG_ONLY(std::cout << "Looping animation back to start frame\n";);
-			currentFrame = startFrame;
+			currentFrame = anim.startIdx;
 		}
 		// If we've gone past the end of this row, wrap to next row
         if(currentFrame.x > numFramesX - 1){
