@@ -197,12 +197,12 @@ void Renderer2D::drawTexturedQuad(Shader& shader, const glm::mat4& transform, co
 	glm::mat4 mvp = proj_ * view_ * model_;
 
 	// Bind and configure texture
-	texture->bind(0); // Bind to texture unit 0
+	texture->bind(texture->getSlot()); // Bind to texture unit 0
 
 	shader.setMat4("MVP", mvp);
 	shader.setVec4("color", color);
 	shader.setInt("useTexture", 1);
-	shader.setInt("slot", 0);
+	shader.setInt("slot", texture->getSlot());
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
@@ -234,11 +234,11 @@ void Renderer2D::drawPlayer(Shader& shader, const glm::mat4& transform, const gl
 	model_ = transform;
 	glm::mat4 mvp = proj_ * view_ * model_;
 
-	texture->bind(1);
+	texture->bind(texture->getSlot());
 	shader.setMat4("MVP", mvp);
 	shader.setVec4("color", color);
 	shader.setInt("useTexture", 1);
-	shader.setInt("slot", 1);
+	shader.setInt("slot", texture->getSlot());
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
