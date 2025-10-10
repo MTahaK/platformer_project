@@ -11,6 +11,7 @@ struct AABB {
 		float left, right, top, bottom;
 };
 
+
 enum class FacingDirection {
 		LEFT,
 		RIGHT

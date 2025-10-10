@@ -117,10 +117,10 @@ void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
 			// Falling animation not implemented yet
 			break;
 		default:
-			break;
+			break; 
 	}
 
-	if(moveState_ != prevMoveState_){
+	if(moveState_ != prevMoveState_){ 
         prevMoveState_ = moveState_;
         currentFrame = startFrame;
         frameTimer = 0.0f;

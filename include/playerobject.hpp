@@ -1,11 +1,19 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <string>
 #include "gameobject.hpp"
 #include "tilemap.hpp"
 #include "globals.hpp"
 struct Sensor {
 		glm::vec2 position; // Position of the sensor relative to the player
 		glm::vec4 color;	// Only used for debug view
+};
+
+struct AnimBounds {
+	std::string animName;
+	glm::ivec2 startIdx;
+	glm::ivec2 endIdx;
+
 };
 
 enum class MoveState { IDLE, WALK, RUN1, RUN2, JUMP, FALL };
@@ -62,17 +70,11 @@ class PlayerObject : public GameObject {
 		int numFramesY = 7;
 
 		// starting and ending 'indices' as pairs for each animation in sprite sheet
-		glm::ivec2 walkStart = glm::ivec2(0, 0);
-		glm::ivec2 walkEnd = glm::ivec2(7, 0);
 
-		glm::ivec2 run1Start = glm::ivec2(0, 1);
-		glm::ivec2 run1End = glm::ivec2(7, 1);
-
-		glm::ivec2 run2Start = glm::ivec2(0, 2);
-		glm::ivec2 run2End = glm::ivec2(7, 2);
-
-		glm::ivec2 idleStart = glm::ivec2(0, 3);
-		glm::ivec2 idleEnd = glm::ivec2(6, 6);
+		AnimBounds walkAnim = {"WALK", glm::ivec2(0,0), glm::ivec2(7,0)};
+		AnimBounds run1Anim = {"RUN1", glm::ivec2(0,1), glm::ivec2(7,1)};
+		AnimBounds run2Anim = {"RUN2", glm::ivec2(0,2), glm::ivec2(7,2)};
+		AnimBounds idleAnim = {"IDLE", glm::ivec2(0,3), glm::ivec2(6,6)};
 
 		inline UVRect gridCellUV(int col, int row, int cols, int rows);
 		void initAnimation();
