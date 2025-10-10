@@ -17,11 +17,7 @@ int main(void) {
 	renderer.initLine(shader); // Initialize line rendering (mostly for debug visuals)
 
 	// --- ASSET LOADING ---
-	std::string tilemapFile = "./assets/levels/test2.tmap";
-
-	Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
 	
-	LevelManager levelManager("./assets/levels");
 
 	// Player textures
 	Texture defTexture("./assets/textures/player/player.png");
@@ -35,6 +31,15 @@ int main(void) {
 	sonicTexture.bind(1);
 	grassTexture.bind(2);
 	wallTexture.bind(3);
+
+	std::string tilemapFile = "./assets/levels/test2.tmap";
+
+	Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f, &grassTexture, &wallTexture); // Load tilemap with 1.0f tile size
+	
+	LevelManager levelManager("./assets/levels");
+	
+	levelManager.wallTex_ = &wallTexture;
+	levelManager.floorTex_ = &grassTexture;
 
 	PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
 	player.initAnimation();

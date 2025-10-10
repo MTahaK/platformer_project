@@ -68,6 +68,9 @@ class Tilemap {
 		glm::ivec2 goalPos_;   // Goal position in tile indices
 
 		float tileSize_; // Size of one tile in world units
+
+		// Texture* wallTex_;
+		// Texture* floorTex_;
 };
 
-Tilemap loadTilemapFromFile(const std::string& filename, float tileSize);
+Tilemap loadTilemapFromFile(const std::string& filename, float tileSize, Texture* floorTex, Texture* wallTex);

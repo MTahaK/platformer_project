@@ -50,5 +50,5 @@ Tilemap LevelManager::loadLevel(int index) {
 		throw std::out_of_range("Invalid level index");
 	}
 	auto& metadata = availableLevels_[index];
-	return loadTilemapFromFile(metadata.filepath.string(), 1.0f);
+	return loadTilemapFromFile(metadata.filepath.string(), 1.0f, floorTex_, wallTex_);
 }

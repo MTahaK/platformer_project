@@ -5,6 +5,7 @@
 #include <fstream>
 #include "debug.hpp"
 #include "tilemap.hpp"
+#include "texture.hpp"
 
 namespace fs = std::filesystem;
 
@@ -45,6 +46,8 @@ class LevelManager {
 		void clearLevelList();
 		void refreshLevelList();
 
+		Texture* wallTex_;
+		Texture* floorTex_;
 	private:
 		std::vector<LevelMetaData> availableLevels_;
 		std::string levelsDir_;

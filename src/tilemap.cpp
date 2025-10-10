@@ -57,7 +57,7 @@ glm::ivec2 Tilemap::worldToTileIndex(const glm::vec2& pos) const {
 
 glm::vec2 Tilemap::tileIndexToWorldPos(int x, int y) const { return glm::vec2(x * tileSize_, y * tileSize_); }
 
-Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
+Tilemap loadTilemapFromFile(const std::string& filename, float tileSize, Texture* floorTex, Texture* wallTex) {
 	std::ifstream file(filename);
 	if (!file.is_open()) {
 		std::cerr << "Failed to open tilemap file: " << filename << std::endl;
@@ -81,6 +81,15 @@ Tilemap loadTilemapFromFile(const std::string& filename, float tileSize) {
 			switch (c) {
 			case '#': // Solid tile
 				type = {TileEnum::SOLID, true, true, glm::vec4(0.3f, 0.3f, 0.1f, 1.0f)};
+				// If there is a solid tile above, use wall texture
+				if(y < height - 1 && tilemap.isSolidTile(x, y + 1)) {
+					// Wall texture
+					tilemap.getTile(x, y).texture = wallTex;
+				} else {
+					// Grass texture
+					tilemap.getTile(x, y).texture = floorTex;
+				}
+
 				break;
 			case '.': // Empty tile
 			default:
