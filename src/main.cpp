@@ -22,12 +22,19 @@ int main(void) {
 	Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f); // Load tilemap with 1.0f tile size
 	
 	LevelManager levelManager("./assets/levels");
-	
-	Texture defTexture("./assets/textures/player.png");
-	Texture sonicTexture("./assets/textures/sonic_resprite2.png");
+
+	// Player textures
+	Texture defTexture("./assets/textures/player/player.png");
+	Texture sonicTexture("./assets/textures/player/sonic_resprite2.png");
+
+	// Level textures
+	Texture grassTexture = Texture("./assets/textures/level/11.png");
+	Texture wallTexture = Texture("./assets/textures/level/2.png");
 
 	defTexture.bind(0);
 	sonicTexture.bind(1);
+	grassTexture.bind(2);
+	wallTexture.bind(3);
 
 	PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
 	player.initAnimation();

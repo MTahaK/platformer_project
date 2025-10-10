@@ -1,12 +1,13 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <vector>
-#include "shader.hpp"
-#include "renderer2d.hpp"
-#include "color.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "shader.hpp"
+#include "renderer2d.hpp"
+#include "color.hpp"
+#include "texture.hpp"
 
 // Define Tile type enum
 enum class TileEnum { EMPTY, SOLID, PLAYER, DWALLSTART, DWALLEND, GOAL };
@@ -21,6 +22,7 @@ struct TileType {
 struct Tile {
 		glm::vec2 position; // Position of the tile in world coordinates
 		TileType tileType;	// Type and color of the tile
+		Texture* texture = nullptr; // Pointer to the texture used for rendering the tile
 };
 
 class Tilemap {
