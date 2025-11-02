@@ -349,7 +349,7 @@ void GameManager::handlePlayState() {
 		
 		// updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
 	}
-	
+	// drawVisuals(window_, renderer_, shader_, tilemap_, player_, objects_);
 	drawTilemapAndPlayer(window_, renderer_, shader_, tilemap_, player_);
 	drawObjects(window_, renderer_, shader_, objects_);
 

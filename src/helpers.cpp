@@ -174,7 +174,39 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 												  -cameraCenter.y + worldHeight / 2.0f - 0.7f, // Camera slightly above player
 												  0.0f));
 
-	renderer.beginScene(shader, view, projection); // Begin the scene
+	// Begin the scene (clears once per frame)
+	renderer.beginScene(shader, view, projection);
+
+	// --- Basic background: draw a screen-filling textured quad behind the world ---
+	// Load once and bind to a dedicated texture slot.
+	static Texture bgTexture("./assets/textures/level/bg.png");
+	static bool bgBound = false;
+	if (!bgBound) { bgTexture.bind(4); bgBound = true; }
+
+	// Position the background so that after applying 'view' it's centered on screen.
+	// Given the view translates by (-camera + centerOffset), placing the model at
+	// (camera + inverseOffset) keeps it visually centered.
+	glm::mat4 bgModel = glm::translate(glm::mat4(1.0f),
+									   glm::vec3(cameraCenter.x + 0.3f,
+											  cameraCenter.y + 0.7f,
+											  0.0f));
+	bgModel = glm::scale(bgModel, glm::vec3(worldWidth, worldHeight, 1.0f));
+
+	// Parallax via UVs: choose repeats across screen and scroll factor (0=static,1=world)
+	const glm::vec2 uvScale(2.0f, 1.0f);   // 2x horizontally, 1x vertically
+	const glm::vec2 s(0.35f, 0.0f);        // scroll slower than world; fixed vertically
+	// Map camera motion in world units to UV space as derived earlier
+	glm::vec2 worldSize(worldWidth, worldHeight);
+	glm::vec2 cam = cameraCenter; // you can include framing offsets too; only deltas matter
+	glm::vec2 uvOffset = glm::fract((uvScale / worldSize) * (s * cam));
+
+	shader.setVec2("u_UVScale", uvScale);
+	shader.setVec2("u_UVOffset", uvOffset);
+	// Draw background first so subsequent world draws appear on top
+	renderer.drawTexturedQuad(shader, bgModel, glm::vec4(1.0f), &bgTexture);
+	// Reset UV uniforms so tilemap/player are unaffected
+	shader.setVec2("u_UVScale", glm::vec2(1.0f));
+	shader.setVec2("u_UVOffset", glm::vec2(0.0f));
 
 	tilemap.renderTileMap(shader, renderer); // Render the tilemap
 
