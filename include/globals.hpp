@@ -3,7 +3,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "userinterface.hpp"
 
-const float EPSILON = 0.001f; // Increased for more reliable collision detection
+const float EPSILON = 0.001f;
+
+const float TILE_SIZE = 1.2f;
 const glm::mat4 IDENTITY_MATRIX = glm::mat4(1.0f);
 
 const float quadVerts[] = {

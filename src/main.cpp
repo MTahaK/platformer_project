@@ -27,15 +27,18 @@ int main(void) {
 	Texture grassTexture = Texture("./assets/textures/level/11.png");
 	Texture wallTexture = Texture("./assets/textures/level/2.png");
 
+	Texture bgTexture = Texture("./assets/textures/level/bg1.png");
+
 	defTexture.bind(0);
 	sonicTexture.bind(1);
 	grassTexture.bind(2);
 	wallTexture.bind(3);
+	bgTexture.bind(4);
 
 	std::string tilemapFile = "./assets/levels/test2.tmap";
 
-	Tilemap tilemap = loadTilemapFromFile(tilemapFile, 1.0f, &grassTexture, &wallTexture); // Load tilemap with 1.0f tile size
-	
+	Tilemap tilemap = loadTilemapFromFile(tilemapFile, TILE_SIZE, &grassTexture, &wallTexture); // Load tilemap with TILE_SIZE
+
 	LevelManager levelManager("./assets/levels");
 	
 	levelManager.wallTex_ = &wallTexture;

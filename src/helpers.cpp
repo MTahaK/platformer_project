@@ -161,7 +161,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 	float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
 
 	// Define a fixed vertical size for the in-game "world"
-	float worldHeight = 5.5f;
+	float worldHeight = 5.5f / 1.1f;
 	float worldWidth = worldHeight * aspect;
 
 	// Projection matrix (orthographic): dynamic, based on aspect
@@ -179,7 +179,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 
 	// --- Basic background: draw a screen-filling textured quad behind the world ---
 	// Load once and bind to a dedicated texture slot.
-	static Texture bgTexture("./assets/textures/level/bg.png");
+	static Texture bgTexture("./assets/textures/level/bg1.png");
 	static bool bgBound = false;
 	if (!bgBound) { bgTexture.bind(4); bgBound = true; }
 
