@@ -50,6 +50,9 @@ bool Window::createWindow(int width, int height, const std::string& title) {
 	// 1. Query the initial framebuffer size **once** after the window is created.
 	//    This accounts for HiDPI scaling where physical pixels ≠ window width/height
 	glfwGetFramebufferSize(window_, &width_, &height_);
+	// Remember initial windowed placement/size for restoring from fullscreen
+	glfwGetWindowPos(window_, &windowedX_, &windowedY_);
+	glfwGetWindowSize(window_, &windowedW_, &windowedH_);
 
 	// 2. Store `this` pointer in the GLFW window so any GLFW callback
 	//    can retrieve the owning `Window` object later.
@@ -90,4 +93,38 @@ void Window::destroy() {
 		glfwTerminate();
 		glfwInitialized_ = false;
 	}
+}
+
+void Window::setFullscreen(bool enable) {
+	if (!window_) return;
+	if (enable == isFullscreen_) return;
+	isFullscreen_ = enable;
+
+	if (enable) {
+		// Save current windowed position and size
+		glfwGetWindowPos(window_, &windowedX_, &windowedY_);
+		glfwGetWindowSize(window_, &windowedW_, &windowedH_);
+
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		if (monitor && mode) {
+			// Switch to true fullscreen on the primary monitor
+			glfwSetWindowMonitor(window_, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+		}
+	} else {
+		// Restore windowed mode at the previous position/size
+		glfwSetWindowMonitor(window_, nullptr, windowedX_, windowedY_,
+							 windowedW_ > 0 ? windowedW_ : 1280,
+							 windowedH_ > 0 ? windowedH_ : 720,
+							 0);
+	}
+
+	// Re-apply vsync and refresh cached framebuffer size/viewport
+	glfwSwapInterval(1);
+	glfwGetFramebufferSize(window_, &width_, &height_);
+	glViewport(0, 0, width_, height_);
+}
+
+void Window::toggleFullscreen() {
+	setFullscreen(!isFullscreen_);
 }

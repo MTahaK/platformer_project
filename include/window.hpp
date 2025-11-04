@@ -24,9 +24,17 @@ class Window {
 
 		void setShouldClose(bool value) { glfwSetWindowShouldClose(window_, value); }
 
+		// Fullscreen control
+		void toggleFullscreen();
+		void setFullscreen(bool enable);
+		bool isFullscreen() const { return isFullscreen_; }
+
 	private:
 		GLFWwindow* window_ = nullptr;
 		int width_ = 0;
 		int height_ = 0;
+		bool isFullscreen_ = false;
+		int windowedX_ = 0, windowedY_ = 0;     // last windowed position
+		int windowedW_ = 0, windowedH_ = 0;     // last windowed size
 		static bool glfwInitialized_;
 };

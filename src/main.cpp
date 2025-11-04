@@ -27,7 +27,7 @@ int main(void) {
 	Texture grassTexture = Texture("./assets/textures/level/11.png");
 	Texture wallTexture = Texture("./assets/textures/level/2.png");
 
-	Texture bgTexture = Texture("./assets/textures/level/bg1.png");
+	Texture bgTexture = Texture("./assets/textures/level/bgpot.png");
 
 	defTexture.bind(0);
 	sonicTexture.bind(1);

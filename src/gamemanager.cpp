@@ -26,6 +26,12 @@ void GameManager::runGameLoop() {
 	// Force quit button in any state
 
 	Input::update();
+
+	// Toggle true fullscreen: F11 or Alt+Enter
+	bool altPressed = Input::isKeyPressed(GLFW_KEY_LEFT_ALT) || Input::isKeyPressed(GLFW_KEY_RIGHT_ALT);
+	if (Input::isKeyJustPressed(GLFW_KEY_F11) || (altPressed && Input::isKeyJustPressed(GLFW_KEY_ENTER))) {
+		window_.toggleFullscreen();
+	}
 	
 	if (Input::isKeyJustPressed(GLFW_KEY_Q) && Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
 		setState(GameState::EXIT);
