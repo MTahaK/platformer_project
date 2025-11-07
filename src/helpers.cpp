@@ -23,7 +23,7 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
 	// Create the PlayerObject
 	PlayerObject player;
 	player.setPosition(playerWorldPos);
-	player.setScale(glm::vec2(1.0f, 1.12f)); // One tile wide/high
+	player.setScale(glm::vec2(1.0f, 1.0f)); // One tile wide/high
 	player.setRotation(0.0f);
 	player.setColor(glm::vec4(0.0, 0.149, 0.557, 1.0));
 	player.setName("Player Object");
