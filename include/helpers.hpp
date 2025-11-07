@@ -38,7 +38,7 @@ enum class InputResult {
 int initializeVisuals(Shader& shader, Renderer2D& renderer);
 
 // SETUP FUNCTIONS
-PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY);
+PlayerObject setupPlayerObject(Tilemap& tilemap, float horizSensorScale, float vertSensorScale, int tileX, int tileY);
 // std::vector<GameObject> setupObjects(float& worldHeight, float& worldWidth);
 
 // INPUT HANDLING -  Will likely add more state-specific functions later, but may move.

@@ -16,7 +16,7 @@ int initializeVisuals(Shader& shader, Renderer2D& renderer) {
 	return 0;
 }
 
-PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
+PlayerObject setupPlayerObject(Tilemap& tilemap, float horizSensorScale, float vertSensorScale, int tileX, int tileY) {
 	// Convert tile index to world-space position
 	glm::vec2 playerWorldPos = tilemap.tileIndexToWorldPos(tileX, tileY);
 
@@ -30,6 +30,8 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, int tileX, int tileY) {
 
 	// Initialize sensor positions
 	player.setUpSensors();
+	player.setSensorScale(horizSensorScale, vertSensorScale);
+
 
 	return player;
 }
@@ -161,7 +163,8 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 	float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
 
 	// Define a fixed vertical size for the in-game "world"
-	float worldHeight = 5.5f / 1.1f;
+	float zoomFactor = 1.0f; // temp
+	float worldHeight = 5.5f / zoomFactor;
 	float worldWidth = worldHeight * aspect;
 
 	// Projection matrix (orthographic): dynamic, based on aspect

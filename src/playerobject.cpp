@@ -3,10 +3,12 @@
 #include <iostream>
 
 void PlayerObject::setUpSensors() {
-	leftSensor_.position = getPosition() + glm::vec2(-getScale().x / 2.0f - EPSILON, 0.0f);
-	rightSensor_.position = getPosition() + glm::vec2(getScale().x / 2.0f + EPSILON, 0.0f);
-	topSensor_.position = getPosition() + glm::vec2(0.0f, getScale().y / 2.0f + EPSILON);
-	bottomSensor_.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - EPSILON);
+	// Default sensor scaling factors = 1.0 (no scaling)
+
+	leftSensor_.position = getPosition() + glm::vec2(-getScale().x * horizSensorScale_ / 2.0f - EPSILON, 0.0f);
+	rightSensor_.position = getPosition() + glm::vec2(getScale().x * horizSensorScale_ / 2.0f + EPSILON, 0.0f);
+	topSensor_.position = getPosition() + glm::vec2(0.0f, getScale().y * vertSensorScale_ / 2.0f + EPSILON);
+	bottomSensor_.position = getPosition() + glm::vec2(0.0f, -getScale().y * vertSensorScale_ / 2.0f - EPSILON);
 
 	// Colours for debug
 	bottomSensor_.color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -15,11 +17,16 @@ void PlayerObject::setUpSensors() {
 	rightSensor_.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
+void PlayerObject::setSensorScale(float horizScale, float vertScale) {
+	horizSensorScale_ = horizScale;
+	vertSensorScale_ = vertScale;
+}
+
 void PlayerObject::sensorUpdate() {
-	leftSensor_.position = getPosition() + glm::vec2(-getScale().x / 2.0f - EPSILON, 0.0f);
-	rightSensor_.position = getPosition() + glm::vec2(getScale().x / 2.0f + EPSILON, 0.0f);
-	topSensor_.position = getPosition() + glm::vec2(0.0f, getScale().y / 2.0f + EPSILON);
-	bottomSensor_.position = getPosition() + glm::vec2(0.0f, -getScale().y / 2.0f - EPSILON);
+	leftSensor_.position = getPosition() + glm::vec2(-getScale().x * horizSensorScale_ / 2.0f - EPSILON, 0.0f);
+	rightSensor_.position = getPosition() + glm::vec2(getScale().x * horizSensorScale_ / 2.0f + EPSILON, 0.0f);
+	topSensor_.position = getPosition() + glm::vec2(0.0f, getScale().y * vertSensorScale_ / 2.0f + EPSILON);
+	bottomSensor_.position = getPosition() + glm::vec2(0.0f, -getScale().y * vertSensorScale_ / 2.0f - EPSILON);
 }
 
 const glm::ivec2 PlayerObject::getPlayerTileIdx(Tilemap& tilemap) const { return tilemap.worldToTileIndex(getPosition()); }

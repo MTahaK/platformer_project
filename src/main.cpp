@@ -44,7 +44,10 @@ int main(void) {
 	levelManager.wallTex_ = &wallTexture;
 	levelManager.floorTex_ = &grassTexture;
 
-	PlayerObject player = setupPlayerObject(tilemap, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
+	float horizSensorScale = 0.75f; // Example horizontal sensor scale
+	float vertSensorScale = 1.0f;  // Example vertical sensor scale
+	PlayerObject player = setupPlayerObject(tilemap, horizSensorScale, vertSensorScale, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
+	std::cout<< "Sensor scale: horiz=" << player.horizSensorScale_ << " vert=" << player.vertSensorScale_ << std::endl;
 	player.initAnimation();
 
 

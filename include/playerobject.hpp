@@ -27,6 +27,7 @@ class PlayerObject : public GameObject {
 
 	public:
 		void setUpSensors();
+		void setSensorScale(float horizScale, float vertScale);
 		void sensorUpdate();
 
 		void setGoalCount(int count) { goalCount_ = count; }
@@ -83,6 +84,10 @@ class PlayerObject : public GameObject {
 		float frameTimer = 0.0f;
 		glm::ivec2 currentFrame = glm::ivec2(0, 0);
 
+		// Sensor scaling factors assume default player scale of (1,1)
+		float horizSensorScale_ = 1.0f;
+		float vertSensorScale_ = 1.0f;
+
 	private:
 		// PlayerObject adds four 'sensors' to detect collisions
 
@@ -90,6 +95,8 @@ class PlayerObject : public GameObject {
 		Sensor rightSensor_;  // Right sensor for detecting walls
 		Sensor topSensor_;	  // Top sensor for detecting ceilings
 		Sensor bottomSensor_; // Bottom sensor for detecting floors
+
+		
 
 		int goalCount_ = 0; // Counter for the number of sensors that detect a goal tile
 		bool inGoal_ = false;
