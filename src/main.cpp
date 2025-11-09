@@ -27,7 +27,7 @@ int main(void) {
 	Texture grassTexture = Texture("./assets/textures/level/11.png");
 	Texture wallTexture = Texture("./assets/textures/level/2.png");
 
-	Texture bgTexture = Texture("./assets/textures/level/bgpot.png");
+	Texture bgTexture = Texture("./assets/textures/level/bg1.png");
 
 	defTexture.bind(0);
 	sonicTexture.bind(1);
@@ -43,6 +43,7 @@ int main(void) {
 	
 	levelManager.wallTex_ = &wallTexture;
 	levelManager.floorTex_ = &grassTexture;
+	levelManager.bgTex_ = &bgTexture;
 
 	float horizSensorScale = 0.75f; // Example horizontal sensor scale
 	float vertSensorScale = 1.0f;  // Example vertical sensor scale

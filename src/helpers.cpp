@@ -171,10 +171,10 @@ void drawBackground(Window& window, Renderer2D& renderer, Shader& shader, const 
 	// Begin the scene (clears once per frame)
 	renderer.beginScene(shader, view, projection);
 
-	// shader.setVec2("u_UVScale", uvScale);
-	// shader.setVec2("u_UVOffset", uvOffset);
-	// // Draw background first so subsequent world draws appear on top
-	// renderer.drawTexturedQuad(shader, bgModel, glm::vec4(1.0f), levelManager.bgTex_);
+	shader.setVec2("u_UVScale", uvScale);
+	shader.setVec2("u_UVOffset", uvOffset);
+	// Draw background first so subsequent world draws appear on top
+	renderer.drawTexturedQuad(shader, bgModel, glm::vec4(1.0f), levelManager.bgTex_);
 	// Reset UV uniforms so tilemap/player are unaffected
 	shader.setVec2("u_UVScale", glm::vec2(1.0f));
 	shader.setVec2("u_UVOffset", glm::vec2(0.0f));
