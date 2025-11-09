@@ -16,6 +16,7 @@
 #include "renderer3d.hpp"
 #include "gameobject.hpp"
 #include "playerobject.hpp"
+#include "level.hpp"
 #include "input.hpp"
 #include "physics.hpp"
 #include "tilemap.hpp"
@@ -47,6 +48,7 @@ InputResult playerInput(GameObject& player);
 // RENDERING FUNCTIONS - some not used
 void drawStep(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects);
 void drawStepPlayer(Window& window, Renderer2D& renderer, Shader& shader, const PlayerObject& player);
+void drawBackground(Window& window, Renderer2D& renderer, Shader& shader, const LevelManager& levelManager, const PlayerObject& player);
 void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, const Tilemap& tilemap, const PlayerObject& player);
 void drawObjects(Window& window, Renderer2D& renderer, Shader& shader, const std::vector<GameObject>& objects);
 void finishDraw(Window& window, Renderer2D& renderer, Shader& shader);

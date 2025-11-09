@@ -48,6 +48,7 @@ class LevelManager {
 
 		Texture* wallTex_;
 		Texture* floorTex_;
+		Texture* bgTex_;
 	private:
 		std::vector<LevelMetaData> availableLevels_;
 		std::string levelsDir_;

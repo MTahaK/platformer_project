@@ -129,41 +129,15 @@ void drawStep(Window& window, Renderer2D& renderer, Shader& shader, const std::v
 	window.swap();
 }
 
-void drawStepPlayer(Window& window, Renderer2D& renderer, Shader& shader, const PlayerObject& player) {
-
+void drawBackground(Window& window, Renderer2D& renderer, Shader& shader, const LevelManager& levelManager, const PlayerObject& player) {
+	
 	// Get current framebuffer size
 	int fbWidth, fbHeight;
 	window.getFramebufferSize(fbWidth, fbHeight);
 	float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
 
 	// Define a fixed vertical size for the in-game "world"
-	float worldHeight = 5.0f;
-	float worldWidth = worldHeight * aspect;
-
-	// Projection matrix (orthographic): dynamic, based on aspect
-	glm::mat4 projection = glm::ortho(0.0f, worldWidth, 0.0f, worldHeight, -1.0f, 1.0f);
-
-	// View matrix: identity for now (no camera)
-	glm::mat4 view = glm::mat4(1.0f);
-
-	renderer.beginScene(shader, view, projection); // Begin the scene
-
-	glm::mat4 model = player.getModelMatrix();
-	renderer.drawQuad(shader, model, player.getColor());
-
-	// Swap buffers
-	// window.swap();
-}
-
-void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, const Tilemap& tilemap, const PlayerObject& player) {
-
-	// Get current framebuffer size
-	int fbWidth, fbHeight;
-	window.getFramebufferSize(fbWidth, fbHeight);
-	float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
-
-	// Define a fixed vertical size for the in-game "world"
-	float zoomFactor = 1.0f; // temp
+	float zoomFactor = 0.8f; // temp
 	float worldHeight = 5.5f / zoomFactor;
 	float worldWidth = worldHeight * aspect;
 
@@ -172,27 +146,18 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 
 	// View matrix: camera follows player
 	glm::vec2 cameraCenter = player.getPosition();
-	glm::mat4 view =
-		glm::translate(glm::mat4(1.0f), glm::vec3(-cameraCenter.x + worldWidth / 2.0f - 0.3f,  // Camera slightly to the right of player
-												  -cameraCenter.y + worldHeight / 2.0f - 0.7f, // Camera slightly above player
-												  0.0f));
-
-	// Begin the scene (clears once per frame)
-	renderer.beginScene(shader, view, projection);
-
-	// --- Basic background: draw a screen-filling textured quad behind the world ---
-	// Load once and bind to a dedicated texture slot.
-	static Texture bgTexture("./assets/textures/level/bg1.png");
-	static bool bgBound = false;
-	if (!bgBound) { bgTexture.bind(4); bgBound = true; }
 
 	// Position the background so that after applying 'view' it's centered on screen.
 	// Given the view translates by (-camera + centerOffset), placing the model at
 	// (camera + inverseOffset) keeps it visually centered.
 	glm::mat4 bgModel = glm::translate(glm::mat4(1.0f),
-									   glm::vec3(cameraCenter.x + 0.3f,
+									   glm::vec3(cameraCenter.x + 0.7f,
 											  cameraCenter.y + 0.7f,
 											  0.0f));
+	glm::mat4 view =
+		glm::translate(glm::mat4(1.0f), glm::vec3(-cameraCenter.x + worldWidth / 2.0f - 0.7f,  // Camera slightly to the right of player
+												  -cameraCenter.y + worldHeight / 2.0f - 0.7f, // Camera slightly above player
+												  0.0f));
 	bgModel = glm::scale(bgModel, glm::vec3(worldWidth, worldHeight, 1.0f));
 
 	// Parallax via UVs: choose repeats across screen and scroll factor (0=static,1=world)
@@ -200,16 +165,23 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 	const glm::vec2 s(0.35f, 0.0f);        // scroll slower than world; fixed vertically
 	// Map camera motion in world units to UV space as derived earlier
 	glm::vec2 worldSize(worldWidth, worldHeight);
-	glm::vec2 cam = cameraCenter; // you can include framing offsets too; only deltas matter
+	glm::vec2 cam = cameraCenter; 
 	glm::vec2 uvOffset = glm::fract((uvScale / worldSize) * (s * cam));
 
-	shader.setVec2("u_UVScale", uvScale);
-	shader.setVec2("u_UVOffset", uvOffset);
-	// Draw background first so subsequent world draws appear on top
-	renderer.drawTexturedQuad(shader, bgModel, glm::vec4(1.0f), &bgTexture);
+	// Begin the scene (clears once per frame)
+	renderer.beginScene(shader, view, projection);
+
+	// shader.setVec2("u_UVScale", uvScale);
+	// shader.setVec2("u_UVOffset", uvOffset);
+	// // Draw background first so subsequent world draws appear on top
+	// renderer.drawTexturedQuad(shader, bgModel, glm::vec4(1.0f), levelManager.bgTex_);
 	// Reset UV uniforms so tilemap/player are unaffected
 	shader.setVec2("u_UVScale", glm::vec2(1.0f));
 	shader.setVec2("u_UVOffset", glm::vec2(0.0f));
+
+}
+
+void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, const Tilemap& tilemap, const PlayerObject& player) {
 
 	tilemap.renderTileMap(shader, renderer); // Render the tilemap
 
@@ -231,6 +203,32 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 		renderer.drawLine(shader, pOrigin, player.getLeftSensor().position, player.getLeftSensor().color);
 		renderer.drawLine(shader, pOrigin, player.getRightSensor().position, player.getRightSensor().color);
 	}
+
+	// Swap buffers
+	// window.swap();
+}
+
+void drawStepPlayer(Window& window, Renderer2D& renderer, Shader& shader, const PlayerObject& player) {
+
+	// Get current framebuffer size
+	int fbWidth, fbHeight;
+	window.getFramebufferSize(fbWidth, fbHeight);
+	float aspect = static_cast<float>(fbWidth) / static_cast<float>(fbHeight);
+
+	// Define a fixed vertical size for the in-game "world"
+	float worldHeight = 5.0f;
+	float worldWidth = worldHeight * aspect;
+
+	// Projection matrix (orthographic): dynamic, based on aspect
+	glm::mat4 projection = glm::ortho(0.0f, worldWidth, 0.0f, worldHeight, -1.0f, 1.0f);
+
+	// View matrix: identity for now (no camera)
+	glm::mat4 view = glm::mat4(1.0f);
+
+	renderer.beginScene(shader, view, projection); // Begin the scene
+
+	glm::mat4 model = player.getModelMatrix();
+	renderer.drawQuad(shader, model, player.getColor());
 
 	// Swap buffers
 	// window.swap();
