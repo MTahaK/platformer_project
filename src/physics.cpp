@@ -76,7 +76,6 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 	glm::ivec2 goalTile = tilemap.getGoalPos();
 	int goalDistance = std::max(std::abs(playerTile.x - goalTile.x), std::abs(playerTile.y - goalTile.y));
 
-	// TODO Will interleave this into the existing sensor checks later
 
 	if (goalDistance <= 5 && !player.checkIfInGoal()) {
 		player.tileGoalCollision(tilemap, player.getLeftSensor());

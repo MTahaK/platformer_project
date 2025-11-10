@@ -43,7 +43,11 @@ InputResult playerInput(GameObject& player) {
 		if (!player.isGrounded()) player.setFacingDirection(FacingDirection::LEFT);
 		if (player.getVelocity().x > 0) {
 			// Player is currently moving right, increase acceleration in opposite direction
-			player.setAcceleration(glm::vec2(-turnaroundAccel, player.getAcceleration().y));
+			if(player.isGrounded()){
+				player.setAcceleration(glm::vec2(-turnaroundAccel, player.getAcceleration().y));
+			} else{
+				player.setAcceleration(glm::vec2(-midairDrag*3, player.getAcceleration().y));
+			}
 		} else {
 			player.setAcceleration(glm::vec2(-movementAccel, player.getAcceleration().y));
 		}
@@ -51,7 +55,11 @@ InputResult playerInput(GameObject& player) {
 		if (!player.isGrounded()) player.setFacingDirection(FacingDirection::RIGHT);
 		if (player.getVelocity().x < 0) {
 			// Player is currently moving left, increase acceleration in opposite direction
-			player.setAcceleration(glm::vec2(turnaroundAccel, player.getAcceleration().y));
+			if(player.isGrounded()){
+				player.setAcceleration(glm::vec2(turnaroundAccel, player.getAcceleration().y));
+			} else{
+				player.setAcceleration(glm::vec2(midairDrag*3, player.getAcceleration().y));
+			}
 		} else {
 			player.setAcceleration(glm::vec2(movementAccel, player.getAcceleration().y));
 		}
@@ -154,15 +162,15 @@ void drawBackground(Window& window, Renderer2D& renderer, Shader& shader, const 
 									   glm::vec3(cameraCenter.x + 0.7f,
 											  cameraCenter.y + 0.7f,
 											  0.0f));
-	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraCenter.x + worldWidth / 2.0f - 0.7f,  // Camera slightly to the right of player
-												  -cameraCenter.y + worldHeight / 2.0f - 0.7f, // Camera slightly above player
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraCenter.x + worldWidth / 2.0f - 0.7f,
+												  -cameraCenter.y + worldHeight / 2.0f - 0.7f,
 												  0.0f));
 	bgModel = glm::scale(bgModel, glm::vec3(worldWidth, worldHeight, 1.0f));
 
 	// Parallax via UVs: choose repeats across screen and scroll factor (0=static,1=world)
 	const glm::vec2 uvScale(2.0f, 1.0f);   // 2x horizontally, 1x vertically
 	const glm::vec2 s(0.35f, 0.0f);        // scroll slower than world; fixed vertically
-	// Map camera motion in world units to UV space as derived earlier
+
 	glm::vec2 worldSize(worldWidth, worldHeight);
 	glm::vec2 cam = cameraCenter; 
 	glm::vec2 uvOffset = glm::fract((uvScale / worldSize) * (s * cam));
