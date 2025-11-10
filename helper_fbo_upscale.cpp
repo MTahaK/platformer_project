@@ -288,9 +288,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 	tilemap.renderTileMap(shader, renderer); // Render the tilemap
 
 	glm::mat4 model = player.getModelMatrix();
-	if (player.getTexture() != nullptr) {
-		// renderer.drawTexturedQuad(shader, model, player.getColor(), player.getTexture());
-		
+	if (player.getTexture() != nullptr) {		
 		renderer.setPlayerUVRect(player.uvMin, player.uvMax);
 		renderer.drawPlayer(shader, model, player.getColor(), player.getTexture());
 	} else {

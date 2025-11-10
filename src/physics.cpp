@@ -68,10 +68,8 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 	//   • Precision check: when that filter passes, probe each of the four sensors.
 	//     A probe is just a tile lookup, so the per-frame cost is O(1) (4 lookups).
 	//
-	// Rationale: sensor probes, while cheap, still add measurable overhead if run
-	// every frame across the whole map. In our current level layouts goal tiles are
-	// either clustered or aligned along one axis, so a single distance test is
-	// enough to gate the precise checks.
+
+	// ? ^ This is just stupid btw
 
 	// Proximity filter: Chebyshev distance (tile units) ≤ 5 to *a* goal tile.
 	glm::ivec2 playerTile = tilemap.worldToTileIndex(player.getPosition());
@@ -88,7 +86,7 @@ void Physics::checkPlayerWorldCollisions(PlayerObject& player, Tilemap& tilemap)
 	}
 
 	// Before this block runs at least once, in_goal is still false
-	if (player.getGoalCount() >= 4 && !player.checkIfInGoal()) {
+	if (player.getGoalCount() >= 1 && !player.checkIfInGoal()) {
 		player.setInGoal(true);
 		// DEBUG_ONLY(std::cout << "Player has reached the goal!\n";);
 	}

@@ -154,8 +154,7 @@ void drawBackground(Window& window, Renderer2D& renderer, Shader& shader, const 
 									   glm::vec3(cameraCenter.x + 0.7f,
 											  cameraCenter.y + 0.7f,
 											  0.0f));
-	glm::mat4 view =
-		glm::translate(glm::mat4(1.0f), glm::vec3(-cameraCenter.x + worldWidth / 2.0f - 0.7f,  // Camera slightly to the right of player
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraCenter.x + worldWidth / 2.0f - 0.7f,  // Camera slightly to the right of player
 												  -cameraCenter.y + worldHeight / 2.0f - 0.7f, // Camera slightly above player
 												  0.0f));
 	bgModel = glm::scale(bgModel, glm::vec3(worldWidth, worldHeight, 1.0f));
