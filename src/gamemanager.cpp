@@ -236,7 +236,7 @@ void GameManager::handleMenuState() {
 						tilemap_ = levelManager_.loadLevel(selectedLevelIndex);
 						
 						// Reset player to new level's starting position
-						player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
+						player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y) + glm::vec2(tilemap_.getTileSize() / 2.0f, tilemap_.getTileSize() / 2.0f));
 						player_.setVelocity(glm::vec2(0.0f, 0.0f));
 						player_.setAcceleration(glm::vec2(0.0f, 0.0f));
 						player_.moveState_ = MoveState::IDLE;
@@ -454,7 +454,7 @@ void GameManager::handlePauseState() {
 		if (ImGui::Button("Restart Level", buttonSize)) {
 			// tilemap_ remains the same as when level was loaded
 
-			player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
+			player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y) + glm::vec2(tilemap_.getTileSize() / 2.0f, tilemap_.getTileSize() / 2.0f));
 			player_.setVelocity(glm::vec2(0.0f, 0.0f));
 			player_.setAcceleration(glm::vec2(0.0f, 0.0f));
 			player_.sensorUpdate();
@@ -564,7 +564,7 @@ void GameManager::handleDeadState() {
 	// Check for input to reset level or exit
 	if (Input::isKeyPressed(GLFW_KEY_ENTER)) {
 		// Reset level and return to PLAY state
-		player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
+		player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y) + glm::vec2(tilemap_.getTileSize() / 2.0f, tilemap_.getTileSize() / 2.0f));
 		player_.setVelocity(glm::vec2(0.0f, 0.0f));
 		player_.setAcceleration(glm::vec2(0.0f, 0.0f));
 		player_.sensorUpdate();
@@ -643,7 +643,7 @@ void GameManager::handleWinState(){
 		if (ImGui::Button("Restart Level", buttonSize)) {
 			// tilemap_ remains the same as when level was loaded
 
-			player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y));
+			player_.setPosition(tilemap_.tileIndexToWorldPos(tilemap_.getInitPlayerPos().x, tilemap_.getInitPlayerPos().y) + glm::vec2(tilemap_.getTileSize() / 2.0f, tilemap_.getTileSize() / 2.0f));
 			player_.setVelocity(glm::vec2(0.0f, 0.0f));
 			player_.setAcceleration(glm::vec2(0.0f, 0.0f));
 			player_.sensorUpdate();

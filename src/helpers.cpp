@@ -18,7 +18,7 @@ int initializeVisuals(Shader& shader, Renderer2D& renderer) {
 
 PlayerObject setupPlayerObject(Tilemap& tilemap, float horizSensorScale, float vertSensorScale, int tileX, int tileY) {
 	// Convert tile index to world-space position
-	glm::vec2 playerWorldPos = tilemap.tileIndexToWorldPos(tileX, tileY);
+	glm::vec2 playerWorldPos = tilemap.tileIndexToWorldPos(tileX, tileY) + glm::vec2(tilemap.getTileSize() / 2.0f, tilemap.getTileSize() / 2.0f);
 
 	// Create the PlayerObject
 	PlayerObject player;
