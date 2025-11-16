@@ -196,7 +196,13 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 	if (player.getTexture() != nullptr) {
 		// renderer.drawTexturedQuad(shader, model, player.getColor(), player.getTexture());
 		
-		renderer.setPlayerUVRect(player.uvMin, player.uvMax);
+		if(player.isGrounded())	{
+
+			renderer.setPlayerUVRect(player.uvMin, player.uvMax, -1.0f/32.0f); // Slight downward offset when grounded
+		}
+		else {
+			renderer.setPlayerUVRect(player.uvMin, player.uvMax, 0.0f); // No offset when midair
+		}
 		renderer.drawPlayer(shader, model, player.getColor(), player.getTexture());
 	} else {
 		renderer.drawQuad(shader, model, player.getColor()); // Draw the player object

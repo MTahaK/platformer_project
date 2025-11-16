@@ -207,7 +207,7 @@ void Renderer2D::drawTexturedQuad(Shader& shader, const glm::mat4& transform, co
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void Renderer2D::setPlayerUVRect(const glm::vec2& uvMin, const glm::vec2& uvMax) {
+void Renderer2D::setPlayerUVRect(const glm::vec2& uvMin, const glm::vec2& uvMax, float yOffset) {
 	// Update only the UV components in the dynamic VBO
 	// Layout per vertex: [x, y, u, v]
 	struct UVPair { float u, v; };
@@ -219,10 +219,10 @@ void Renderer2D::setPlayerUVRect(const glm::vec2& uvMin, const glm::vec2& uvMax)
 
 	glBindBuffer(GL_ARRAY_BUFFER, playerVBO_);
 	float playerVertices[16] = {
-		-0.5f, -0.5f, uvs[0].u, uvs[0].v,
-		 0.5f, -0.5f, uvs[1].u, uvs[1].v,
-		 0.5f,  0.5f, uvs[2].u, uvs[2].v,
-		-0.5f,  0.5f, uvs[3].u, uvs[3].v
+		-0.5f, -0.5f + yOffset, uvs[0].u, uvs[0].v,
+		 0.5f, -0.5f + yOffset, uvs[1].u, uvs[1].v,
+		 0.5f,  0.5f + yOffset, uvs[2].u, uvs[2].v,
+		-0.5f,  0.5f + yOffset, uvs[3].u, uvs[3].v
 	};
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(playerVertices), playerVertices);
 }
