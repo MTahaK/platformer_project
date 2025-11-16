@@ -349,7 +349,7 @@ void GameManager::handlePlayState() {
 			frameDuration = 1 / 16.0f; // 16 FPS
 		} else if(player_.getSpeed().x <= 28.0f){
 			frameDuration = 1 / 20.0f; // 20 FPS
-		} else if(player_.getSpeed().x > 25.0f){
+		} else if(player_.getSpeed().x > 32.0f){
 			frameDuration = 1 / 30.0f; // 24 FPS
 		}
 		player_.updateAtlasAnimation(deltaTime, frameDuration);

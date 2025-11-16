@@ -99,13 +99,13 @@ bool PlayerObject::tileGoalCollision(Tilemap& tilemap, const Sensor& sensor) {
 void PlayerObject::updateMoveState(){
 	auto speedX = abs(getVelocity().x);
 	if(speedX > 0.1f){
-		if(speedX < 6.0f){
+		if(speedX < 8.0f){
 			moveState_ = MoveState::WALK;
-		} else if(speedX < 12.0f){
+		} else if(speedX < 14.0f){
 			moveState_ = MoveState::FASTWALK;
-		}else if(speedX < 18.0f){
+		}else if(speedX < 16.0f){
 			moveState_ = MoveState::RUN1;
-		} else if(speedX < 24.0f){
+		} else if(speedX < 28.0f){
 			moveState_ = MoveState::RUN2;
 		}else{
 			moveState_ = MoveState::RUN3;
@@ -188,6 +188,9 @@ void PlayerObject::updateAtlasAnimation(float deltaTime, float frameDuration){
 		}
 		frameTimer_ = 0.0f;
 		currentAtlasAnim_->currentFrameIdx = 0;
+
+		// Resize quad if needed based on frame size
+		
 	} else{
 		// Continue current animation
 		if(frameTimer_ >= frameDuration){
@@ -206,6 +209,7 @@ void PlayerObject::updateAtlasAnimation(float deltaTime, float frameDuration){
 	if(getFacingDirection() == FacingDirection::RIGHT){
         std::swap(uvMin.x, uvMax.x);
     }
+
 }
 void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
 	frameTimer_ += deltaTime;
@@ -273,4 +277,5 @@ void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
 	if(getFacingDirection() == FacingDirection::RIGHT){
         std::swap(uvMin.x, uvMax.x);
     }
+
 }

@@ -32,6 +32,8 @@ struct SpriteAtlas {
 	int atlasWidth;  // Width of the atlas in pixels
 	int atlasHeight; // Height of the atlas in pixels
 	std::unordered_map<std::string, AtlasAnimation> animations;
+	int baseFrameWidth = 0;   // Reference frame width for scaling
+	int baseFrameHeight = 0;  // Reference frame height for scaling
 };
 
 
@@ -123,6 +125,8 @@ class PlayerObject : public GameObject {
 		// Sensor scaling factors assume default player scale of (1,1)
 		float horizSensorScale_ = 1.0f;
 		float vertSensorScale_ = 1.0f;
+
+		glm::vec2 baseScale_ = glm::vec2(1.0f, 1.0f); // Store the original scale for proportional sizing
 
 	private:
 		// PlayerObject adds four 'sensors' to detect collisions
