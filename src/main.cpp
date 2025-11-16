@@ -21,7 +21,8 @@ int main(void) {
 
 	// Player textures
 	Texture defTexture("./assets/textures/player/player.png");
-	Texture sonicTexture("./assets/textures/player/sonic_resprite2.png");
+	// Texture sonicTexture("./assets/textures/player/sonic_resprite2.png");
+	Texture sonicTexture("./assets/textures/player/sonicbasic.png");
 
 	// Level textures
 	Texture grassTexture = Texture("./assets/textures/level/11.png");
@@ -48,7 +49,10 @@ int main(void) {
 	float horizSensorScale = 0.75f; // Example horizontal sensor scale
 	float vertSensorScale = 1.0f;  // Example vertical sensor scale
 	PlayerObject player = setupPlayerObject(tilemap, horizSensorScale, vertSensorScale, tilemap.getPlayerPosition().x, tilemap.getPlayerPosition().y);
-	player.initAnimation();
+	player.setTexture(&sonicTexture);
+	player.loadSpriteAtlas("./assets/textures/player/sonicbasic.json");
+	player.initAtlasAnimation();
+	// player.initAnimation();
 
 
 	Input::initialize(window.getWindow());
@@ -76,7 +80,6 @@ int main(void) {
 	objects.push_back(std::move(deathWall));
 
 
-	player.setTexture(&sonicTexture);
 
 	GameManager gameManager(window, shader, renderer, levelManager, tilemap, player, objects, physicsSystem);
 

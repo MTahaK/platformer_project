@@ -241,8 +241,10 @@ void GameManager::handleMenuState() {
 						player_.setAcceleration(glm::vec2(0.0f, 0.0f));
 						player_.moveState_ = MoveState::IDLE;
 						player_.prevMoveState_ = MoveState::IDLE;
-						player_.currentFrame = player_.idleAnim.startIdx;
-						player_.initAnimation();
+						player_.currentFrame_ = player_.idleAnim.startIdx;
+						// player_.initAnimation();
+						std::cout<<"Loading anim"<<std::endl;
+						player_.initAtlasAnimation();
 						player_.sensorUpdate();
 						player_.setShouldDie(false);
 						player_.setGoalCount(0);
@@ -350,7 +352,7 @@ void GameManager::handlePlayState() {
 		} else if(player_.getSpeed().x > 25.0f){
 			frameDuration = 1 / 30.0f; // 24 FPS
 		}
-		player_.updateAnimation(deltaTime, frameDuration);
+		player_.updateAtlasAnimation(deltaTime, frameDuration);
 
 		
 		// updateDeathWall(objects_[0], deltaTime); // Update the death wall behavior
@@ -374,7 +376,7 @@ void GameManager::handlePlayState() {
 			ImGui::Text("Player Position: %.2f, %.2f", player_.getPosition().x, player_.getPosition().y);
 			ImGui::Text("Player Velocity: %.2f, %.2f", player_.getVelocity().x, player_.getVelocity().y);
 			ImGui::Text("Player Move State: %s", moveStateToString(player_.moveState_).c_str());
-			ImGui::Text("Player Animation Frame Indices: (%d, %d)", player_.currentFrame.x, player_.currentFrame.y);
+			ImGui::Text("Player Animation Frame Indices: (%d, %d)", player_.currentFrame_.x, player_.currentFrame_.y);
 			ImGui::Text("Player UV: Min(%.2f, %.2f) Max(%.2f, %.2f)", player_.uvMin.x, player_.uvMin.y, player_.uvMax.x, player_.uvMax.y);
 			ImGui::Text("Player Facing Direction: %s", facingDirectionToString(player_.getFacingDirection()).c_str());
 			ImGui::Text("Player Grounded: %s", player_.isGrounded() ? "Yes" : "No");
