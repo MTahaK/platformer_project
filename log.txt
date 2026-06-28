@@ -1,0 +1,1127 @@
+commit cb950171ef722462fa28f7d1fed32e3b7da788fa
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Nov 16 09:41:07 2025 -0500
+
+    Playing around with speeds and run cycle transitions
+
+commit e7126c238552eed25a29bf1d6e36296dbc04e3af
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Nov 16 09:19:52 2025 -0500
+
+    Added vertical offset to player renderer method (when grounded; player is offset one pixel down for sprite alignment)
+
+commit e267ffd540d714dd8bcb656bdd47ab0bbd57cd69
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Nov 16 09:02:55 2025 -0500
+
+    Removed zone identifier
+
+commit 20d65ef0f3e75044d99b8634352acd4ce8f8a636
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Nov 16 09:02:36 2025 -0500
+
+    Successfully rendered player sprite animations using the new spritesheet workflow and metadata!
+
+commit a4cb3f3804b22fe77897b005c97aa08059feff0d
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Nov 14 15:26:46 2025 -0500
+
+    Fixed inconsistency in where player is placed upon respawn/load-in relative to tile index: player was placed at tile reference location rather than tile world location (centre of tile)
+
+commit ce0c1b96248b936125b346140001e2cf85ea9173
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Nov 10 17:04:13 2025 -0500
+
+    Reduced turnaround accel in air - closer to typical sonic control
+
+commit f2631aa96f882bfeaf1cfcb4283a04cbe22ba320
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Nov 10 16:29:32 2025 -0500
+
+    Changed sensor collision requirement for goal tiles - only one sensor needs to be on a goal tile for win
+
+commit 382dc793f05dc1890c84ea6253c6ed959de8f58e
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Nov 8 23:58:47 2025 -0500
+
+    Fixed background rendering. Forgot to actually set the bg tex in the levelManager 💀
+
+commit c65a6c87a68bbb2c71a529ac0f1d4b14b74a9816
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Nov 8 23:56:05 2025 -0500
+
+    Moved background render logic into new function, currently not working
+
+commit 4889adb267a2f40c8f06ff7fecd4c9841ee55601
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Nov 7 08:53:00 2025 -0500
+
+    Added rescale for collision hitbox (ie: it is possible now to apply a scaling factor to sensors
+
+commit 3a170de55f6e97c046f7d1b6f1a3fcc297e937e1
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Nov 7 08:35:51 2025 -0500
+
+    Reverted player scale changes, playing around with camera zoom
+
+commit 1915330a2351e430d16e16c705e9dfa903d060de
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Nov 3 21:01:51 2025 -0500
+
+    Added fullscreen toggle, background changes
+
+commit f6c454b9af5b7dca84a2419794ff74d40a268f78
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Nov 2 22:16:18 2025 -0500
+
+    Selected BG texture from atlas, played around with tilemap scale and zoom level
+
+commit b81623c8ef662198af4dd8d5ca6ea71ca35c5c09
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Nov 2 16:36:46 2025 -0500
+
+    Playing around with bg texture
+
+commit f6faf2b1ba7ac4e4d5ff806523811beb3b6d6ea5
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Oct 10 15:46:45 2025 -0400
+
+    Successfully rendered level textures
+
+commit 29797bb1909104d66f1131d2c1f6f8b74b67f993
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Oct 10 15:09:19 2025 -0400
+
+    Added texture slot to Texture object, previously rendering functions used hard-coded slot uniform uploads & binds
+
+commit b1f74530b56e4a05adbb8c80d67a8fd6e3ddd254
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Oct 10 11:59:48 2025 -0400
+
+    Added level texture to repo
+
+commit 8ada9e05b3504de92145009e169168230fd9c51a
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Oct 10 11:38:53 2025 -0400
+
+    Replaced anim references to use new anim struct
+
+commit 2948d952f89b3a39623c5986838f1066d9241d57
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Oct 10 11:34:22 2025 -0400
+
+    Made structure for sprite animations
+
+commit 30ea43dcfa9dfe820cd3444c0b66fd50e83952b8
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Oct 6 14:45:54 2025 -0400
+
+    Reverted to old sprite sheet
+
+commit d4336546a68debd06adc0b1a2ebd3418ab3b389a
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Oct 5 12:35:38 2025 -0400
+
+    Added cropped full sprite sheet (for later edits)
+
+commit 0adeb8d73106fbc3bbbbd4bc1c198ffb64625cc4
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Oct 4 22:54:19 2025 -0400
+
+    Attempting to improve player sprite sheet
+
+commit cc6e1994ec5b28075ff41d0fbb11c0a46b896ccb
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Oct 3 21:15:59 2025 -0400
+
+    Cleaned up unused values from PlayerObject class definition that were meant to be used in animation
+
+commit 8c156ad99571766f0c9c0fd89363b6694e77f522
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Oct 3 00:18:47 2025 -0400
+
+    Fixed wall-pressing animation flicker. Velocity jitter remains, but is imperceptible.
+
+commit feac11686b3e08a4e5be5a97da25b51222a979b4
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Oct 2 18:13:12 2025 -0400
+
+    Animation fixes, physics constant tweaks, animation speed tweaks
+
+commit 393f95b994d735fee5bfc6d976cd3db643b0bf69
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Oct 2 15:57:32 2025 -0400
+
+    Successfully rendered an animated player sprite! Featuring weird bugs though lol
+
+commit e029c7fb8f38b9782422fc13b25de8449595b3fe
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Oct 2 12:40:22 2025 -0400
+
+    Added nuance to direction update - tied to input when midair, tied to velocity when grounded.
+
+commit 924444908432e1e723b881394fdd8de66957a0f9
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Oct 2 12:26:38 2025 -0400
+
+    Facing direction switch in player input handler was somehow deleted, re-added.
+
+commit 4a46d2882b355f484cbe746cb3f6af54029b9bc1
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Oct 2 08:19:18 2025 -0400
+
+    Fixed physics bug that resulted in jittering due to velocity overshooting into opposite direction upon deceleration. Changed directional flipping to be tied to player input
+
+commit ba232a1c3fc36fb92d8fe32449b296ae71085c26
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Oct 2 02:09:27 2025 -0400
+
+    Progress on sprite animation support, FIXED PHYSICS BUG THAT CAUSED JUMPING 'STICKINESS'
+
+commit 1ca7d13cb8cabd11b7d4dd478e0a6302125a46d7
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Oct 1 20:37:52 2025 -0400
+
+    Temporarily disabled death wall movement
+
+commit 7ecdf93133a4d425d0821736d0a6a7232d9d628e
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Oct 1 20:26:18 2025 -0400
+
+    Moved FacingDirection and texture pointer from PlayerObject to GameObject
+
+commit 0617762ca3057c008bdf2eb41905a2ce7e655c66
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Oct 1 19:50:07 2025 -0400
+
+    Added sprite sheet
+
+commit b6e28869623ba78b4419da4a1d5977df340abc21
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Sep 29 19:46:51 2025 -0400
+
+    Updated drawLine to get rid of redundant VAO saving
+
+commit b44060e216f9c049c92f718f76b10f0480d31e9f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Sep 29 19:31:33 2025 -0400
+
+    Fixed debug line colour, which was sampling from texture after shader updates.
+
+commit 7447170b80681ef4206da75e6311c89b4ff1640a
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Sep 29 18:55:33 2025 -0400
+
+    Added drawTexturedQuad function to Renderer2D, textures now working
+
+commit 7b9eabefc1014bf26ecfefe69d10f22e4173ba14
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Sep 29 18:34:02 2025 -0400
+
+    Trying to get texture to work. Attrib pointer modified to include texcoords, but texture not rendering.
+
+commit c0562629da60e0dd6b2f54306e17d23e0c020d0b
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Sep 24 08:04:19 2025 -0400
+
+    Added direction flipping logic to Player
+
+commit 50ba67c645b129ad32c9855bad69611ee03a83bd
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Sep 24 00:03:29 2025 -0400
+
+    Implemented Texture class
+
+commit a5e96a5564cc571c3dc044ccd910370878be82d8
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Sep 23 17:32:30 2025 -0400
+
+    Updated Makefile to exclude non-project files on regular build operations, and added vendor (stbi) build rule
+
+commit 60e376a63ce15b3b10df12ca38d577108eae2791
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Sep 21 19:48:21 2025 -0400
+
+    Added stb_image.h
+
+commit c2dfd66015da80ac2cf748f3e937c915f2d037c4
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Sep 19 00:03:41 2025 -0400
+
+    Cleared out old win state manager
+
+commit 7b1cbc07258bd1f71d6bb03d44272782517ba3bd
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Sep 16 16:37:25 2025 -0400
+
+    Added explicit file path string conversion for Windows VS compatibility
+
+commit 99ec7aae818db29291db10f0681f39ea02a9d6a6
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Sep 16 16:27:51 2025 -0400
+
+    Added 3D Shader performance optimizations
+
+commit 4f646e73e3fd1ef15aae560269faa4bfe2ca0d56
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Sep 11 21:11:42 2025 -0400
+
+    Added 'Restart Level' option to pause menu, added countdown timers whenever level is restarted
+
+commit d7475830b6efbbb049e63ed274be8554f93dc913
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Sep 11 20:30:58 2025 -0400
+
+    Added countdown at level start after level selection
+
+commit 1df41c3b1541e8501d363f264ef6141d5ef6bc0d
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Sep 9 21:43:57 2025 -0400
+
+    Changed win state - instead of the game counting down before restarting the level once the win condition has been met, a menu opens upallowing the player to restart, go to menu, or quit.
+
+commit 778a8e3a046f5cdd299fc07afd152ade886a26bb
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Aug 28 21:20:46 2025 -0400
+
+    Refined level selection
+
+commit 6c3fc2dead104bd7b405cbbabfcd0529d96b4d76
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Aug 28 21:07:04 2025 -0400
+
+    Implemented level select UI, needs polishing
+
+commit 7920e4961f20bc38e1b0cd2319380429db05afb6
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 26 23:18:41 2025 -0400
+
+    Progress on level select UI
+
+commit dda80a5fc2c5d9c63c1a89edef368d2a7598084f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Aug 24 20:06:48 2025 -0400
+
+    Implemented LevelManager functions
+
+commit 07a51ad327d3d5ed36d96086cc0f5a20ba34a86c
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Aug 23 23:38:43 2025 -0400
+
+    Added modal-style pop-up on level select press. Fixed issues from before by getting rid of main window focus (instantly closes popup)
+
+commit fad09eceed1ac0f23ec1c188ba913a0013ac9c32
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Aug 22 22:06:28 2025 -0400
+
+    Trying to create level UI, not working
+
+commit 6355cacd6064bce03fd10791ec29bd943b95b858
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Aug 21 03:42:46 2025 -0400
+
+    Changed light position slider max and min
+
+commit a04d377be4b4d95fc629f7dd3ba99feb45b2211f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Aug 21 03:37:02 2025 -0400
+
+    Optimized draw calls by creating dedicated VBOs and EBOs for each geometry type in 3D renderer.
+
+commit a9b9077f47c95fa8072e20ed7f584293af5c0b15
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Aug 21 02:23:53 2025 -0400
+
+    Fixed initial cameraPhi for 3D renderer
+
+commit 6c2fe9459d702c963e75452861cac6852d9df383
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Aug 20 23:17:16 2025 -0400
+
+    Fixed sphere geometry (winding was incorrect)
+
+commit d62da4b9561dad486bb3a79cee7e37d747a3b151
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Aug 20 22:35:00 2025 -0400
+
+    Fixes, camera control, lighting control
+
+commit 9ad6c128646d55a56cb336551879653c78bcf34e
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Aug 20 18:29:54 2025 -0400
+
+    Added more sophisticated lighting mode cycling by using separate shaders, accurately demonstrating performance impact of each lighting mode
+
+commit 2a205636375f56e9ac8e0ab9381f3a6edfd31e0c
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Aug 20 17:39:28 2025 -0400
+
+    Added lighting component toggles
+
+commit 1486eb2e91c524ce4015cef771036858fdda51f1
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Aug 20 10:39:20 2025 -0400
+
+    Added UI to 3D Demo, sliders to change lighting parameters
+
+commit 1f1b2fecd7fd6c96f8885b91a7bc6e9a9b32d41d
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Aug 20 04:49:52 2025 -0400
+
+    Fixed pyramid geometry, Blinn-Phong shading implemented
+
+commit e0ed7784d3c0577654c8058a4bcdd946a3a9e4dd
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Aug 20 04:40:51 2025 -0400
+
+    Fixed Blinn Phong lighting issues in cube rendering. Issues before were entirely due to geometry setup not including enough faces (only defined front and back for cube and relied on shared vertices for remaining sides), normals were not correct as a result.
+
+commit 6b2b4408b727f6cbf61f8ff9e1daebb39879b666
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Aug 20 03:11:14 2025 -0400
+
+    Attempted to add Blinn-Phong shaders, visual bugs present. Added methods to allow for shader swapping, reloading
+
+commit fe9721f1a4b18bb71eeb05b5c88eb1a92d535a9b
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 19 13:39:36 2025 -0400
+
+    Added shader switching utility to 3D renderer
+
+commit 9ed0e75263763f686a9d4ac5bd0b39752790abdb
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 19 13:21:36 2025 -0400
+
+    Added cube and pyramid draw
+
+commit 345be5cc230ba5d88c883f9cf52c0ba4375a614f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 19 13:09:08 2025 -0400
+
+    Added plane draw and utility to switch what shape is being drawn
+
+commit 4ef2c2fee1beb0c465c733ec5ec2c2158872859f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 19 01:25:24 2025 -0400
+
+    Zippy 3000
+
+commit 352350861416e21dbd2e62f314483b84a3cc744c
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 19 00:13:16 2025 -0400
+
+    Rotating triangle 3D demo is now working (with back-face culling)
+
+commit 1d34dae00a28f832183401a313c7b14a8fe42404
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Aug 18 23:39:23 2025 -0400
+
+    Created menu integration to swap into 3D Demo
+
+commit f012dbe1f31b266b78be326a2b3f8181e39d0764
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Aug 18 22:43:13 2025 -0400
+
+    Implemented 3D triangle draw function and vertex and fragment shaders for 3D.
+
+commit 33662b8cd8b7dec2f0924df12191e5465310ebf2
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Aug 18 17:48:10 2025 -0400
+
+    Started building (debug, sandboxed) 3D renderer
+
+commit 3215b21b538979d82e9e562100f0a9979ae210ea
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Aug 14 22:01:06 2025 -0400
+
+    Added UI Demo mode
+
+commit 3a0ca2e53fda9382710e40a7fe97c6354d6f6cd0
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Aug 13 15:17:54 2025 -0400
+
+    Added shader optimization: uniform locations are now cached, preventing constant lookup every frame
+
+commit f6ff6f263d26ed13cd8d3cd56419fb5ca3082681
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 12 17:49:06 2025 -0400
+
+    Added constraints that enforce that a tilemap must contain certain elements (player start, death wall start and end)
+
+commit 46ff3e549d03b0bbf9e70b60fffa4b1ed948c3f0
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 12 17:43:51 2025 -0400
+
+    Added death wall start and end position tile types. Required for per-level death wall definition.
+
+commit 4d538f38b44a7e6746e2dd1416549df6d75ce704
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 12 17:15:08 2025 -0400
+
+    Fixed input update placements. Input is now updated once per frame
+
+commit e743996ab8cdb6e72c5f85545b70f49cac1ffedc
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 12 16:55:47 2025 -0400
+
+    Started building more sophisticated level loading system
+
+commit 367721d83de2f46e3260687e541a635e32da4d3c
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Aug 9 18:48:55 2025 -0400
+
+    Added UI elements to PAUSE menu
+
+commit 0151ed69271026c6317d45caedfc9f8604d328bd
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Aug 9 07:04:30 2025 -0400
+
+    Added initial functional menu UI
+
+commit f0a25550a963a625f181085eeb7d21511ec71513
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Aug 8 22:51:28 2025 -0400
+
+    Fixed some styling
+
+commit 2700eedad385fc28a6312776377ea091ee114dc0
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Aug 8 01:47:27 2025 -0400
+
+    Successfully opened up ImGui demo window
+
+commit 077a1946265d4375fe59a5c6a5f58744fafc1de3
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Aug 8 01:34:32 2025 -0400
+
+    Changed ordering of includes. For some reason, this is important for OpenGL loader functionality???
+
+commit 72f80827d3bde015d0d1de7eb69e68407ad374dd
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 5 01:46:55 2025 -0400
+
+    Removed temporary readme
+
+commit c79a4956af9e1b817f68e194f5eabff3cc0949c2
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 5 01:46:30 2025 -0400
+
+    Applied autoformatting according to preferences throughout project
+
+commit 7527175f84659b8ab0dd32e0f7b781f7fb483299
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 5 00:47:57 2025 -0400
+
+    Updated gitignore
+
+commit 2e9f454382ade81c42c936e17781a4512b408174
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Aug 5 00:43:07 2025 -0400
+
+    Removed macOS build workflows - not a priority right now, was just needed to produce a single mac build for testing
+
+commit 642dd7ae8c0f2182ffe51493ab425c1c9d4db0a1
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Aug 4 20:43:09 2025 -0400
+
+    Updated README to trim out unnecessary info
+
+commit d64b7d6b12b9394f3e13ba88a21b45729ad85bff
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Aug 3 17:26:48 2025 -0400
+
+    Updated README
+
+commit 986a4697e209175cf7047209beae469e4124cb5f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Aug 2 08:12:48 2025 -0400
+
+    Updated README
+
+commit 463496d162e97c911f082cdec9e4f9b46656fdca
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Aug 2 02:04:38 2025 -0400
+
+    Added Dear ImGui to project
+
+commit b2252ae4a2d6c8bd4ddd61332bc96b9eb1aae536
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Aug 1 16:25:05 2025 -0400
+
+    Fixed some styling
+
+commit a0222d1cccf8c5fdb7b955f74c2e38096e6c9250
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 31 19:58:19 2025 -0400
+
+    Added basic control scheme document
+
+commit c3122a6b74c59d6b9238366795b2e4eb689424e0
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 31 19:49:14 2025 -0400
+
+    DeathWall implemented, player can now die to the death wall, and they enter the DEAD state.
+
+commit 998bffe884b80fe4ea072f6cdd2296a066b60930
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 31 19:09:41 2025 -0400
+
+    Implemented DEAD state, need to still integrate into main game flow
+
+commit bc127639786402d8950ac7668e7b00f65558a0a4
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 31 19:08:38 2025 -0400
+
+    Specified that PLAY state player update function is for PLAY state alone
+
+commit 7ca282d9d4b80d88055420d5d314eb0ec1ddd590
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 31 19:04:24 2025 -0400
+
+    Moved PLAY state player updates into single function
+
+commit 49626b898b15496ca9d73304663a5bf59446b73d
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 31 11:23:12 2025 -0400
+
+    Added new level that incorporates better level design philosophy for final game
+
+commit 3755c260b82738af96c4ffc13d9115c7c168448b
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 31 09:09:07 2025 -0400
+
+    Player-DeathWall collision implemented, currently just outputs a message to the terminal in debug mode
+
+commit 29b584298a510e0c796dacbb97f28d5ae02dc66a
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 31 07:46:14 2025 -0400
+
+    DeathWall movement and visuals implemented
+
+commit aedc90961e42b1e144a429953c97b84854fca87a
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jul 27 21:54:30 2025 -0400
+
+    DeathWall visuals working
+
+commit f49b1c0042a094ac087d0d225485793c1630a15f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jul 27 21:11:57 2025 -0400
+
+    Fixed mac buildflow
+
+commit 9d0f0ee69bd4187591fea26a2848e692675d9f89
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jul 27 21:10:00 2025 -0400
+
+    Converted spaces to tabs across project :sob:
+
+commit 1af4522c95353ba14c11c65d3781bc1c3ef2c7ef
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jul 27 21:09:32 2025 -0400
+
+    Converted spaces to tabs across project :sob:
+
+commit 0f0a8940c1869206adc9b08b3f26be3b59029ec2
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jul 27 21:02:34 2025 -0400
+
+    Committing before reformatting entire project to use tabs instead of spaces (I feel disgusted that it has come to this
+
+commit 68aa66da7b9353bf0004111ea789bff1b9ee2d7e
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jul 26 00:16:31 2025 -0400
+
+    Simplified DeathWall behaviour movement update - direction is pre-computed, then applied every update
+
+commit f3e2e485a34064f7a35bff210173bb9a9a5710ba
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jul 25 22:13:12 2025 -0400
+
+    Positional changes within Behaviors modified to directly interact with associated GameObject position
+
+commit e5572e12ac8f067f7c9cb589f82a506ecd0bdea5
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jul 25 17:38:17 2025 -0400
+
+    Removed Action system - unused, and incompatible with current methods
+
+commit a3b9198e54fc5f58780bbdb390283cec432fbb85
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jul 25 16:39:07 2025 -0400
+
+    Ready to test basic behavior
+
+commit ac73a34d579c191cbfe4cb1749b8c08d7a8e4ebb
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 24 23:50:58 2025 -0400
+
+    Started writing behaviour system
+
+commit dc61d9e71b158d0d4afc02f65c7b8c94215b23a5
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jul 21 21:17:20 2025 -0400
+
+    Implemented WIN state, moved countdown and player reset logic into WIN state.
+
+commit 540840a43b47ea5169dcea6b789a0376b430494b
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jul 21 21:00:36 2025 -0400
+
+    Added PAUSE state and functionality, and reworked some aspects of PLAY state input handling. playerInput() now returns an InputResult enum for better clarity
+
+commit 18317c9af3b8ff8c2e81bec3f5334b20af1819e4
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jul 20 18:41:33 2025 -0400
+
+    Restructured helpers into implementation file (still temp), added functionality for EXIT state, moved old main loop logic in to PLAY state. State transition function now in use.
+
+commit 533d952d2d6320d84f5758e61caf178b85b198c4
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Jul 16 17:56:25 2025 -0400
+
+    Roughed-out basic menu logic with placeholder 'menu' visuals. Only the MENU state logic is implemented (and quite messily) - transitioning out of it puts the game into PLAY state and moves into the old game logic.
+
+commit 0f658bbd766b2157b17a4581f44f2f65d2021c89
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Jul 16 17:04:04 2025 -0400
+
+    Started work on GameManager class
+
+commit ee3030e50f6f3edd7b73ba6410cc9b1eadde1f5f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Jul 15 01:19:16 2025 -0400
+
+    Added notes on future player action system
+
+commit 858ed9941ddcb725bfeb64f08f2bc2efbe96b8aa
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jul 13 22:22:00 2025 -0400
+
+    Fixed inconsistencies in naming style
+
+commit 2be27f64ad2918fda9ebbe4f88bd2c3c237cff6a
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jul 11 21:22:58 2025 -0400
+
+    Changed behaviour when player reaches goal - player no longer needs to remain in goal zone for win to register.
+
+commit 5154c547841ca5edbf912a1e23c8a1c03478b750
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jul 11 20:45:50 2025 -0400
+
+    Minor clean-up, locked-in 4 sensor approach after testing 6 sensors
+
+commit 70fe51bcbd5e509a068764d57a46d61b4c02ca95
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Jul 9 23:29:57 2025 -0400
+
+    Cleaned up a few comments
+
+commit de065cdaa79d4124da4434e3ba3abec02666b113
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jul 7 19:32:02 2025 -0400
+
+    Added goal logic - player is reset to starting position after a 5 second delay after making full sensor contact with a goal zone
+
+commit ec94e47ac5aa9f87d283a4b6fa44158a4c6331e0
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jul 6 11:42:47 2025 -0400
+
+    Added fix for lGL framework for macOS
+
+commit 5730df5eb3cbb245ccd0a40b95ba4bc5de55fa67
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jul 6 11:40:00 2025 -0400
+
+    Updated makefile to (hopefully) be able to find GLFW on macOS
+
+commit 6031ee3936e1301174c9ef2877eb11160de7ec7d
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jul 6 11:37:39 2025 -0400
+
+    Added macOS GitHub Actions workflow
+
+commit fa8f2be97645f269054602ab82cf7e558ce58f8c
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jul 5 23:06:12 2025 -0400
+
+    Added level completion/goal support to tilemap (currently only visual)
+
+commit a034ec1708d55fbb86e4b51ba89a2cf97b89f6e7
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jul 4 23:50:55 2025 -0400
+
+    Changed debug mode call
+
+commit 345583de60a5c9629336c3e4d50cea48e15c133f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 3 23:08:00 2025 -0400
+
+    Added auxiliary colour functions
+
+commit 6471e5ea953da5f4c68bdad0b06368d6b9be26b8
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jul 3 01:19:06 2025 -0400
+
+    Added turnaround acceleration
+
+commit dda41ec7d1b67e9ef7310ea364127df8de5854fe
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Jul 2 20:40:21 2025 -0400
+
+    Cleaned up a bit of input function code, got rid of unnecessary sensor updates
+
+commit cd9b61bb8a036b96791b02b425446a7bc0a10e00
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Jul 2 19:57:34 2025 -0400
+
+    Uncommented initial sensor position setup (shouldn't have been commented lol)
+
+commit bac839fe8a0967a56f8e5efbec84069c21110a7a
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Jul 2 19:53:51 2025 -0400
+
+    Fixed four sensor collision system (so far, at least). No more sticking or tunneling
+
+commit 67136d2b705b3561a8a21f33ab2f7b12086ad558
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Jul 2 15:28:39 2025 -0400
+
+    Fixed bottom collision (mostly) - implementing exact tile snapping offset - will implement for top too
+
+commit b03e4b92e0ce3f02831b32fc3d1b490339408652
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Jul 2 05:27:10 2025 -0400
+
+    Tried reverting back to 4-sensor system, ENABLING DEBUG allows player to slowly phase through objects (NOT PRESENT IN OLD SYSTEM)????
+
+commit 3af69283a005071b6c84142245ccb0ba6a923b0d
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Jul 1 16:23:40 2025 -0400
+
+    Added additional sensors, disabled collision for additional sensor rewrite
+
+commit bc8617b274185be4ecfeca9b77640da7fed7ec2d
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Jul 1 15:34:40 2025 -0400
+
+    Modified makefile to automatically include dependencies
+
+commit dc725591ead4f7d865bc58e58adbed3635f77547
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Jul 1 01:57:06 2025 -0400
+
+    Temp-ish fix for grounding resolution and sticking. Revisit.
+
+commit 5af209cc5c034af5ca9632ad009ae49394d584ad
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jun 30 23:32:33 2025 -0400
+
+    Cleaned up main a bit, tweaked some collision parameters.
+
+commit d6a99ab7ba853f1d31e870d34bdb2472da45a0a4
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jun 30 22:41:57 2025 -0400
+
+    Successfully implemented collisions. End-of-month deadline met!
+
+commit d4066cf52923aad2e4166db9827a3a4665778c8f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jun 30 22:18:02 2025 -0400
+
+    Tile rendering modified - tiles are rendered centred in local space. Prior to this, their bottom left corners were centred. As a result, collision detection is aligned correctly.
+
+commit 837c8cdb176308d581fb095eb39eef6cdfef93e2
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jun 30 20:39:39 2025 -0400
+
+    Camera now follows player.
+
+commit daf28286ee89759a4416dc96c33e8040df383567
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jun 30 06:44:21 2025 -0400
+
+    Added player sensor drawing in debug mode
+
+commit 3088d4313506982ff9588dc9c2d8b28c35668c41
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jun 30 05:59:07 2025 -0400
+
+    Added global debug control
+
+commit ac58e1e2aa9bc09982bb48cce2d8884accd0948c
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jun 30 01:01:12 2025 -0400
+
+    Tilemap generation working, tilemap+player rendering working.
+
+commit e45e84c36b2a14ca57023e0d490206c419f26ead
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jun 29 22:09:07 2025 -0400
+
+    Added function for placing player object in tilemap, tilemap generation can now accept initial player position
+
+commit eca77244dd0ce5ec03910553f62d409ce4de7b63
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 28 18:43:30 2025 -0400
+
+    TileMap generation ready to test
+
+commit 7fd5d4e88d10518f20eaf3cc17cf54fedc31df52
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 28 18:18:38 2025 -0400
+
+    Wrote TileMap member implementation
+
+commit f64496014a5c8c2a8c3e8f19e0c23008337b84b1
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 28 18:08:26 2025 -0400
+
+    Wrote TileMap class
+
+commit 139652378b549cda4b0a7b12b155ad683de14bd6
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jun 27 23:29:36 2025 -0400
+
+    Created PlayerObject derived from GameObject
+
+commit 50b73b135ec6509a1c3a99ae03b4a5a877938367
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jun 26 22:54:14 2025 -0400
+
+    Physics class restructuring
+
+commit a30433f659630143b801619db8c512faa2498668
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jun 26 20:09:12 2025 -0400
+
+    Implemented player gravity, completing basic movement step
+
+commit 6a181539b8533e5d0faed5605c59eb79cea2b2e5
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jun 26 19:14:30 2025 -0400
+
+    Made slowdown acceleration for player change based on grounded state
+
+commit b2ef583334bc20cc793b1caeb14d6f2e0a5d4f20
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Jun 25 22:47:16 2025 -0400
+
+    Started Physics subsystem, started implementing acceleration-based movement
+
+commit dbba8354d52744d950ed56fbf5cdeede1c103bef
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Jun 24 23:20:41 2025 -0400
+
+    Decoupled player movement from action system entirely
+
+commit ad5cca1cb8e97c0f40cae1639cbb41296208b5fc
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Jun 24 23:19:48 2025 -0400
+
+    Cleaned up main.
+
+commit 299d5321df93df4e1fdb9b1223fb2873fcc086ea
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Jun 24 20:02:13 2025 -0400
+
+    Cleaning up main, moving most functionality into helper functions. Clean-up before properly figuring out physics and collision system.
+
+commit 3b0e228551535fb9bf33da821f4041f2bb6e6810
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jun 23 19:10:08 2025 -0400
+
+    Trying to work out bugs in physics, action queue, and collision system. Might not be worth continuing with my current methods.
+
+commit d7565658e5fa66a07ba579b7513f5340814ee19f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jun 22 19:34:55 2025 -0400
+
+    lol everything is falling down
+
+commit 945e02b4fc252255c46f74c1d7d4e152dddae520
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jun 22 19:11:45 2025 -0400
+
+    Fixed existing grounding checks and sets, and added falling grounding unset
+
+commit 3deadff16dd5ccfdad9fe19606c11913fe16c33e
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jun 22 18:59:28 2025 -0400
+
+    Grounding test and setting implemented into action queue validation
+
+commit b792c68653cfe424ab8e4f09704dc821babe753d
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jun 22 18:39:26 2025 -0400
+
+    Added ground for (later) gravity testing
+
+commit 58dbd8d08a79966bb2c97d5079e0e560e8ac19ba
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 21 22:16:57 2025 -0400
+
+    Implemented action *skipping* when collision is detected. Note, this is NOT action rejection
+
+commit 5745484fba637122bb9bec3351727a6a6393414f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 21 21:56:19 2025 -0400
+
+    Moved AABB recomputation to setters in GameObject
+
+commit 7ac1c5372a3a525a33b7712c07727ec65b247e97
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 21 20:26:29 2025 -0400
+
+    Reset player speed after shift release
+
+commit 4666b0a12c83e9bec8a9e90d8a6e0c521404c0cc
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 21 20:05:50 2025 -0400
+
+    Collision working, changed movement details in main (for test)
+
+commit fa2203041b5c14c6f6cfc6de6863617b22dc7e66
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 21 19:05:57 2025 -0400
+
+    Added AABB to GameObject
+
+commit 7817d4c042b5f73a76e459167832437d1b35aed5
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jun 20 21:36:36 2025 -0400
+
+    Action system created, working
+
+commit 2907f0d2a939209d1c89f444a0931d7625af823e
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jun 20 21:25:29 2025 -0400
+
+    Added action.hpp
+
+commit 100da72af0f949baa7bdfea0cf403cc4645e22bd
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jun 19 23:39:51 2025 -0400
+
+    Made tracked_keys a private member. Why did I make it public???
+
+commit 09920acb5d7b7ffaf39b9fb1c990d46d8ab4b776
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jun 19 23:38:47 2025 -0400
+
+    Tested input, working. Moved tracked_keys into Input class as a public member.
+
+commit 67119b8db40b622e4723a449e897543fa00a2917
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jun 19 23:29:38 2025 -0400
+
+    Added basic movement tests to main
+
+commit 8eb6bf8bdf2cb3d43c13f3fe79467d14bdaddf01
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jun 19 18:03:05 2025 -0400
+
+    Minor restructuring, defined static members for Input class
+
+commit 7e78a1848d3a34ea2272ff4880f0d0b3e81ac2a0
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jun 19 01:50:10 2025 -0400
+
+    Wrote input class, added notes on key map track list for remapping in the future
+
+commit 9985feb499586ac7343806d73ca6b7f52d6e36a6
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Jun 17 23:34:51 2025 -0400
+
+    Basic input header
+
+commit 791cceb392aaa20b02c53cfe314a00dd993aae2d
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jun 16 02:53:59 2025 -0400
+
+    Decoupled game object creation from draw loop. Result: window resize culls world viewport - design choice? Resembles Terraria
+
+commit 081f87f3e6777a249614d1064968cfc842667607
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Mon Jun 16 02:13:41 2025 -0400
+
+    Tested GameObject class, working
+
+commit e0be3f061614ae9c6c6ee33dcac98835c7ac41a6
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sun Jun 15 23:38:15 2025 -0400
+
+    Wrote GameObject class
+
+commit db6bb2e6526119bb3028aa63160ecf39e0939b65
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 14 22:32:06 2025 -0400
+
+    Confirmed multi quad rendering to work. Tested window resizing on Windows - stalls are due to WSL.
+
+commit dc74cdcf0ee51a20e6097b9f8da9dce5cd425b95
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 14 21:42:06 2025 -0400
+
+    Full render pipeline is working for a static image. Working on window resize stall
+
+commit cf8b63893734c92e160c5f396e304c8b7de5898e
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Sat Jun 14 21:03:55 2025 -0400
+
+    Finished Renderer2D class, made some modifications to Shader class. Ready to test basic, single-quad render.
+
+commit 67537502a87ec1159c333e3d331f388499c31863
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jun 13 18:18:01 2025 -0400
+
+    Wrote Shader class
+
+commit 7a37742c551c436642c0201cf7a08e511e3ea06f
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jun 13 17:54:24 2025 -0400
+
+    Moved shader class and implementation into their own files
+
+commit 83a90c93d6b33ff8652b519a39dd47142a78b410
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Fri Jun 13 07:43:22 2025 -0400
+
+    Added headers for Shader and Renderer2D classes, implemented all but uniform setters for Shader
+
+commit 7fe2e2021c265c3d1ffdb84fcf31c0d0d6bed3ae
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jun 12 22:59:51 2025 -0400
+
+    Added some notes on renderer class concepts
+
+commit 3e9dc2cc2b259a29435a55609f7c019668be23e0
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Thu Jun 12 00:21:28 2025 -0400
+
+    Window class created
+
+commit 23ca0004cd99859f77b4288d5ed83f13687da90e
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Wed Jun 11 21:46:34 2025 -0400
+
+    Updated makefile to use wildcard for source files
+
+commit 41706c489b0e0bacb6bdd7f2af3284519b27ee6b
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Jun 10 23:31:06 2025 -0400
+
+    Tested makefile build setup, works.
+
+commit 10438248b4697acf93289cd2c219391362a4df74
+Author: MTahaK <taha.khokhar@mail.utoronto.ca>
+Date:   Tue Jun 10 23:27:01 2025 -0400
+
+    Initial project setup, glad, glm setup
+
+commit c594f51fa0477bcaa753362b20f7e64eacdb91f9
+Author: Taha Khokhar <81580343+MTahaK@users.noreply.github.com>
+Date:   Tue Jun 10 23:23:06 2025 -0400
+
+    Initial commit

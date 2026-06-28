@@ -7,3 +7,4 @@ project_dump.txt
 # Ignore workflows for now
 .github/workflows/
 chat.json
+CLAUDE.md

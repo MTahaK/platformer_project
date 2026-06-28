@@ -23,7 +23,7 @@ PlayerObject setupPlayerObject(Tilemap& tilemap, float horizSensorScale, float v
 	// Create the PlayerObject
 	PlayerObject player;
 	player.setPosition(playerWorldPos);
-	player.setScale(glm::vec2(1.0f, 1.0f)); // One tile wide/high
+	player.setScale(glm::vec2(TILE_SIZE)); // One tile wide/high
 	player.setRotation(0.0f);
 	player.setColor(glm::vec4(0.0, 0.149, 0.557, 1.0));
 	player.setName("Player Object");
@@ -159,10 +159,10 @@ void drawBackground(Window& window, Renderer2D& renderer, Shader& shader, const 
 	// Given the view translates by (-camera + centerOffset), placing the model at
 	// (camera + inverseOffset) keeps it visually centered.
 	glm::mat4 bgModel = glm::translate(glm::mat4(1.0f),
-									   glm::vec3(cameraCenter.x + 0.7f,
+									   glm::vec3(cameraCenter.x + 2.0f,
 											  cameraCenter.y + 0.7f,
 											  0.0f));
-	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraCenter.x + worldWidth / 2.0f - 0.7f,
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraCenter.x + worldWidth / 2.0f - 2.0f,
 												  -cameraCenter.y + worldHeight / 2.0f - 0.7f,
 												  0.0f));
 	bgModel = glm::scale(bgModel, glm::vec3(worldWidth, worldHeight, 1.0f));
@@ -198,7 +198,7 @@ void drawTilemapAndPlayer(Window& window, Renderer2D& renderer, Shader& shader, 
 		
 		if(player.isGrounded())	{
 
-			renderer.setPlayerUVRect(player.uvMin, player.uvMax, -1.0f/32.0f); // Slight downward offset when grounded
+			renderer.setPlayerUVRect(player.uvMin, player.uvMax, -1.0f/player.getCurrentAtlasAnim()->frames[player.getCurrentAtlasAnim()->currentFrameIdx].h); // Slight downward offset when grounded
 		}
 		else {
 			renderer.setPlayerUVRect(player.uvMin, player.uvMax, 0.0f); // No offset when midair

@@ -99,11 +99,11 @@ bool PlayerObject::tileGoalCollision(Tilemap& tilemap, const Sensor& sensor) {
 void PlayerObject::updateMoveState(){
 	auto speedX = abs(getVelocity().x);
 	if(speedX > 0.1f){
-		if(speedX < 8.0f){
+		if(speedX < 5.0f){
 			moveState_ = MoveState::WALK;
-		} else if(speedX < 14.0f){
+		} else if(speedX < 10.0f){
 			moveState_ = MoveState::FASTWALK;
-		}else if(speedX < 16.0f){
+		}else if(speedX < 14.0f){
 			moveState_ = MoveState::RUN1;
 		} else if(speedX < 28.0f){
 			moveState_ = MoveState::RUN2;
@@ -113,18 +113,6 @@ void PlayerObject::updateMoveState(){
 	}else{
 		moveState_ = MoveState::IDLE;
 	}
-}
-UVRect PlayerObject::gridCellUV(int col, int row, int cols, int rows) {
-	const float cw = 1.0f / cols;           // normalized cell width
-    const float ch = 1.0f / rows;           // normalized cell height
-
-    float u0 = col * cw;
-    float u1 = (col + 1) * cw;
-
-	float v0 = 1.0f - (row + 1) * ch;
-	float v1 = 1.0f - row * ch;
-
-    return {u0, v0, u1, v1};
 }
 
 UVRect PlayerObject::atlasFrameUV(const AtlasFrame& frame){
@@ -138,15 +126,6 @@ UVRect PlayerObject::atlasFrameUV(const AtlasFrame& frame){
 	return {u0, v0, u1, v1};
 }
 
-void PlayerObject::initAnimation(){
-	currentFrame_ = idleAnim.startIdx;
-	UVRect rect = gridCellUV(currentFrame_.x, currentFrame_.y, numFramesX, numFramesY);
-	uvMin = glm::vec2(rect.u0, rect.v0);
-	uvMax = glm::vec2(rect.u1, rect.v1);
-	if(getFacingDirection() == FacingDirection::RIGHT){
-        std::swap(uvMin.x, uvMax.x);
-    }
-}
 
 void PlayerObject::initAtlasAnimation(){
 	currentAtlasAnim_ = &spriteAtlas_.animations["idle"];
@@ -205,74 +184,6 @@ void PlayerObject::updateAtlasAnimation(float deltaTime, float frameDuration){
 	UVRect rect = atlasFrameUV(currentAtlasAnim_->frames[currentAtlasAnim_->currentFrameIdx]);
 	uvMin = glm::vec2(rect.u0, rect.v0);
 	uvMax = glm::vec2(rect.u1, rect.v1);
-
-	if(getFacingDirection() == FacingDirection::RIGHT){
-        std::swap(uvMin.x, uvMax.x);
-    }
-
-}
-void PlayerObject::updateAnimation(float deltaTime, float frameDuration){
-	frameTimer_ += deltaTime;
-	SpriteAnim anim;
-
-	switch(moveState_){
-		case MoveState::IDLE:
-			anim = idleAnim;
-			break;
-		case MoveState::WALK:
-			anim = walkAnim;
-			break;
-		case MoveState::RUN1:
-			anim = run1Anim;
-			break;
-		case MoveState::RUN2:
-			anim = run2Anim;
-			break;
-		case MoveState::JUMP:
-			// Jumping animation not implemented yet
-			break;
-		case MoveState::FALL:
-			// Falling animation not implemented yet
-			break;
-		default:
-			break; 
-	}
-
-	if(moveState_ != prevMoveState_){ 
-        prevMoveState_ = moveState_;
-        currentFrame_ = anim.startIdx;
-        frameTimer_ = 0.0f;
-    }
-
-	// Sprite 'array' is a 8x7 grid, 8 cols, 7 rows
-	// Bounds are defined in player object as numFramesX/Y
-	if(frameTimer_ >= frameDuration){
-		// Current frame has lingered for long enough, advance frame
-		frameTimer_ -= frameDuration;
-
-		if (currentFrame_ == anim.endIdx) {
-			// If we've reached the end frame, loop back to start
-			// DEBUG_ONLY(std::cout << "Looping animation back to start frame\n";);
-			currentFrame_ = anim.startIdx;
-		}
-		// If we've gone past the end of this row, wrap to next row
-        if(currentFrame_.x > numFramesX - 1){
-			currentFrame_.x = 0;
-            currentFrame_.y++;
-        }
-		
-		currentFrame_.x++;
-        // If we've gone past the last row, wrap back to start
-		// Based on the setup of the sprite sheet, this is actually unnecessary
-        // if(currentFrame.y > numFramesY - 1){
-        //     currentFrame = startFrame; // Reset to first frame
-        // }
-	}
-
-	UVRect rect = gridCellUV(currentFrame_.x, currentFrame_.y, numFramesX, numFramesY);
-	uvMin = glm::vec2(rect.u0, rect.v0);
-	uvMax = glm::vec2(rect.u1, rect.v1);
-
 
 	if(getFacingDirection() == FacingDirection::RIGHT){
         std::swap(uvMin.x, uvMax.x);

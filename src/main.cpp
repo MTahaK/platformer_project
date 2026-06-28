@@ -36,8 +36,8 @@ int main(void) {
 	wallTexture.bind(3);
 	bgTexture.bind(4);
 
-	std::string tilemapFile = "./assets/levels/test2.tmap";
-
+	// std::string tilemapFile = "./assets/levels/test2.tmap";
+	std::string tilemapFile = "./assets/levels/open_extra_large.tmap";
 	Tilemap tilemap = loadTilemapFromFile(tilemapFile, TILE_SIZE, &grassTexture, &wallTexture); // Load tilemap with TILE_SIZE
 
 	LevelManager levelManager("./assets/levels");
@@ -52,7 +52,6 @@ int main(void) {
 	player.setTexture(&sonicTexture);
 	player.loadSpriteAtlas("./assets/textures/player/sonicbasic.json");
 	player.initAtlasAnimation();
-	// player.initAnimation();
 
 
 	Input::initialize(window.getWindow());

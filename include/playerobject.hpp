@@ -10,12 +10,6 @@ struct Sensor {
 		glm::vec4 color;	// Only used for debug view
 };
 
-struct SpriteAnim {
-	std::string animName;
-	glm::ivec2 startIdx;
-	glm::ivec2 endIdx;
-	
-};
 struct AtlasFrame {
 	int x, y, w, h;  // Rectangle in atlas (pixels)
 };
@@ -32,8 +26,6 @@ struct SpriteAtlas {
 	int atlasWidth;  // Width of the atlas in pixels
 	int atlasHeight; // Height of the atlas in pixels
 	std::unordered_map<std::string, AtlasAnimation> animations;
-	int baseFrameWidth = 0;   // Reference frame width for scaling
-	int baseFrameHeight = 0;  // Reference frame height for scaling
 };
 
 
@@ -98,35 +90,21 @@ class PlayerObject : public GameObject {
 
 		void updateMoveState();
 
-		int numFramesX = 8;
-		int numFramesY = 7;
-
-		// starting and ending 'indices' as pairs for each animation in sprite sheet
-
-		SpriteAnim walkAnim = {"WALK", glm::ivec2(0,0), glm::ivec2(7,0)};
-		SpriteAnim run1Anim = {"RUN1", glm::ivec2(0,1), glm::ivec2(7,1)};
-		SpriteAnim run2Anim = {"RUN2", glm::ivec2(0,2), glm::ivec2(7,2)};
-		SpriteAnim idleAnim = {"IDLE", glm::ivec2(0,3), glm::ivec2(6,6)};
-
-		inline UVRect gridCellUV(int col, int row, int cols, int rows);
 		inline UVRect atlasFrameUV(const AtlasFrame& frame);
-		void initAnimation();
+		// void initAnimation();
 		void initAtlasAnimation();
 		
 		void updateAtlasAnimation(float deltaTime, float frameDuration);
-		void updateAnimation(float deltaTime, float frameDuration);
 
 		float frameTimer_ = 0.0f;
-		glm::ivec2 currentFrame_ = glm::ivec2(0, 0);
 
 		AtlasFrame currentAtlasFrame_ = {0,0,0,0};
 		AtlasAnimation* currentAtlasAnim_ = nullptr;
+		AtlasAnimation* getCurrentAtlasAnim() const { return currentAtlasAnim_; } 
 
 		// Sensor scaling factors assume default player scale of (1,1)
 		float horizSensorScale_ = 1.0f;
 		float vertSensorScale_ = 1.0f;
-
-		glm::vec2 baseScale_ = glm::vec2(1.0f, 1.0f); // Store the original scale for proportional sizing
 
 	private:
 		// PlayerObject adds four 'sensors' to detect collisions
